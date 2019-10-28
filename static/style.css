@@ -1,0 +1,51 @@
+
+.chatbox{
+    background: aliceblue;
+    height: 800px;
+    border: 2px solid black;
+}
+
+.row{
+    margin: 50px;
+}
+
+.task{
+    margin-left: 50px;
+}
+
+
+.message {
+  box-sizing: border-box;
+  width: auto;
+  max-width: 80%;
+  position: relative;
+  clear: both;
+
+  filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#95c2fd', endColorstr='#bee2ff');
+
+  border: solid 1px rgba(0,0,0,0.5);
+  -webkit-border-radius: 20px;
+  -moz-border-radius: 20px;
+  border-radius: 20px;
+
+  margin: 20px;
+  padding: 6px 20px;
+  color: #000;
+  text-shadow: 0 1px 1px rgba(255,255,255,0.8);
+  word-wrap: break-word;
+}
+
+.submission input{
+    width: 80%;
+}
+
+
+.msg-mine{
+    float: right;
+    background: greenyellow;
+}
+
+.msg-other{
+  background: #95c2fd;
+  float: left;
+}
