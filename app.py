@@ -9,7 +9,7 @@ import random
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
-socketio = flask_socketio.SocketIO(app)
+socketio = flask_socketio.SocketIO(app, cors_allowed_origins='*')
 ROOM_PATH = "data/rooms.tsv"
 
 CHAT_ROOMS_DATA = {'123dasdq34radc': "First Room",
@@ -69,6 +69,6 @@ def handle_my_custom_event(json, methods=('GET', 'POST')):
 
 
 if __name__ == '__main__':
-    socketio.run(host='https://localhost', port=8888, app=app)
+    socketio.run(host='localhost', port=8888, app=app)
     # Threaded option to enable multiple instances for multiple user access support
     # app.run(threaded=True, port=5000)
