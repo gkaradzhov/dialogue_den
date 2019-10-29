@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="/static/style.css"/>
+
+    <title>Dialogue Den</title>
+</head>
+<body>
+
+<h1>{{room_data.name}}</h1>
+<input id="chat_id" type="hidden" value="{{room_data.id}}"/>
+<input id="user_id" type="hidden" value="{{room_data.user_id}}"/>
+<input id="user_name" type="hidden" value="{{room_data.username}}"/>
+
+<div class="row">
+    <div class="col-4">
+        <div class="task">
+            Wason game
+        </div>
+    </div>
+    <div class="col-8">
+        <div class="chatbox">
+        </div>
+        <form class="sumbission" action="" method="POST">
+          <input type="text" id="message" placeholder="Messages"/>
+          <input class="btn btn-primary" type="submit"/>
+        </form>
+    </div>
+</div>
+</body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
+<script type="text/javascript">
+
+    var socket = io.connect('http://' + document.domain + ':' + location.port);
+    var room_id = $('input#chat_id').val();
+    var uname = $('input#user_name').val();
+    var user_id = $('input#user_id').val();
+
+    socket.on( 'connect', function() {
+    socket.emit('join', { 'room': room_id, 'username': uname});
+
+    var form = $('form').on('submit', function( e ) {
+      console.log('form submit called');
+      e.preventDefault()
+      let user_input = $('input#message').val()
+      socket.emit( 'response', {
+        user_id: user_id,
+        user_name: uname,
+        message: user_input,
+        room: room_id
+      } )
+      $( 'input#message' ).val('').focus()
+    } )
+    } )
+    socket.on( 'response', function( msg ) {
+    console.log(msg)
+    if( typeof msg.user_name !== 'undefined' ) {
+        local_name = msg.user_name
+        local_id = msg.user_id
+
+        if (local_id == user_id){
+            $( 'div.chatbox' ).append('<div class="message msg-mine"><b style="color: #000">' + local_name +': </b> '+ msg.message+'</div>' )
+        }else{
+            $( 'div.chatbox' ).append('<div class="message msg-other"><b style="color: #000">' + local_name +'</b> '+ msg.message+'</div>' )
+        }
+    }
+    })
+
+</script>
+</html>
+
