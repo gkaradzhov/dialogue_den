@@ -4,7 +4,7 @@ from flask_socketio import join_room, leave_room
 from flask_socketio import send, emit
 
 from message import Room
-from utils import read_rooms_to_file, write_rooms_to_file
+from utils import read_rooms_to_file, write_rooms_to_file, generate_user
 import random
 
 app = Flask(__name__)
@@ -17,10 +17,7 @@ CHAT_ROOMS_DATA = {'123dasdq34radc': "First Room",
                    "dasd3rfsdcfs3aczzzzz": 'Third Room'
                    }
 
-USERNAMES = [{'username': 'Pink', 'uid': 1234},
-             {'username': 'Blue', 'uid': 567},
-             {'username': 'Green', 'uid': 123123123123123123}
-             ]
+
 
 # A welcome message to test our server
 @app.route('/')
@@ -33,8 +30,8 @@ def index():
 def chatroom(room_id):
     existing_rooms = read_rooms_to_file(ROOM_PATH)
     name = [n.name for n in existing_rooms][0]
-    user = random.choice(USERNAMES)
-    print(user)
+    user = generate_user([])
+
     return render_template("room.html", room_data={'id': room_id, 'name': name, 'user_id': user['uid'],
                                                    'username': user['username']})
 

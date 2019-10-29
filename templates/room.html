@@ -20,6 +20,10 @@
 <input id="user_name" type="hidden" value="{{room_data.username}}"/>
 
 <div class="row">
+    <h4>Your username is: <b>{{room_data.username}}</b></h4>
+</div>
+
+<div class="row">
     <div class="col-4">
         <div class="task">
             Wason game
@@ -69,7 +73,7 @@
         if (local_id == user_id){
             $( 'div.chatbox' ).append('<div class="message msg-mine"><b style="color: #000">' + local_name +': </b> '+ msg.message+'</div>' )
         }else{
-            $( 'div.chatbox' ).append('<div class="message msg-other"><b style="color: #000">' + local_name +'</b> '+ msg.message+'</div>' )
+            $( 'div.chatbox' ).append('<div class="message msg-other"><b style="color: #000">' + local_name +': </b> '+ msg.message+'</div>' )
         }
     }
     })
