@@ -1,4 +1,6 @@
 Click==7.0
+dnspython==1.16.0
+eventlet==0.25.1
 Flask==1.1.1
 Flask-SocketIO==4.2.1
 Flask-Sockets==0.2.1
@@ -9,6 +11,7 @@ gunicorn==19.9.0
 itsdangerous==1.1.0
 Jinja2==2.10.3
 MarkupSafe==1.1.1
+monotonic==1.5
 python-engineio==3.10.0
 python-socketio==4.3.1
 six==1.12.0
