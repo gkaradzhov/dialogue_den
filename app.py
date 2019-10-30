@@ -2,6 +2,7 @@ import flask_socketio
 from flask import Flask, request, render_template, redirect
 from flask_socketio import join_room
 from flask_socketio import send
+from gunicorn.app.wsgiapp import WSGIApplication
 
 from message import Room
 from utils import read_rooms_to_file, write_rooms_to_file, generate_user
@@ -63,6 +64,20 @@ def handle_my_custom_event(json, methods=('GET', 'POST')):
 
 
 if __name__ == '__main__':
-    socketio.run(host='localhost', port=8888, app=app)
+    # socketio.run(host='localhost', port=8888, app=app)
     # Threaded option to enable multiple instances for multiple user access support
     # app.run(threaded=True, port=5000)
+
+    gunicorn = WSGIApplication()
+    gunicorn.load_wsgiapp = lambda: app
+    gunicorn.cfg.set('bind', '%s:%s' % ('localhost', 8888))
+    gunicorn.cfg.set('workers', 8)
+    gunicorn.cfg.set('threads', 8)
+    gunicorn.cfg.set('pidfile', None)
+    gunicorn.cfg.set('worker_class', 'sync')
+    gunicorn.cfg.set('keepalive', 10)
+    gunicorn.cfg.set('accesslog', '-')
+    gunicorn.cfg.set('errorlog', '-')
+    gunicorn.cfg.set('reload', True)
+    gunicorn.chdir()
+    gunicorn.run()
