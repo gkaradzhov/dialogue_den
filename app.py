@@ -1,22 +1,15 @@
-from flask import Flask, request, jsonify, render_template, redirect
 import flask_socketio
-from flask_socketio import join_room, leave_room
-from flask_socketio import send, emit
+from flask import Flask, request, render_template, redirect
+from flask_socketio import join_room
+from flask_socketio import send
 
 from message import Room
 from utils import read_rooms_to_file, write_rooms_to_file, generate_user
-import random
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
-socketio = flask_socketio.SocketIO(app, cors_allowed_origins='*')
+socketio = flask_socketio.SocketIO(app, cors_allowed_origins='*', async_mode='gevent')
 ROOM_PATH = "data/rooms.tsv"
-
-CHAT_ROOMS_DATA = {'123dasdq34radc': "First Room",
-                   'das3dasdasdas': "Second Room",
-                   "dasd3rfsdcfs3aczzzzz": 'Third Room'
-                   }
-
 
 
 # A welcome message to test our server
@@ -31,7 +24,7 @@ def chatroom(room_id):
     existing_rooms = read_rooms_to_file(ROOM_PATH)
     name = [n.name for n in existing_rooms][0]
     user = generate_user([])
-
+    
     return render_template("room.html", room_data={'id': room_id, 'name': name, 'user_id': user['uid'],
                                                    'username': user['username']})
 
@@ -47,7 +40,8 @@ def create_room():
         existing_rooms.append(room)
         write_rooms_to_file(existing_rooms, ROOM_PATH)
         return redirect('/')
-    
+
+
 @socketio.on('join')
 def on_join(data):
     username = data['username']

@@ -54,16 +54,21 @@
     socket.emit('join', { 'room': room_id, 'username': uname});
 
     var form = $('form').on('submit', function( e ) {
+      e.preventDefault();
+
       console.log('form submit called');
-      e.preventDefault()
-      let user_input = $('input#message').val()
-      socket.emit( 'response', {
-        user_id: user_id,
-        user_name: uname,
-        message: user_input,
-        room: room_id
-      } )
-      $( 'input#message' ).val('').focus()
+      let message = $('input#message').val();
+      if (message!=""){
+        socket.emit( 'response', {
+            user_id: user_id,
+            user_name: uname,
+            message: user_input,
+            room: room_id
+        } )
+       $('input#message').val('').focus()
+
+      }
+
     } )
     } )
     socket.on( 'response', function( msg ) {
@@ -71,7 +76,6 @@
     if( typeof msg.user_name !== 'undefined' ) {
         local_name = msg.user_name
         local_id = msg.user_id
-
         if (local_id == user_id){
             $( 'div.chatbox' ).append('<div class="message msg-mine"><b style="color: #000">' + local_name +': </b> '+ msg.message+'</div>' )
         }else{
