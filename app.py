@@ -52,10 +52,6 @@ def on_join(data):
     send(username + ' has entered the room.', room=room)
 
 
-def messageReceived(methods=('GET', 'POST')):
-    print('message was received!!!')
-
-
 @socketio.on('response')
 def handle_my_custom_event(json, methods=('GET', 'POST')):
     print('received my event: ' + str(json))
