@@ -74,6 +74,7 @@ def sign_s3():
   presigned_post = s3.upload_file(Bucket=S3_BUCKET,
     Key=file_name,
     filename=file_name, filetype=file_type)
+  return json.dumps(presigned_post)
 
 
 if __name__ == '__main__':
