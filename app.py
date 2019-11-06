@@ -3,6 +3,9 @@ from flask import Flask, request, render_template, redirect
 from flask_socketio import join_room
 from flask_socketio import send
 from gunicorn.app.wsgiapp import WSGIApplication
+import os
+import boto3, json
+
 
 from message import Room
 from utils import read_rooms_to_file, write_rooms_to_file, generate_user, generate_wason_cards
@@ -58,6 +61,27 @@ def handle_my_custom_event(json, methods=('GET', 'POST')):
     print('received my event: ' + str(json))
     room = json['room']
     socketio.emit('response', json, room=room)
+    
+@app.route('/test_s3')
+def sign_s3():
+  S3_BUCKET = os.environ.get('S3_BUCKET')
+  s3 = boto3.client('s3')
+
+  presigned_post = s3.generate_presigned_post(
+    Bucket=S3_BUCKET,
+    Key="text",
+    Fields = {"acl": "public-read", "Content-Type": "text"},
+    Conditions = [
+      {"acl": "public-read"},
+      {"Content-Type": "text"}
+    ],
+    ExpiresIn=3600
+  )
+
+  return json.dumps({
+    'data': presigned_post,
+    'url': 'https://%s.s3.amazonaws.com/%s' % (S3_BUCKET, "text")
+  })
 
 
 if __name__ == '__main__':
