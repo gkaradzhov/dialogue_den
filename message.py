@@ -21,8 +21,10 @@ class Room:
         
         
 class Message:
-    def __init__(self, origin, text):
+    def __init__(self, origin, content, room_id, message_type):
         self.origin = origin
-        self.text = text
+        self.message_type = message_type
+        self.content = content
         self.timestamp = datetime.datetime.now()
         self.unique_id = uuid.uuid4().hex
+        self.room_id = room_id

@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
           integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="/static/style.css"/>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" crossorigin="anonymous">
 
     <title>Dialogue Den</title>
 </head>
@@ -26,65 +27,156 @@
 </div>
 
 <div class="row">
-    <div class="col-4">
+    <div class="col-5">
         <div class="task">
-            Wason game
+            <div class="task_description">
+                Collaborate to play the game
+            </div>
+            <div class='cards_list'>
+                {% for card in room_data.game%}
+                <div class='card_container'>
+                    <div class='card'>{{card}}</div>
+                    <input type="checkbox" id='{{card}}' value='{{card}}'>
+                </div>
+                {% endfor %}
+            </div>
         </div>
     </div>
-    <div class="col-8">
+    <div class="col-7">
         <div class="chatbox">
         </div>
         <form class="sumbission" action="" method="POST">
-          <input type="text" id="message" placeholder="Type a message"/>
-          <input class="btn btn-primary" type="submit"/>
+            <input type="text" id="message" placeholder="Type a message"/>
+            <input class="btn btn-primary" type="submit"/>
         </form>
     </div>
 </div>
 </body>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
-<script type="text/javascript">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 
+
+<script type="text/javascript">
+$(function() {
     var socket = io.connect('http://' + document.domain + ':' + location.port, { transports: ['websocket'] });
     var room_id = $('input#chat_id').val();
     var uname = $('input#user_name').val();
     var user_id = $('input#user_id').val();
 
     socket.on( 'connect', function() {
-    socket.emit('join', { 'room': room_id, 'username': uname});
+        socket.emit('join', { 'room': room_id, 'username': uname});
+        var form = $('form').on('submit', function( e ) {
+          e.preventDefault();
+          console.log('form submit called');
+          let message = $('input#message').val();
+          if (message!=""){
+           socket.emit( 'response', {
+                user_id: user_id,
+                user_name: uname,
+                type: 'chat_message',
+                message: message,
+                room: room_id
+            });
+           $('input#message').val('').focus();
+          }
+        });
 
-    var form = $('form').on('submit', function( e ) {
-      e.preventDefault();
-
-      console.log('form submit called');
-      let message = $('input#message').val();
-      if (message!=""){
-       console.log('start emitting');
-
-        socket.emit( 'response', {
-            user_id: user_id,
-            user_name: uname,
-            message: message,
-            room: room_id
-        } )
-       $('input#message').val('').focus()
-
-      }
-
-    } )
-    } )
-    socket.on( 'response', function( msg ) {
-    console.log(msg)
-    if( typeof msg.user_name !== 'undefined' ) {
-        local_name = msg.user_name
-        local_id = msg.user_id
-        if (local_id == user_id){
-            $( 'div.chatbox' ).append('<div class="message msg-mine"><b style="color: #000">' + local_name +': </b> '+ msg.message+'</div>' )
-        }else{
-            $( 'div.chatbox' ).append('<div class="message msg-other"><b style="color: #000">' + local_name +': </b> '+ msg.message+'</div>' )
+        var card_click = $('input:checkbox').on('change', function(e){
+            console.log('card selected');
+            let selection = []
+            $("input:checkbox").each(function(){
+                selection.push({'value': $(this).val(), 'checked': $(this).is(":checked")});
+            });
+            console.log(selection);
+            socket.emit( 'response', {
+                user_id: user_id,
+                user_name: 'wason',
+                type: 'wason_game',
+                message: selection,
+                room: room_id
+            });
+        });
+    });
+    socket.on('response', function( msg ) {
+        console.log(msg)
+        if(msg.type =='chat_message' && typeof msg.user_name !== 'undefined' ) {
+            local_name = msg.user_name
+            local_id = msg.user_id
+            if (local_id == user_id){
+                $( 'div.chatbox' ).append('<div class="message msg-mine"><b style="color: #000">' + local_name +': </b> '+ msg.message+'</div>' )
+            }else{
+                $( 'div.chatbox' ).append('<div class="message msg-other"><b style="color: #000">' + local_name +': </b> '+ msg.message+'</div>' )
+            }
         }
+
+        if (msg.type == 'wason_game'){
+            $.each( msg.message, function( key, value ) {
+                $('input:checkbox#' + value['value']).prop('checked', value['checked']);
+            });
+        }
+    });
+
+    var utilizatoriJson = [
+        {'label': "@ActionScript",'id':'1'},
+        {'label': "@Java",'id':'2'},
+        {'label': "@C++",'id':'3'},
+        {'label': "@Javascript",'id':'4'},
+        {'label': "@Python",'id':'5'},
+        {'label': "@BASIC",'id':'6'},
+        {'label': "@ColdFusion",'id':'7'},
+        {'label': "@Haskell",'id':'8'},
+        {'label': "@Lisp",'id':'9'},
+        {'label': "@Scala",'id':'10'}
+    ];
+    function split( val ) {
+      return val.split( / \s*/ );
     }
-    })
+    function extractLast( term ) {
+      return split( term ).pop();
+    }
+
+    $("#message")
+      // don't navigate away from the field on tab when selecting an item
+      .bind("keydown", function( event ) {
+        if ( event.keyCode === $.ui.keyCode.TAB &&
+            $( this ).autocomplete( "instance" ).menu.active ) {
+          event.preventDefault();
+        }
+      })
+      .autocomplete({
+        minLength: 1,
+        source: function( request, response ) {
+            // delegate back to autocomplete, but extract the last term
+            var lastword = extractLast(request.term);
+            // Regexp for filtering those labels that start with '@'
+            var matcher = new RegExp( "^" + $.ui.autocomplete.escapeRegex( lastword ), "i" );
+            // Get all labels
+            var labels = utilizatoriJson.map(function(item){return item.label;});
+            var results = $.grep(labels ,function( item ){
+                             return matcher.test( item );
+                        });
+            response( $.ui.autocomplete.filter(
+            results, lastword ) );
+        },
+        focus: function() {
+          // prevent value inserted on focus
+          return false;
+        },
+        select: function( event, ui ) {
+          var terms = split( this.value );
+          // remove the current input
+          terms.pop();
+          // add the selected item
+          terms.push( ui.item.value );
+          // add placeholder to get the comma-and-space at the end
+          terms.push( "" );
+          this.value = terms.join( " " );
+          return false;
+        }
+      });
+});
+
 
 </script>
 </html>

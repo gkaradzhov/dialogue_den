@@ -5,7 +5,7 @@ from flask_socketio import send
 from gunicorn.app.wsgiapp import WSGIApplication
 
 from message import Room
-from utils import read_rooms_to_file, write_rooms_to_file, generate_user
+from utils import read_rooms_to_file, write_rooms_to_file, generate_user, generate_wason_cards
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
@@ -25,9 +25,10 @@ def chatroom(room_id):
     existing_rooms = read_rooms_to_file(ROOM_PATH)
     name = [n.name for n in existing_rooms][0]
     user = generate_user([])
+    wason_game = generate_wason_cards()
     
     return render_template("room.html", room_data={'id': room_id, 'name': name, 'user_id': user['uid'],
-                                                   'username': user['username']})
+                                                   'username': user['username'], 'game': wason_game})
 
 
 @app.route('/create_room', methods=('GET', 'POST'))
@@ -60,6 +61,6 @@ def handle_my_custom_event(json, methods=('GET', 'POST')):
 
 
 if __name__ == '__main__':
-    socketio.run(host='localhost', port=8888, app=app)
+    socketio.run(host='localhost', port=8898, app=app)
     # Threaded option to enable multiple instances for multiple user access support
     # app.run(threaded=True, port=5000)
