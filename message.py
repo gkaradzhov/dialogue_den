@@ -1,6 +1,7 @@
 import datetime
 import operator
 import uuid
+import json
 
 class Room:
     def __init__(self, name, room_id=None, is_done=False):
@@ -21,10 +22,17 @@ class Room:
         
         
 class Message:
-    def __init__(self, origin, content, room_id, message_type):
-        self.origin = origin
+    def __init__(self, origin_name, origin_id, room_id, message_type, content=''):
+        self.origin = origin_name
+        self.origin_id = origin_id
         self.message_type = message_type
         self.content = content
         self.timestamp = datetime.datetime.now()
         self.unique_id = uuid.uuid4().hex
         self.room_id = room_id
+        
+        with open('data/dialogues/{}'.format(room_id), 'a') as wf:
+            wf.writelines(self.to_json())
+
+    def to_json(self):
+        return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)

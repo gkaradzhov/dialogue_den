@@ -1,7 +1,7 @@
 import csv
 import os
 import uuid
-
+import boto3
 from message import Room
 import random
 
@@ -45,3 +45,27 @@ def generate_wason_cards():
     random.shuffle(cards_array)
     
     return cards_array
+
+def save_file(file_name):
+    S3_BUCKET = os.environ.get('S3_BUCKET_NAME')
+    try:
+        s3 = boto3.client('s3')
+        s3.upload_file(Bucket=S3_BUCKET, Key=file_name, Filename=file_name)
+    except:
+        pass
+
+def sync_rooms():
+    file_name = "data/rooms.tsv"
+    save_file(file_name)
+
+
+def sync_dialogue():
+    S3_BUCKET = os.environ.get('S3_BUCKET_NAME')
+    
+    file_name = "data/rooms.tsv"
+    
+    try:
+        s3 = boto3.client('s3')
+        s3.upload_file(Bucket=S3_BUCKET, Key=file_name, Filename=file_name)
+    except:
+        pass
