@@ -1,7 +1,10 @@
 import datetime
-import operator
-import uuid
 import json
+import os
+import uuid
+
+from sys_config import DIALOGUES_RUNNING
+
 
 class Room:
     def __init__(self, name, room_id=None, is_done=False):
@@ -12,15 +15,15 @@ class Room:
         else:
             self.room_id = room_id
         self.is_done = is_done
-        
+    
     @classmethod
     def from_text_representation(cls, data_tuple):
         return cls(*data_tuple)
-        
+    
     def get_file_representation(self):
         return (self.name, self.room_id, self.is_done)
-        
-        
+
+
 class Message:
     def __init__(self, origin_name, origin_id, room_id, message_type, content=''):
         self.origin = origin_name
@@ -31,8 +34,22 @@ class Message:
         self.unique_id = uuid.uuid4().hex
         self.room_id = room_id
         
-        with open('data/dialogues/{}'.format(room_id), 'a') as wf:
-            wf.writelines(self.to_json())
-
+        filename = os.path.join(DIALOGUES_RUNNING, room_id)
+        if os.path.exists(filename):
+            append_write = 'a'  # append if already exists
+        else:
+            append_write = 'w'  # make a new file if not
+        
+        with open(filename, append_write) as wf:
+            wf.writelines(self.to_json() + '\n')
+    
     def to_json(self):
-        return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
+        output_dict = {
+            'user_id': self.origin_id,
+            'user_name': self.origin,
+            'type': self.message_type,
+            'message': self.content,
+            'timestamp': str(self.timestamp),
+            'room_id': self.room_id
+        }
+        return json.dumps(output_dict)

@@ -19,12 +19,17 @@
 
 <h1>{{room_data.name}}</h1>
 <input id="chat_id" type="hidden" value="{{room_data.id}}"/>
-<input id="user_id" type="hidden" value="{{room_data.user_id}}"/>
-<input id="user_name" type="hidden" value="{{room_data.username}}"/>
+<input id="user_id" type="hidden" value=""/>
+<input id="user_name" type="hidden" value=""/>
 
 <div class="row">
-    <h4>Your username is: <b>{{room_data.username}}</b></h4>
+    <div id="user_identifier"></div>
+    <button id="join_room" class="btn btn-success">Join room</button>
+    <button id="leave_room" class="btn btn-danger disabled">Leave room</button>
+    <b>Current Users:</b> <div id="current_users"></div>
 </div>
+
+
 
 <div class="row">
     <div class="col-5">
@@ -61,43 +66,60 @@
 $(function() {
     var socket = io.connect('http://' + document.domain + ':' + location.port, { transports: ['websocket'] });
     var room_id = $('input#chat_id').val();
-    var uname = $('input#user_name').val();
-    var user_id = $('input#user_id').val();
+    existing = $('#current_users').text();
+    $('#join_room').on('click', function(e){
+        $.ajax({
+          url: "/request_join",
+          dataType: 'json',
+          data: {
+            existing_users: existing
+          }
+        }).success(function(return_data) {
+            user_name = return_data.user_name;
+            user_id = return_data.user_id;
+            socket.emit('join', { user_name: user_name, room: room_id, user_id:user_id});
+            $("#user_name").val(user_name);
+            $("#user_id").val(user_name);
+            $("#user_identifier").text(user_name);
+            $("#current_users").append(user_name)
+        });
+    });
 
-    socket.on( 'connect', function() {
-        socket.emit('join', { 'room': room_id, 'username': uname});
-        var form = $('form').on('submit', function( e ) {
-          e.preventDefault();
-          console.log('form submit called');
-          let message = $('input#message').val();
-          if (message!=""){
-           socket.emit( 'response', {
+
+    $('form').on('submit', function(e) {
+        var uname = $('input#user_name').val();
+        var user_id = $('input#user_id').val();
+        e.preventDefault();
+        let message = $('input#message').val();
+        if (message!=""){
+            socket.emit( 'response', {
                 user_id: user_id,
                 user_name: uname,
                 type: 'chat_message',
                 message: message,
                 room: room_id
-            });
-           $('input#message').val('').focus();
-          }
-        });
+          });
+        }
+        $('input#message').val('').focus();
+      });
 
-        var card_click = $('input:checkbox').on('change', function(e){
-            console.log('card selected');
-            let selection = []
-            $("input:checkbox").each(function(){
-                selection.push({'value': $(this).val(), 'checked': $(this).is(":checked")});
-            });
-            console.log(selection);
-            socket.emit( 'response', {
-                user_id: user_id,
-                user_name: 'wason',
-                type: 'wason_game',
-                message: selection,
-                room: room_id
-            });
+
+    var card_click = $('input:checkbox').on('change', function(e){
+        console.log('card selected');
+        let selection = []
+        $("input:checkbox").each(function(){
+            selection.push({'value': $(this).val(), 'checked': $(this).is(":checked")});
+        });
+        console.log(selection);
+        socket.emit( 'response', {
+            user_id: user_id,
+            user_name: 'wason',
+            type: 'wason_game',
+            message: selection,
+            room: room_id
         });
     });
+
     socket.on('response', function( msg ) {
         console.log(msg)
         if(msg.type =='chat_message' && typeof msg.user_name !== 'undefined' ) {
@@ -176,7 +198,6 @@ $(function() {
         }
       });
 });
-
 
 </script>
 </html>
