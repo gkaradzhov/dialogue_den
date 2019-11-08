@@ -1,10 +1,11 @@
 import csv
+import json
 import os
 
 import boto3
 
 from message import Room
-from sys_config import ROOM_PATH
+from sys_config import ROOM_PATH, DIALOGUES_RUNNING
 
 
 def write_rooms_to_file(rooms):
@@ -24,6 +25,16 @@ def read_rooms_from_file():
             for row in csv_reader:
                 result.append(Room.from_text_representation(row))
     return result
+
+def get_dialogue(room_id):
+    dialogue = []
+    filepath = os.path.join(DIALOGUES_RUNNING, room_id)
+    if os.path.isfile(filepath):
+        with open(filepath, 'r') as rf:
+            for row in rf.readlines():
+                dialogue.append(json.loads(row))
+    
+    return dialogue
 
 
 def save_file(file_name):

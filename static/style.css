@@ -1,8 +1,9 @@
 
 .chatbox{
     background: aliceblue;
-    height: 50vh;
+    height: 80vh;
     border: 2px solid black;
+    overflow-y: scroll;
 }
 
 .row{

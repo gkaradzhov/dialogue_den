@@ -19,29 +19,34 @@
 
 <h1>{{room_data.name}}</h1>
 <input id="chat_id" type="hidden" value="{{room_data.id}}"/>
-<input id="user_id" type="hidden" value=""/>
-<input id="user_name" type="hidden" value=""/>
-
-<div class="row">
-    <div id="user_identifier"></div>
-    <button id="join_room" class="btn btn-success">Join room</button>
-    <button id="leave_room" class="btn btn-danger disabled">Leave room</button>
-    <b>Current Users:</b> <div id="current_users"></div>
-</div>
-
+<input id="user_id" type="hidden" value="{{room_data.current_user_id}}"/>
+<input id="user_name" type="hidden" value="{{room_data.current_user}}"/>
 
 
 <div class="row">
     <div class="col-5">
+        <div id="user_identifier">Your user is <b>{{room_data.current_user}}</b></div>
+        <button id="leave_room" class="btn btn-danger">Leave room</button>
+            Other logged users:
+            <div id="current_users">
+                {% for item in room_data.existing_users %}
+                <div class="logged_user" id="{{item[1]}}"><b>{{item[0]}}</b></div>
+                {% endfor %}
+            </div>
         <div class="task">
             <div class="task_description">
                 Collaborate to play the game
             </div>
             <div class='cards_list'>
                 {% for card in room_data.game%}
+                {% set attr = 'checked' if card['checked'] == 'True' else '' %}
                 <div class='card_container'>
-                    <div class='card'>{{card}}</div>
-                    <input type="checkbox" id='{{card}}' value='{{card}}'>
+                    <div class='card'>{{card['value']}}</div>
+                        {% if card['checked'] %}
+                            <input type="checkbox" checked id='{{card["value"]}}' value={{card["value"]}}>
+                        {% else %}
+                            <input type="checkbox" id='{{card["value"]}}' value={{card["value"]}}>
+                        {% endif %}
                 </div>
                 {% endfor %}
             </div>
@@ -49,6 +54,9 @@
     </div>
     <div class="col-7">
         <div class="chatbox">
+            {% for item in room_data.messages %}
+            <div class="message msg-other"><b>{{item['user_name']}}: </b>{{item['message']}}</div>
+            {%endfor%}
         </div>
         <form class="sumbission" action="" method="POST">
             <input type="text" id="message" placeholder="Type a message"/>
@@ -62,111 +70,25 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 
 
+</html>
 <script type="text/javascript">
 $(function() {
-    var socket = io.connect('http://' + document.domain + ':' + location.port, { transports: ['websocket'] });
-    var room_id = $('input#chat_id').val();
-    existing = $('#current_users').text();
-    $('#join_room').on('click', function(e){
-        $.ajax({
-          url: "/request_join",
-          dataType: 'json',
-          data: {
-            existing_users: existing
-          }
-        }).success(function(return_data) {
-            user_name = return_data.user_name;
-            user_id = return_data.user_id;
-            socket.emit('join', { user_name: user_name, room: room_id, user_id:user_id});
-            $("#user_name").val(user_name);
-            $("#user_id").val(user_name);
-            $("#user_identifier").text(user_name);
-            $("#current_users").append(user_name)
-        });
-    });
-
-
-    $('form').on('submit', function(e) {
-        var uname = $('input#user_name').val();
-        var user_id = $('input#user_id').val();
-        e.preventDefault();
-        let message = $('input#message').val();
-        if (message!=""){
-            socket.emit( 'response', {
-                user_id: user_id,
-                user_name: uname,
-                type: 'chat_message',
-                message: message,
-                room: room_id
-          });
-        }
-        $('input#message').val('').focus();
-      });
-
-
-    var card_click = $('input:checkbox').on('change', function(e){
-        console.log('card selected');
-        let selection = []
-        $("input:checkbox").each(function(){
-            selection.push({'value': $(this).val(), 'checked': $(this).is(":checked")});
-        });
-        console.log(selection);
-        socket.emit( 'response', {
-            user_id: user_id,
-            user_name: 'wason',
-            type: 'wason_game',
-            message: selection,
-            room: room_id
-        });
-    });
-
-    socket.on('response', function( msg ) {
-        console.log(msg)
-        if(msg.type =='chat_message' && typeof msg.user_name !== 'undefined' ) {
-            local_name = msg.user_name
-            local_id = msg.user_id
-            if (local_id == user_id){
-                $( 'div.chatbox' ).append('<div class="message msg-mine"><b style="color: #000">' + local_name +': </b> '+ msg.message+'</div>' )
-            }else{
-                $( 'div.chatbox' ).append('<div class="message msg-other"><b style="color: #000">' + local_name +': </b> '+ msg.message+'</div>' )
-            }
-        }
-
-        if (msg.type == 'wason_game'){
-            $.each( msg.message, function( key, value ) {
-                $('input:checkbox#' + value['value']).prop('checked', value['checked']);
-            });
-        }
-    });
-
-    var utilizatoriJson = [
-        {'label': "@ActionScript",'id':'1'},
-        {'label': "@Java",'id':'2'},
-        {'label': "@C++",'id':'3'},
-        {'label': "@Javascript",'id':'4'},
-        {'label': "@Python",'id':'5'},
-        {'label': "@BASIC",'id':'6'},
-        {'label': "@ColdFusion",'id':'7'},
-        {'label': "@Haskell",'id':'8'},
-        {'label': "@Lisp",'id':'9'},
-        {'label': "@Scala",'id':'10'}
+    $('div.chatbox').scrollTop($('div.chatbox')[0].scrollHeight);
+    var logged_users = [
+        {'label': "@all",'id':'1'},
     ];
-    function split( val ) {
+
+    {% for user in room_data.existing_users%}
+        logged_users.push({'label': "@" + "{{user[0]}}", 'id': "{{user[1]}}"})
+    {%endfor%}
+    function split(val){
       return val.split( / \s*/ );
     }
-    function extractLast( term ) {
-      return split( term ).pop();
+    function extractLast(term) {
+      return split(term).pop();
     }
 
-    $("#message")
-      // don't navigate away from the field on tab when selecting an item
-      .bind("keydown", function( event ) {
-        if ( event.keyCode === $.ui.keyCode.TAB &&
-            $( this ).autocomplete( "instance" ).menu.active ) {
-          event.preventDefault();
-        }
-      })
-      .autocomplete({
+    var autocomplete_options = {
         minLength: 1,
         source: function( request, response ) {
             // delegate back to autocomplete, but extract the last term
@@ -174,7 +96,7 @@ $(function() {
             // Regexp for filtering those labels that start with '@'
             var matcher = new RegExp( "^" + $.ui.autocomplete.escapeRegex( lastword ), "i" );
             // Get all labels
-            var labels = utilizatoriJson.map(function(item){return item.label;});
+            var labels = logged_users.map(function(item){return item.label;});
             var results = $.grep(labels ,function( item ){
                              return matcher.test( item );
                         });
@@ -196,9 +118,131 @@ $(function() {
           this.value = terms.join( " " );
           return false;
         }
+      }
+
+    var socket = io.connect('http://' + document.domain + ':' + location.port, { transports: ['websocket'] });
+    var room_id = $('input#chat_id').val();
+    existing = $('#current_users').text();
+
+
+    socket.on( 'connect', function() {
+        user_name = $("#user_name").val();
+        socket.emit('join', { 'room': room_id, 'user_name': user_name});
+       });
+    $('#join_room').on('click', function(e){
+        $.ajax({
+          url: "/request_join",
+          dataType: 'json',
+          data: {
+            existing_users: existing
+          }
+        }).success(function(return_data) {
+            user_name = return_data.user_name;
+            user_id = return_data.user_id;
+            socket.emit('join', { user_name: user_name, room: room_id, user_id:user_id});
+            $("#user_name").val(user_name);
+            $("#user_id").val(user_name);
+            $("#user_identifier").text(user_name);
+            $("#join_room").addClass('disabled');
+            $("#leave_room").removeClass('disabled');
+        });
+    });
+
+    $('#leave_room').on('click', function(e){
+        var user_name = $('input#user_name').val();
+        var user_id = $('input#user_id').val();
+        socket.emit('leave', { user_name: user_name, room: room_id, user_id:user_id});
+        //Redirect to home
+
+    });
+
+    $('form').on('submit', function(e) {
+        var user_name = $('input#user_name').val();
+        var user_id = $('input#user_id').val();
+        e.preventDefault();
+        let message = $('input#message').val();
+        if (message!=""){
+            socket.emit( 'response', {
+                user_id: user_id,
+                user_name: user_name,
+                type: 'chat_message',
+                message: message,
+                room: room_id
+          });
+        }
+        $('input#message').val('').focus();
       });
+
+
+    var card_click = $('input:checkbox').on('change', function(e){
+        let selection = []
+        $("input:checkbox").each(function(){
+            selection.push({'value': $(this).val(), 'checked': $(this).is(":checked")});
+        });
+        var user_name = $('input#user_name').val();
+        var user_id = $('input#user_id').val();
+        socket.emit( 'response', {
+            user_id: user_id,
+            user_name: user_name,
+            type: 'wason_game',
+            message: selection,
+            room: room_id
+        });
+    });
+
+    socket.on('response', function(message_str) {
+        msg =  JSON.parse(message_str);
+
+        if(msg.type =='chat_message' && typeof msg.user_name !== 'undefined' ) {
+            var user_name = $('input#user_name').val();
+            var user_id = $('input#user_id').val();
+            local_name = msg.user_name
+            local_id = msg.user_id
+            if (local_id == user_id){
+                $( 'div.chatbox' ).append('<div class="message msg-mine"><b>' + local_name +': </b> '+ msg.message+'</div>' )
+            }else{
+                $( 'div.chatbox' ).append('<div class="message msg-other"><b>' + local_name +': </b> '+ msg.message+'</div>' )
+            }
+            $('div.chatbox').scrollTop($('div.chatbox')[0].scrollHeight);
+        }
+
+        if (msg.type == 'wason_game'){
+            $.each( msg.message, function( key, value ) {
+                $('input:checkbox#' + value['value']).prop('checked', value['checked']);
+            });
+        }
+
+        if (msg.type == 'JOIN_ROOM'){
+            $("#current_users").append("<div class='logged_user' id='" + msg.user_id + "'><b>" + msg.user_name + "</b></div>");
+
+            logged_users.push({'label': "@" + msg.user_name,'id': msg.user_id})
+            $("#message").bind("keydown", function(event){
+                if (event.keyCode === $.ui.keyCode.TAB &&
+                    $(this).autocomplete("instance").menu.active ) {
+                  event.preventDefault();
+                }
+              }).autocomplete(autocomplete_options);
+        }
+
+        if (msg.type == 'LEAVE_ROOM'){
+            console.log("Leaving: " + msg.user_name);
+            logged_users= logged_users.filter(function(el) { return el.label != "@"+msg.user_name; });
+            $("#message").bind("keydown", function( event ) {
+                if (event.keyCode === $.ui.keyCode.TAB &&
+                    $(this).autocomplete("instance").menu.active ) {
+                  event.preventDefault();
+                }
+              }).autocomplete(autocomplete_options);
+        }
+    });
+
+    $("#message").bind("keydown", function( event ) {
+        if (event.keyCode === $.ui.keyCode.TAB &&
+            $(this).autocomplete("instance").menu.active ) {
+          event.preventDefault();
+        }
+      }).autocomplete(autocomplete_options);
 });
 
 </script>
-</html>
 

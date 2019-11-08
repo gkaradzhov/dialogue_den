@@ -6,7 +6,7 @@ from flask import Flask, request, render_template, redirect
 from flask_socketio import join_room, leave_room
 from flask_socketio import send
 
-from data_persistency_utils import read_rooms_from_file, write_rooms_to_file
+from data_persistency_utils import read_rooms_from_file, write_rooms_to_file, get_dialogue
 from message import Room, Message
 from utils import generate_user, generate_wason_cards
 
@@ -29,14 +29,41 @@ def chatroom(room_id):
     existing_rooms = read_rooms_from_file()
     room_name = [n.name for n in existing_rooms][0]
     
-    # TODO: 1. Get messages from memory
-    # TODO: 2. Generate user if you have to (??)
-    # TODO: 3. Generate game if you have to. Get latest game state
-    # TODO: 4. Display logged in users (provide a way to login into the game)
+    running_dialogue = get_dialogue(room_id)
     
-    wason_game = generate_wason_cards()
+    messages = [d for d in running_dialogue if d['type'] == 'chat_message']
+    logged_users = set()
+    for item in running_dialogue:
+        if item['type'] == 'JOIN_ROOM':
+            logged_users.add((item['user_name'], item['user_id']))
+        elif item['type'] == 'LEAVE_ROOM' and (item['user_name'], item['user_id']) in logged_users:
+            logged_users.remove((item['user_name'], item['user_id']))
     
-    return render_template("room.html", room_data={'id': room_id, 'name': room_name, 'game': wason_game})
+    current_user = generate_user([d[0] for d in logged_users])
+    m = Message(origin_name=current_user['user_name'], message_type='JOIN_ROOM', room_id=room_id,
+                origin_id=current_user['user_id'])
+    CONVERSATION_LOGS[room_id].append(m)
+    socketio.emit('response', m.to_json(), room=room_id)
+    
+    wason_initial = [d['message'] for d in running_dialogue if d['type'] == 'WASON_INITIAL']
+    if len(wason_initial) > 0:
+        wason_initial = wason_initial[0]
+        wason_final_state = [d['message'] for d in running_dialogue if d['type'] == 'wason_game']
+        if len(wason_final_state) > 0:
+            wason_initial = wason_final_state[-1]
+    
+    if len(wason_initial) == 0:
+        wason_game = generate_wason_cards()
+        m = Message(origin_name='SYSTEM', message_type='WASON_INITIAL', room_id=room_id,
+                    origin_id='-1', content=wason_game)
+        CONVERSATION_LOGS[room_id].append(m)
+    else:
+        wason_game = wason_initial
+    
+    return render_template("room.html", room_data={'id': room_id, 'name': room_name, 'game': wason_game,
+                                                   'messages': messages, 'existing_users': logged_users,
+                                                   'current_user': current_user['user_name'],
+                                                   'current_user_id': current_user['user_id']})
 
 
 @app.route('/create_room', methods=('GET', 'POST'))
@@ -55,7 +82,7 @@ def create_room():
 @app.route('/request_join', methods=('GET', 'POST'))
 def request_join():
     data = request.args.get('existing_users', None)
-
+    
     if data:
         data = data.split(',')
     else:
@@ -68,12 +95,6 @@ def request_join():
 def on_join(data):
     room = data['room']
     join_room(room)
-    print(data)
-    m = Message(origin_name=data['user_name'], message_type='JOIN_ROOM', room_id=room, origin_id=data['user_id'])
-    
-    CONVERSATION_LOGS[room].append(m)
-    
-    print("User {} joined the room {}".format(data['user_name'], room))
     send(data['user_name'] + ' has entered the room.', room=room)
 
 
@@ -87,14 +108,15 @@ def on_leave(data):
     CONVERSATION_LOGS[room].append(m)
     
     print("User {} has left the room {}".format(username, room))
-    send(username + ' has left the room.', room=room)
+    socketio.emit('response', m.to_json(), room=room)
 
 
 @socketio.on('response')
 def handle_response(json, methods=('GET', 'POST')):
     print('received my event: ' + str(json))
     room = json['room']
-    m = Message(origin_id=json['user_id'], origin_name=json['user_name'], message_type=json['type'], room_id=room)
+    m = Message(origin_id=json['user_id'], origin_name=json['user_name'], message_type=json['type'], room_id=room,
+                content=json['message'])
     
     socketio.emit('response', m.to_json(), room=room)
 

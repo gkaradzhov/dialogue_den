@@ -25,7 +25,7 @@ class Room:
 
 
 class Message:
-    def __init__(self, origin_name, origin_id, room_id, message_type, content=''):
+    def __init__(self, origin_name, room_id, message_type, content='', origin_id=None):
         self.origin = origin_name
         self.origin_id = origin_id
         self.message_type = message_type
@@ -50,6 +50,7 @@ class Message:
             'type': self.message_type,
             'message': self.content,
             'timestamp': str(self.timestamp),
-            'room_id': self.room_id
+            'room_id': self.room_id,
+            'message_id': self.unique_id
         }
         return json.dumps(output_dict)

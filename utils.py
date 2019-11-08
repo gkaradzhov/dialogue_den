@@ -2,17 +2,15 @@ import random
 import uuid
 
 ANIMALS = {"Cat", "Guinea pig", "Alpaca", "Bat", "Beaver", "Bee", "Chipmunk", "Dolphin", "Duck", "Falcon", "Kiwi",
-           "Lobster", "Ox", "Leopard", "Zebra", "Llama", "Narwhal"}
-COLOURS = {"Red", "Orange", "Purple", "Yellow", "Green", "Blue", "Pink", "Cyan", "Black", "White"}
+           "Lobster", "Ox", "Leopard", "Zebra", "Llama", "Narwhal", 'Lion', 'Tiger', "Hedgehog", "Giraffe"}
+# COLOURS = {"Red", "Orange", "Purple", "Yellow", "Green", "Blue", "Pink", "Cyan", "Black", "White"}
 
 
 def generate_user(exclude_list):
-    exclude_colours = set([a.split()[0] for a in exclude_list])
-    exclude_animals = set([a.split()[1] for a in exclude_list])
+    exclude_animals = set([a for a in exclude_list])
     
-    colours = list(COLOURS.difference(exclude_colours))
     animals = list(ANIMALS.difference(exclude_animals))
-    user_name = "{} {}".format(random.choice(colours), random.choice(animals))
+    user_name = "{}".format(random.choice(animals))
     return {'user_name': user_name, 'user_id': uuid.uuid4().hex}
 
 
@@ -24,5 +22,5 @@ def generate_wason_cards():
     cards_array = [random.choice(even_numbers), random.choice(odd_numbers), random.choice(consonants),
                    random.choice(vowels)]
     random.shuffle(cards_array)
-    
-    return cards_array
+    cards_obj = [{'value': str(a), 'checked': False} for a in cards_array]
+    return cards_obj
