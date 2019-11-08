@@ -90,6 +90,8 @@ $(function() {
 
     var autocomplete_options = {
         minLength: 1,
+        position: { my : "right bottom", at: "right top" },
+        autoFocus: true,
         source: function( request, response ) {
             // delegate back to autocomplete, but extract the last term
             var lastword = extractLast(request.term);
