@@ -152,32 +152,15 @@ $(function() {
     socket.on( 'connect', function() {
         user_name = $("#user_name").val();
         socket.emit('join', { 'room': room_id, 'user_name': user_name});
-       });
-    $('#join_room').on('click', function(e){
-        $.ajax({
-          url: "/request_join",
-          dataType: 'json',
-          data: {
-            existing_users: existing
-          }
-        }).success(function(return_data) {
-            user_name = return_data.user_name;
-            user_id = return_data.user_id;
-            socket.emit('join', { user_name: user_name, room: room_id, user_id:user_id});
-            $("#user_name").val(user_name);
-            $("#user_id").val(user_name);
-            $("#user_identifier").text(user_name);
-            $("#join_room").addClass('disabled');
-            $("#leave_room").removeClass('disabled');
-        });
+        $('.logged_user').removeClass('wason-agreed');
+
     });
 
     $('#leave_room').on('click', function(e){
         var user_name = $('input#user_name').val();
         var user_id = $('input#user_id').val();
         socket.emit('leave', { user_name: user_name, room: room_id, user_id:user_id});
-        //Redirect to home
-
+        window.location.replace("/");
     });
 
     $('form').on('submit', function(e) {
@@ -199,66 +182,114 @@ $(function() {
 
 
     var card_click = $('input:checkbox').on('change', function(e){
-        let selection = []
-        $("input:checkbox").each(function(){
-            selection.push({'value': $(this).val(), 'checked': $(this).is(":checked")});
-        });
+        var selection = get_card_selection();
         var user_name = $('input#user_name').val();
         var user_id = $('input#user_id').val();
         socket.emit( 'response', {
             user_id: user_id,
             user_name: user_name,
-            type: 'wason_game',
+            type: 'WASON_GAME',
             message: selection,
             room: room_id
         });
     });
 
+
+    var agree_clicked = $('#btn-agree').on('click', function(e){
+        var selection = get_card_selection();
+        var user_name = $('input#user_name').val();
+        var user_id = $('input#user_id').val();
+        socket.emit('response', {
+            user_id: user_id,
+            user_name: user_name,
+            type: 'AGREE_WASON_GAME',
+            message: selection,
+            room: room_id
+        });
+        $('#btn-agree').prop('disabled', true);
+        $('#btn-disagree').prop('disabled', false);
+
+    });
+
+    var disagree_clicked = $('#btn-disagree').on('click', function(e){
+        var selection = get_card_selection();
+        var user_name = $('input#user_name').val();
+        var user_id = $('input#user_id').val();
+        socket.emit('response', {
+            user_id: user_id,
+            user_name: user_name,
+            type: 'DISAGREE_WASON_GAME',
+            message: selection,
+            room: room_id
+        });
+        $('#btn-disagree').prop('disabled', true);
+        $('#btn-agree').prop('disabled', false);
+    });
+
     socket.on('response', function(message_str) {
         msg =  JSON.parse(message_str);
 
-        if(msg.type =='chat_message' && typeof msg.user_name !== 'undefined' ) {
-            var user_name = $('input#user_name').val();
-            var user_id = $('input#user_id').val();
-            local_name = msg.user_name
-            local_id = msg.user_id
-            if (local_id == user_id){
-                $( 'div.chatbox' ).append('<div class="message msg-mine"><b>' + local_name +': </b> '+ msg.message+'</div>' )
-            }else{
-                $( 'div.chatbox' ).append('<div class="message msg-other"><b>' + local_name +': </b> '+ msg.message+'</div>' )
-            }
-            $('div.chatbox').scrollTop($('div.chatbox')[0].scrollHeight);
-        }
+        switch(msg.type) {
+            case 'CHAT_MESSAGE':
+                if(typeof msg.user_name !== 'undefined' ) {
+                        var user_name = $('input#user_name').val();
+                        var user_id = $('input#user_id').val();
+                        local_name = msg.user_name
+                        local_id = msg.user_id
 
-        if (msg.type == 'wason_game'){
-            $.each( msg.message, function( key, value ) {
-                $('input:checkbox#' + value['value']).prop('checked', value['checked']);
-            });
-        }
-
-        if (msg.type == 'JOIN_ROOM'){
-            $("#current_users").append("<div class='logged_user' id='" + msg.user_id + "'><b>" + msg.user_name + "</b></div>");
-
-            logged_users.push({'label': "@" + msg.user_name,'id': msg.user_id})
-            $("#message").bind("keydown", function(event){
-                if (event.keyCode === $.ui.keyCode.TAB &&
-                    $(this).autocomplete("instance").menu.active ) {
-                  event.preventDefault();
-                }
-              }).autocomplete(autocomplete_options);
-        }
-
-        if (msg.type == 'LEAVE_ROOM'){
-            console.log("Leaving: " + msg.user_name);
-            logged_users= logged_users.filter(function(el) { return el.label != "@"+msg.user_name; });
-            $("#message").bind("keydown", function( event ) {
-                if (event.keyCode === $.ui.keyCode.TAB &&
-                    $(this).autocomplete("instance").menu.active ) {
-                  event.preventDefault();
-                }
-              }).autocomplete(autocomplete_options);
+                        processed_message = boldMentions(msg.message);
+                        console.log(processed_message);
+                        if (local_id == user_id){
+                            $( 'div.chatbox' ).append('<div class="message msg-mine"><b>' + local_name +': </b> ' + processed_message +'</div>' )
+                        }else{
+                            $( 'div.chatbox' ).append('<div class="message msg-other"><b>' + local_name +': </b> ' + processed_message + '</div>' )
+                        }
+                        $('div.chatbox').scrollTop($('div.chatbox')[0].scrollHeight);
+                    }
+                break;
+            case 'WASON_GAME':
+                $.each( msg.message, function( key, value ) {
+                    $('input:checkbox#' + value['value']).prop('checked', value['checked']);
+                });
+                $('.logged_user').removeClass('wason-agreed');
+                $('#btn-agree').prop('disabled', false);
+                break;
+            case 'AGREE_WASON_GAME':
+                target_user_id = msg.user_id;
+                $('#' + target_user_id).removeClass('wason-disagreed');
+                $('#' + target_user_id).addClass('wason-agreed');
+                break;
+            case 'DISAGREE_WASON_GAME':
+                target_user_id = msg.user_id;
+                $('#' + target_user_id).removeClass('wason-agreed');
+                $('#' + target_user_id).addClass('wason-disagreed');
+                break;
+            case 'JOIN_ROOM':
+                $("#current_users").append("<div class='logged_user' id='" + msg.user_id + "'><b>" + msg.user_name + "</b></div>");
+                logged_users.push({'label': "@" + msg.user_name,'id': msg.user_id})
+                $("#message").bind("keydown", function(event){
+                    if (event.keyCode === $.ui.keyCode.TAB &&
+                        $(this).autocomplete("instance").menu.active ) {
+                      event.preventDefault();
+                    }
+                  }).autocomplete(autocomplete_options);
+                break;
+            case 'LEAVE_ROOM':
+                console.log("Leaving: " + msg.user_name);
+                logged_users= logged_users.filter(function(el) { return el.label != "@"+msg.user_name; });
+                $("#message").bind("keydown", function( event ) {
+                    if (event.keyCode === $.ui.keyCode.TAB &&
+                        $(this).autocomplete("instance").menu.active ) {
+                      event.preventDefault();
+                    }
+                }).autocomplete(autocomplete_options);
+                break;
+            default:
+            // code block
         }
     });
+
+
 
     $("#message").bind("keydown", function( event ) {
         if (event.keyCode === $.ui.keyCode.TAB &&
@@ -266,6 +297,35 @@ $(function() {
           event.preventDefault();
         }
       }).autocomplete(autocomplete_options);
+
+
+    $(window).on('mouseover', (function () {
+        window.onbeforeunload = null;
+    }));
+    $(window).on('mouseout', (function () {
+        window.onbeforeunload = Leave;
+    }));
+    function Leave() {
+        var user_name = $('input#user_name').val();
+        var user_id = $('input#user_id').val();
+        socket.emit('leave', { user_name: user_name, room: room_id, user_id:user_id});
+    }
+    var prevKey="";
+    $(document).keydown(function (e) {
+        if (e.key=="F5") {
+            window.onbeforeunload = Leave;
+        }
+        else if (e.key.toUpperCase() == "W" && prevKey == "CONTROL") {
+            window.onbeforeunload = Leave;
+        }
+        else if (e.key.toUpperCase() == "R" && prevKey == "CONTROL") {
+            window.onbeforeunload = Leave;
+        }
+        else if (e.key.toUpperCase() == "F4" && (prevKey == "ALT" || prevKey == "CONTROL")) {
+            window.onbeforeunload = Leave;
+        }
+        prevKey = e.key.toUpperCase();
+    });
 });
 
 </script>
