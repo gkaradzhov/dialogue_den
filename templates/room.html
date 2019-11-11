@@ -25,10 +25,10 @@
 
 <div class="row">
     <div class="col-5">
-        <div id="user_identifier">Your user is <b>{{room_data.current_user}}</b></div>
-        <button id="leave_room" class="btn btn-danger">Leave room</button>
-            Other logged users:
+        Logged users:
             <div id="current_users">
+                <div class="logged_user" id="{{room_data.current_user_id}}"><b> <i>(you)</i> {{room_data.current_user}}</b>
+                    <button id="leave_room" class="btn btn-danger btn-sm float-right">Leave room</button></div>
                 {% for item in room_data.existing_users %}
                 <div class="logged_user" id="{{item[1]}}"><b>{{item[0]}}</b></div>
                 {% endfor %}
@@ -50,6 +50,9 @@
                 </div>
                 {% endfor %}
             </div>
+            <button type="button" id="btn-agree" class="btn btn-success">Agree</button>
+            <button type="button" id="btn-disagree" class="btn btn-danger">Disagree</button>
+
         </div>
     </div>
     <div class="col-7">
@@ -73,19 +76,36 @@
 </html>
 <script type="text/javascript">
 $(function() {
+    function boldMentions(str){
+        var regex = new RegExp("@\\w*", 'gi');
+        str = str.replace(regex, function(str) {return '<b>'+str+'</b>'})
+        return str;
+    }
+
     $('div.chatbox').scrollTop($('div.chatbox')[0].scrollHeight);
+
     var logged_users = [
         {'label': "@all",'id':'1'},
     ];
-
     {% for user in room_data.existing_users%}
         logged_users.push({'label': "@" + "{{user[0]}}", 'id': "{{user[1]}}"})
     {%endfor%}
+
     function split(val){
       return val.split( / \s*/ );
     }
+
     function extractLast(term) {
       return split(term).pop();
+    }
+
+    function get_card_selection(){
+        let selection = []
+        $("input:checkbox").each(function(){
+            selection.push({'value': $(this).val(), 'checked': $(this).is(":checked")});
+        });
+
+        return selection;
     }
 
     var autocomplete_options = {

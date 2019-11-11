@@ -141,3 +141,24 @@
   -ms-transform: rotate(45deg);
   transform: rotate(45deg);
 }
+
+
+.wason-agreed{
+    font-weight: bold !important;
+    color: green;
+}
+
+.wason-agreed:after{
+    color: green !important;
+    content: "\2713" !important;
+}
+
+.wason-disagreed{
+    font-weight: bold !important;
+    color: red;
+}
+
+.wason-disagreed:after{
+    color: red !important;
+    content: "\2716" !important;
+}
