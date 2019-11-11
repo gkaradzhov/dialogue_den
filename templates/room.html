@@ -115,15 +115,17 @@ $(function() {
         source: function( request, response ) {
             // delegate back to autocomplete, but extract the last term
             var lastword = extractLast(request.term);
+            if (lastword.length == 0){
+                return;
+            }
             // Regexp for filtering those labels that start with '@'
-            var matcher = new RegExp( "^" + $.ui.autocomplete.escapeRegex( lastword ), "i" );
+            var matcher = new RegExp( "^" + $.ui.autocomplete.escapeRegex(lastword) + '+', "i" );
             // Get all labels
             var labels = logged_users.map(function(item){return item.label;});
-            var results = $.grep(labels ,function( item ){
-                             return matcher.test( item );
+            var results = $.grep(labels, function( item ){
+                             return matcher.test(item);
                         });
-            response( $.ui.autocomplete.filter(
-            results, lastword ) );
+            response( $.ui.autocomplete.filter(results, lastword) );
         },
         focus: function() {
           // prevent value inserted on focus
@@ -136,8 +138,8 @@ $(function() {
           // add the selected item
           terms.push( ui.item.value );
           // add placeholder to get the comma-and-space at the end
-          terms.push( "" );
-          this.value = terms.join( " " );
+          terms.push("");
+          this.value = terms.join(" ");
           return false;
         }
       }
