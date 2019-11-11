@@ -276,6 +276,7 @@ $(function() {
                 break;
             case 'LEAVE_ROOM':
                 console.log("Leaving: " + msg.user_name);
+                $('#'+msg.user_id).remove();
                 logged_users= logged_users.filter(function(el) { return el.label != "@"+msg.user_name; });
                 $("#message").bind("keydown", function( event ) {
                     if (event.keyCode === $.ui.keyCode.TAB &&
@@ -288,7 +289,6 @@ $(function() {
             // code block
         }
     });
-
 
 
     $("#message").bind("keydown", function( event ) {
