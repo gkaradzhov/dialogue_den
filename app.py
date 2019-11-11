@@ -31,7 +31,7 @@ def chatroom(room_id):
     
     running_dialogue = get_dialogue(room_id)
     
-    messages = [d for d in running_dialogue if d['type'] == 'chat_message']
+    messages = [d for d in running_dialogue if d['type'] == 'CHAT_MESSAGE']
     logged_users = set()
     for item in running_dialogue:
         if item['type'] == 'JOIN_ROOM':
@@ -48,7 +48,7 @@ def chatroom(room_id):
     wason_initial = [d['message'] for d in running_dialogue if d['type'] == 'WASON_INITIAL']
     if len(wason_initial) > 0:
         wason_initial = wason_initial[0]
-        wason_final_state = [d['message'] for d in running_dialogue if d['type'] == 'wason_game']
+        wason_final_state = [d['message'] for d in running_dialogue if d['type'] == 'WASON_GAME']
         if len(wason_final_state) > 0:
             wason_initial = wason_final_state[-1]
     
@@ -77,18 +77,6 @@ def create_room():
         existing_rooms.append(room)
         write_rooms_to_file(existing_rooms)
         return redirect('/')
-
-
-@app.route('/request_join', methods=('GET', 'POST'))
-def request_join():
-    data = request.args.get('existing_users', None)
-    
-    if data:
-        data = data.split(',')
-    else:
-        data = []
-    user = generate_user(data)
-    return json.dumps(user)
 
 
 @socketio.on('join')
