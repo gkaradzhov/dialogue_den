@@ -16,26 +16,22 @@
     <title>Dialogue Den</title>
 </head>
 <body>
-
-<h1>{{room_data.name}}</h1>
 <input id="chat_id" type="hidden" value="{{room_data.id}}"/>
 <input id="user_id" type="hidden" value="{{room_data.current_user_id}}"/>
 <input id="user_name" type="hidden" value="{{room_data.current_user}}"/>
 
+<div id="result_holder"></div>
 
 <div class="row">
     <div class="col-5">
-        Logged users:
-            <div id="current_users">
-                <div class="logged_user" id="{{room_data.current_user_id}}"><b> <i>(you)</i> {{room_data.current_user}}</b>
-                    <button id="leave_room" class="btn btn-danger btn-sm float-right">Leave room</button></div>
-                {% for item in room_data.existing_users %}
-                <div class="logged_user" id="{{item[1]}}"><b>{{item[0]}}</b></div>
-                {% endfor %}
-            </div>
         <div class="task">
+            <h3>Task: </h3>
             <div class="task_description">
-                Collaborate to play the game
+                You are presented with four cards. Each card has a letter on one side and a number on the other.
+                <b>Collaborate</b> with the other participants in this conversation to solve the following task: <br/>
+                <b> Which card must you turn to test the rule: <br/>
+                All cards with vowels on one side have an even number on the other.</b>
+                To successfully finish the game you all have to agree on the final answer by pressing the <b>Agree</b> button.
             </div>
             <div class='cards_list'>
                 {% for card in room_data.game%}
@@ -50,10 +46,20 @@
                 </div>
                 {% endfor %}
             </div>
-            <button type="button" id="btn-agree" class="btn btn-success">Agree</button>
-            <button type="button" id="btn-disagree" class="btn btn-danger">Disagree</button>
-
+            <div class="game_buttons">
+                <button type="button" id="btn-agree" class="btn btn-success btn-lg">Agree</button>
+                <button type="button" id="btn-disagree" class="btn btn-danger btn-lg">Disagree</button>
+            </div>
         </div>
+        <hr/>
+        <h3>Logged users:</h3>
+            <div id="current_users">
+                <div class="logged_user" id="{{room_data.current_user_id}}"><b> <i>(you)</i> {{room_data.current_user}}</b>
+                    <button id="leave_room" class="btn btn-danger btn-sm float-right">Leave room</button></div>
+                {% for item in room_data.existing_users %}
+                <div class="logged_user" id="{{item[1]}}"><b>{{item[0]}}</b></div>
+                {% endfor %}
+            </div>
     </div>
     <div class="col-7">
         <div class="chatbox">
@@ -64,6 +70,7 @@
         <form class="sumbission" action="" method="POST">
             <input type="text" id="message" placeholder="Type a message"/>
             <input class="btn btn-primary" type="submit"/>
+            <div class="note">TIP: You can @mention the other participants.</div>
         </form>
     </div>
 </div>
@@ -275,7 +282,6 @@ $(function() {
                   }).autocomplete(autocomplete_options);
                 break;
             case 'LEAVE_ROOM':
-                console.log("Leaving: " + msg.user_name);
                 $('#'+msg.user_id).remove();
                 logged_users= logged_users.filter(function(el) { return el.label != "@"+msg.user_name; });
                 $("#message").bind("keydown", function( event ) {
@@ -284,6 +290,14 @@ $(function() {
                       event.preventDefault();
                     }
                 }).autocomplete(autocomplete_options);
+                break;
+            case 'WASON_FINISHED':
+                $('button').prop('disabled', true);
+                $('input').prop('disabled', true);
+                var user_name = $('input#user_name').val();
+                var user_id = $('input#user_id').val();
+                socket.emit('leave', { user_name: user_name, room: room_id, user_id:user_id});
+                $('#result_holder').append("<h1 class='finish'>Game Finished! Thank you for playing</h1>")
                 break;
             default:
             // code block

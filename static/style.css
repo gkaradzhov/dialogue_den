@@ -10,8 +10,14 @@
     margin: 50px;
 }
 
-.task{
-    margin-left: 50px;
+.game_buttons{
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.game_buttons button{
+    margin-right: 50px;
 }
 
 
@@ -161,4 +167,11 @@
 .wason-disagreed:after{
     color: red !important;
     content: "\2716" !important;
+}
+
+
+.finish{
+    font-weight: bold !important;
+    color: red !important;
+    size: larger !important;
 }

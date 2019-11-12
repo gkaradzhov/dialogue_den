@@ -99,14 +99,37 @@ def on_leave(data):
     socketio.emit('response', m.to_json(), room=room)
 
 
+def check_finished(room_history):
+    logged_users = {}
+    for item in room_history:
+        if item.message_type == 'JOIN_ROOM' or item.message_type == 'DISAGREE_WASON_GAME':
+            logged_users[item.origin_id] = False
+        elif item.message_type == 'LEAVE_ROOM' and item.origin_id in logged_users:
+            del logged_users[item.origin_id]
+        elif item.message_type == 'AGREE_WASON_GAME':
+            logged_users[item.origin_id] = True
+    
+    for user, outcome in logged_users.items():
+        if not outcome:
+            return False
+    return True
+
 @socketio.on('response')
 def handle_response(json, methods=('GET', 'POST')):
     print('received my event: ' + str(json))
     room = json['room']
     m = Message(origin_id=json['user_id'], origin_name=json['user_name'], message_type=json['type'], room_id=room,
                 content=json['message'])
-    
+
+    CONVERSATION_LOGS[room].append(m)
     socketio.emit('response', m.to_json(), room=room)
+
+    is_finished = check_finished(CONVERSATION_LOGS[room])
+    
+    if is_finished:
+        m = Message(origin_id=-1, origin_name='SYSTEM', message_type='WASON_FINISHED', room_id=room,
+                    content=json['message'])
+        socketio.emit('response', m.to_json(), room=room)
 
 
 if __name__ == '__main__':
