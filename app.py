@@ -6,9 +6,11 @@ from flask import Flask, request, render_template, redirect
 from flask_socketio import join_room, leave_room
 from flask_socketio import send
 
-from data_persistency_utils import read_rooms_from_file, write_rooms_to_file, get_dialogue
+from data_persistency_utils import read_rooms_from_file, write_rooms_to_file, get_dialogue, add_new_archive
 from message import Room, Message
 from utils import generate_user, generate_wason_cards
+from sys_config import DIALOGUES_STABLE
+from os import path
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
@@ -16,6 +18,32 @@ socketio = flask_socketio.SocketIO(app, cors_allowed_origins='*', async_mode='ev
 
 CONVERSATION_LOGS = defaultdict(list)
 
+def trigger_finish(room_data):
+    
+    room_id = room_data[0]['room']
+    
+    # 1. Save the dialogue to dialogues_stable
+    filepath = path.join(DIALOGUES_STABLE, room_id)
+    with open(filepath, 'w') as wf:
+        for item in room_data:
+            wf.writelines(item.to_json() + '\n')
+            
+    # 2. Mark room as closed
+    existing_rooms = read_rooms_from_file()
+    for room in existing_rooms:
+        if room[1] == room_id:
+            room[2] = True
+    write_rooms_to_file(existing_rooms)
+    
+    # 3. Archive data folder
+    add_new_archive()
+    
+    # 4. Sync with amazon s3
+    
+    
+    # 5. Send via email ?
+    
+    pass
 
 # A welcome message to test our server
 @app.route('/')
@@ -108,6 +136,9 @@ def check_finished(room_history):
             del logged_users[item.origin_id]
         elif item.message_type == 'AGREE_WASON_GAME':
             logged_users[item.origin_id] = True
+        elif item.message_type == 'WASON_GAME':
+            for key in logged_users.keys():
+                logged_users[key] = False
     
     for user, outcome in logged_users.items():
         if not outcome:
@@ -129,6 +160,7 @@ def handle_response(json, methods=('GET', 'POST')):
     if is_finished:
         m = Message(origin_id=-1, origin_name='SYSTEM', message_type='WASON_FINISHED', room_id=room,
                     content=json['message'])
+        triger_finish(CONVERSATION_LOGS[room])
         socketio.emit('response', m.to_json(), room=room)
 
 
