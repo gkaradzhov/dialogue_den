@@ -19,8 +19,10 @@
 <input id="chat_id" type="hidden" value="{{room_data.id}}"/>
 <input id="user_id" type="hidden" value="{{room_data.current_user_id}}"/>
 <input id="user_name" type="hidden" value="{{room_data.current_user}}"/>
+<input id="user_status" type="hidden" value="{{room_data.current_user_status}}"/>
 
 <div id="result_holder"></div>
+<div class="timer_holder hidden"> You have: <div id="timer"></div> to complete the task</div>
 
 <div class="row">
     <div class="col-5">
@@ -28,11 +30,11 @@
             <h3>Task: </h3>
             <div class="task_description">
                 You are presented with four cards. Each card has a letter on one side and a number on the other.
-                <b>Collaborate</b> with the other participants in this conversation to solve the following task: <br/>
                 <b> Which card(s) must you turn to test the rule: <br/>
                 All cards with vowels on one side have an even number on the other.</b>
-                To successfully finish the game you all have to agree on the final answer by pressing the <b>Agree</b> button.
+                To successfully finish the game you all have to agree on the final answer by pressing the <b>Submit</b> button.
             </div>
+            <div class="play_prompt hidden">Thank you! Now you have to <b>collaborate</b> with the other participants in this conversation to try to solve the task together.</div>
             <div class='cards_list'>
                 {% for card in room_data.game%}
                 {% set attr = 'checked' if card['checked'] == 'True' else '' %}
@@ -60,7 +62,7 @@
                 {% endfor %}
             </div>
     </div>
-    <div class="col-7">
+    <div id="chat_container" class="col-7 hidden">
         <div class="chatbox">
             {% for item in room_data.messages %}
             <div class="message msg-other"><b>{{item['user_name']}}: </b>{{item['message']}}</div>
@@ -85,11 +87,14 @@
 const JOIN_ROOM = 'JOIN_ROOM';
 const CHAT_MESSAGE = 'CHAT_MESSAGE';
 const LEAVE_ROOM = 'LEAVE_ROOM';
-
+const FINISHED_ONBOARDING = 'FINISHED_ONBOARDING';
 const WASON_INITIAL = 'WASON_INITIAL';
 const WASON_GAME = 'WASON_GAME';
 const WASON_AGREE = 'WASON_SUBMIT';
 const WASON_FINISHED = 'WASON_FINISHED';
+
+const USR_ONBOARDING = 'USR_ONBOARDING';
+const USR_PLAYING = 'USR_PLAYING';
 
 $(function() {
     function boldMentions(str){
@@ -167,21 +172,23 @@ $(function() {
 
     socket.on( 'connect', function() {
         user_name = $("#user_name").val();
-        socket.emit('join', { 'room': room_id, 'user_name': user_name});
+        var user_status = $('input#user_status').val();
+        socket.emit('join', { 'room': room_id, 'user_name': user_name, 'user_status': user_status});
         $('.logged_user').removeClass('wason-agreed');
-
     });
 
     $('#leave_room').on('click', function(e){
         var user_name = $('input#user_name').val();
         var user_id = $('input#user_id').val();
-        socket.emit('leave', { user_name: user_name, room: room_id, user_id:user_id});
+        var user_status = $('input#user_status').val();
+        socket.emit('leave', { user_name: user_name, room: room_id, user_id:user_id, user_status: user_status});
         window.location.replace("/");
     });
 
     $('form').on('submit', function(e) {
         var user_name = $('input#user_name').val();
         var user_id = $('input#user_id').val();
+        var user_status = $('input#user_status').val()
         e.preventDefault();
         let message = $('input#message').val();
         if (message!=""){
@@ -190,7 +197,8 @@ $(function() {
                 user_name: user_name,
                 type: CHAT_MESSAGE,
                 message: message,
-                room: room_id
+                room: room_id,
+                user_status: user_status
           });
         }
         $('input#message').val('').focus();
@@ -201,11 +209,13 @@ $(function() {
         var selection = get_card_selection();
         var user_name = $('input#user_name').val();
         var user_id = $('input#user_id').val();
+        var user_status = $('input#user_status').val()
         socket.emit( 'response', {
             user_id: user_id,
             user_name: user_name,
             type: WASON_GAME,
             message: selection,
+            user_status: user_status,
             room: room_id
         });
     });
@@ -215,16 +225,25 @@ $(function() {
         var selection = get_card_selection();
         var user_name = $('input#user_name').val();
         var user_id = $('input#user_id').val();
+        var user_status = $('input#user_status').val()
+
         socket.emit('response', {
             user_id: user_id,
             user_name: user_name,
             type: WASON_AGREE,
             message: selection,
-            room: room_id
+            room: room_id,
+            user_status: user_status
         });
-        $('#btn-agree').prop('disabled', true);
-        $('#btn-disagree').prop('disabled', false);
 
+        if (user_status == USR_ONBOARDING){
+                $('input#user_status').val(USR_PLAYING);
+                $('#chat_container').toggle();
+                $('.play_prompt').toggle();
+        }
+        else{
+            $('#btn-agree').prop('disabled', true);
+        }
     });
 
     socket.on('response', function(message_str) {
@@ -273,9 +292,42 @@ $(function() {
                 $('input').prop('disabled', true);
                 var user_name = $('input#user_name').val();
                 var user_id = $('input#user_id').val();
-                socket.emit('leave', { user_name: user_name, room: room_id, user_id:user_id});
+                var user_status = $('input#user_status').val()
+
+                socket.emit('leave', { user_name: user_name, room: room_id, user_id:user_id, user_status: user_status});
                 $('#result_holder').append("<h1 class='finish'>Game Finished! Thank you for playing</h1>")
                 break;
+            case WASON_AGREE:
+                target_user_id = msg.user_id;
+                if (msg.user_status == USR_PLAYING){
+                    $('#' + target_user_id).addClass('wason-agreed');
+                }
+                break
+            case FINISHED_ONBOARDING:
+                $('.timer_holder').toggle();
+                var date = msg.message;
+                var countDownDate = new Date(date).getTime();
+
+                var x = setInterval(function() {
+                    var now = new Date().getTime();
+
+                    // Find the distance between now and the count down date
+                    var distance = countDownDate - now;
+
+                    // Time calculations for days, hours, minutes and seconds
+
+                    var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                    document.getElementById("timer").innerHTML = minutes + "minutes " + seconds + "seconds ";
+
+                    // If the count down is finished, write some text
+                    if (distance < 0) {
+                    clearInterval(x);
+                    document.getElementById("timer").innerHTML = "Out of time";
+                    }
+                }, 1000);
+                break
             default:
             // code block
         }
@@ -299,7 +351,9 @@ $(function() {
     function Leave() {
         var user_name = $('input#user_name').val();
         var user_id = $('input#user_id').val();
-        socket.emit('leave', { user_name: user_name, room: room_id, user_id:user_id});
+        var user_status = $('input#user_status').val()
+
+        socket.emit('leave', { user_name: user_name, room: room_id, user_id:user_id, user_status: user_status});
     }
     var prevKey="";
     $(document).keydown(function (e) {

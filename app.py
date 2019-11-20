@@ -7,7 +7,8 @@ from flask import Flask, request, render_template, redirect
 from flask_socketio import join_room, leave_room
 from flask_socketio import send
 
-from constants import JOIN_ROOM, CHAT_MESSAGE, LEAVE_ROOM, WASON_INITIAL, WASON_AGREE, WASON_GAME, WASON_FINISHED
+from constants import JOIN_ROOM, CHAT_MESSAGE, LEAVE_ROOM, WASON_INITIAL, WASON_AGREE, WASON_GAME, WASON_FINISHED, \
+    USR_ONBOARDING, USR_PLAYING, FINISHED_ONBOARDING
 from data_persistency_utils import read_rooms_from_file, write_rooms_to_file, get_dialogue
 from message import Room, Message
 from sys_config import DIALOGUES_STABLE
@@ -73,7 +74,7 @@ def chatroom(room_id):
     
     current_user = generate_user([d[0] for d in logged_users])
     m = Message(origin_name=current_user['user_name'], message_type=JOIN_ROOM, room_id=room_id,
-                origin_id=current_user['user_id'])
+                origin_id=current_user['user_id'], user_status=USR_ONBOARDING)
     
     CONVERSATION_LOGS[room_id].append(m)
     socketio.emit('response', m.to_json(), room=room_id)
@@ -83,7 +84,8 @@ def chatroom(room_id):
     return render_template("room.html", room_data={'id': room_id, 'name': room_name, 'game': wason_initial,
                                                    'messages': messages, 'existing_users': logged_users,
                                                    'current_user': current_user['user_name'],
-                                                   'current_user_id': current_user['user_id']})
+                                                   'current_user_id': current_user['user_id'],
+                                                   'current_user_status': USR_ONBOARDING})
 
 
 @app.route('/create_room', methods=('GET', 'POST'))
@@ -124,12 +126,12 @@ def on_leave(data):
     socketio.emit('response', m.to_json(), room=room)
 
 
-def check_finished(room_history):
+def check_finished(room_history, usr_status):
     logged_users = {}
     for item in room_history:
         if item.message_type == LEAVE_ROOM and item.origin_id in logged_users:
             del logged_users[item.origin_id]
-        elif item.message_type == WASON_AGREE:
+        elif item.message_type == WASON_AGREE and item.user_status == usr_status:
             logged_users[item.origin_id] = True
         elif item.message_type == WASON_GAME or item.message_type == JOIN_ROOM:
             logged_users[item.origin_id] = False
@@ -139,20 +141,31 @@ def check_finished(room_history):
             return False
     return True
 
+import datetime
 
 @socketio.on('response')
 def handle_response(json, methods=('GET', 'POST')):
     print('received my event: ' + str(json))
     room = json['room']
     m = Message(origin_id=json['user_id'], origin_name=json['user_name'], message_type=json['type'], room_id=room,
-                content=json['message'])
+                content=json['message'], user_status=json['user_status'])
     
     CONVERSATION_LOGS[room].append(m)
+    
     socketio.emit('response', m.to_json(), room=room)
     
-    is_finished = check_finished(CONVERSATION_LOGS[room])
+    finished_onboarding = check_finished(CONVERSATION_LOGS[room], USR_ONBOARDING)
     
-    if is_finished:
+    if finished_onboarding:
+        after_5mins = datetime.datetime.utcnow() + datetime.timedelta(minutes=5)
+        date_str = after_5mins.isoformat()
+        m = Message(origin_id=-1, origin_name='SYSTEM', message_type=FINISHED_ONBOARDING, room_id=room, content=date_str)
+        print(m.to_json())
+        CONVERSATION_LOGS[room].append(m)
+        socketio.emit('response', m.to_json(), room=room)
+
+    finished_game = check_finished(CONVERSATION_LOGS[room], USR_PLAYING)
+    if finished_game:
         m = Message(origin_id=-1, origin_name='SYSTEM', message_type=WASON_FINISHED, room_id=room)
         CONVERSATION_LOGS[room].append(m)
         trigger_finish(CONVERSATION_LOGS[room])

@@ -175,3 +175,15 @@
     color: red !important;
     size: larger !important;
 }
+
+.hidden{
+    display: none;
+}
+
+.play_prompt{
+    color: green !important;
+}
+
+.timer_holder{
+    color: red !important;
+}

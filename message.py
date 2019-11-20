@@ -25,7 +25,7 @@ class Room:
 
 
 class Message:
-    def __init__(self, origin_name, room_id, message_type, content='', origin_id=None):
+    def __init__(self, origin_name, room_id, message_type, content='', origin_id=None, user_status='UKN'):
         self.origin = origin_name
         self.origin_id = origin_id
         self.message_type = message_type
@@ -33,6 +33,7 @@ class Message:
         self.timestamp = datetime.datetime.now()
         self.unique_id = uuid.uuid4().hex
         self.room_id = room_id
+        self.user_status = user_status
         
         filename = os.path.join(DIALOGUES_RUNNING, room_id)
         if os.path.exists(filename):
@@ -51,6 +52,7 @@ class Message:
             'message': self.content,
             'timestamp': str(self.timestamp),
             'room_id': self.room_id,
-            'message_id': self.unique_id
+            'message_id': self.unique_id,
+            'user_status': self.user_status
         }
         return json.dumps(output_dict)
