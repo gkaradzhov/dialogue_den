@@ -22,7 +22,7 @@
 <input id="user_status" type="hidden" value="{{room_data.current_user_status}}"/>
 
 <div id="result_holder"></div>
-<div class="timer_holder hidden"> You have: <div id="timer"></div> to complete the task</div>
+<div class="timer_holder hidden"> Please complete the task within the next: <div id="timer"></div></div>
 
 <div class="row">
     <div class="col-5">
@@ -34,7 +34,7 @@
                 All cards with vowels on one side have an even number on the other.</b>
                 To successfully finish the game you all have to agree on the final answer by pressing the <b>Submit</b> button.
             </div>
-            <div class="play_prompt hidden">Thank you! Now you have to <b>collaborate</b> with the other participants in this conversation to try to solve the task together.</div>
+            <div class="play_prompt hidden">Thank you! Now you have to <b>collaborate</b> with the other participants in this conversation to solve the task together.</div>
             <div class='cards_list'>
                 {% for card in room_data.game%}
                 {% set attr = 'checked' if card['checked'] == 'True' else '' %}
@@ -319,12 +319,12 @@ $(function() {
                     var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
                     var seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-                    document.getElementById("timer").innerHTML = minutes + "minutes " + seconds + "seconds ";
+                    $('#timer').text(minutes + " minutes " + seconds + " seconds");
 
                     // If the count down is finished, write some text
                     if (distance < 0) {
-                    clearInterval(x);
-                    document.getElementById("timer").innerHTML = "Out of time";
+                        clearInterval(x);
+                        $('#timer').text("Out of time");
                     }
                 }, 1000);
                 break
