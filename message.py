@@ -14,7 +14,7 @@ class Room:
             self.room_id = uuid.uuid4().hex
         else:
             self.room_id = room_id
-        self.is_done = is_done
+        self.is_done = is_done == 'True'
     
     @classmethod
     def from_text_representation(cls, data_tuple):

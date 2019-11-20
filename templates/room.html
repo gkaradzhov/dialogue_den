@@ -81,6 +81,16 @@
 
 </html>
 <script type="text/javascript">
+
+const JOIN_ROOM = 'JOIN_ROOM';
+const CHAT_MESSAGE = 'CHAT_MESSAGE';
+const LEAVE_ROOM = 'LEAVE_ROOM';
+
+const WASON_INITIAL = 'WASON_INITIAL';
+const WASON_GAME = 'WASON_GAME';
+const WASON_AGREE = 'WASON_SUBMIT';
+const WASON_FINISHED = 'WASON_FINISHED';
+
 $(function() {
     function boldMentions(str){
         var regex = new RegExp("@\\w*", 'gi');
@@ -178,7 +188,7 @@ $(function() {
             socket.emit( 'response', {
                 user_id: user_id,
                 user_name: user_name,
-                type: 'CHAT_MESSAGE',
+                type: CHAT_MESSAGE,
                 message: message,
                 room: room_id
           });
@@ -194,7 +204,7 @@ $(function() {
         socket.emit( 'response', {
             user_id: user_id,
             user_name: user_name,
-            type: 'WASON_GAME',
+            type: WASON_GAME,
             message: selection,
             room: room_id
         });
@@ -208,7 +218,7 @@ $(function() {
         socket.emit('response', {
             user_id: user_id,
             user_name: user_name,
-            type: 'AGREE_WASON_GAME',
+            type: WASON_AGREE,
             message: selection,
             room: room_id
         });
@@ -221,7 +231,7 @@ $(function() {
         msg =  JSON.parse(message_str);
 
         switch(msg.type) {
-            case 'CHAT_MESSAGE':
+            case CHAT_MESSAGE:
                 if(typeof msg.user_name !== 'undefined' ) {
                         var user_name = $('input#user_name').val();
                         var user_id = $('input#user_id').val();
@@ -238,7 +248,7 @@ $(function() {
                         $('div.chatbox').scrollTop($('div.chatbox')[0].scrollHeight);
                     }
                 break;
-            case 'JOIN_ROOM':
+            case JOIN_ROOM:
                 $("#current_users").append("<div class='logged_user' id='" + msg.user_id + "'><b>" + msg.user_name + "</b></div>");
                 logged_users.push({'label': "@" + msg.user_name,'id': msg.user_id})
                 $("#message").bind("keydown", function(event){
@@ -248,7 +258,7 @@ $(function() {
                     }
                   }).autocomplete(autocomplete_options);
                 break;
-            case 'LEAVE_ROOM':
+            case LEAVE_ROOM:
                 $('#'+msg.user_id).remove();
                 logged_users= logged_users.filter(function(el) { return el.label != "@"+msg.user_name; });
                 $("#message").bind("keydown", function( event ) {
@@ -258,7 +268,7 @@ $(function() {
                     }
                 }).autocomplete(autocomplete_options);
                 break;
-            case 'WASON_FINISHED':
+            case WASON_FINISHED:
                 $('button').prop('disabled', true);
                 $('input').prop('disabled', true);
                 var user_name = $('input#user_name').val();
