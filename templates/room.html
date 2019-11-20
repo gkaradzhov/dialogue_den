@@ -29,7 +29,7 @@
             <div class="task_description">
                 You are presented with four cards. Each card has a letter on one side and a number on the other.
                 <b>Collaborate</b> with the other participants in this conversation to solve the following task: <br/>
-                <b> Which card must you turn to test the rule: <br/>
+                <b> Which card(s) must you turn to test the rule: <br/>
                 All cards with vowels on one side have an even number on the other.</b>
                 To successfully finish the game you all have to agree on the final answer by pressing the <b>Agree</b> button.
             </div>
@@ -47,8 +47,7 @@
                 {% endfor %}
             </div>
             <div class="game_buttons">
-                <button type="button" id="btn-agree" class="btn btn-success btn-lg">Agree</button>
-                <button type="button" id="btn-disagree" class="btn btn-danger btn-lg">Disagree</button>
+                <button type="button" id="btn-agree" class="btn btn-success btn-lg">Submit</button>
             </div>
         </div>
         <hr/>
@@ -218,21 +217,6 @@ $(function() {
 
     });
 
-    var disagree_clicked = $('#btn-disagree').on('click', function(e){
-        var selection = get_card_selection();
-        var user_name = $('input#user_name').val();
-        var user_id = $('input#user_id').val();
-        socket.emit('response', {
-            user_id: user_id,
-            user_name: user_name,
-            type: 'DISAGREE_WASON_GAME',
-            message: selection,
-            room: room_id
-        });
-        $('#btn-disagree').prop('disabled', true);
-        $('#btn-agree').prop('disabled', false);
-    });
-
     socket.on('response', function(message_str) {
         msg =  JSON.parse(message_str);
 
@@ -253,23 +237,6 @@ $(function() {
                         }
                         $('div.chatbox').scrollTop($('div.chatbox')[0].scrollHeight);
                     }
-                break;
-            case 'WASON_GAME':
-                $.each( msg.message, function( key, value ) {
-                    $('input:checkbox#' + value['value']).prop('checked', value['checked']);
-                });
-                $('.logged_user').removeClass('wason-agreed');
-                $('#btn-agree').prop('disabled', false);
-                break;
-            case 'AGREE_WASON_GAME':
-                target_user_id = msg.user_id;
-                $('#' + target_user_id).removeClass('wason-disagreed');
-                $('#' + target_user_id).addClass('wason-agreed');
-                break;
-            case 'DISAGREE_WASON_GAME':
-                target_user_id = msg.user_id;
-                $('#' + target_user_id).removeClass('wason-agreed');
-                $('#' + target_user_id).addClass('wason-disagreed');
                 break;
             case 'JOIN_ROOM':
                 $("#current_users").append("<div class='logged_user' id='" + msg.user_id + "'><b>" + msg.user_name + "</b></div>");

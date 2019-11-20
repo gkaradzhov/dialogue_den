@@ -21,7 +21,7 @@ CONVERSATION_LOGS = defaultdict(list)
 
 def trigger_finish(room_data):
     
-    room_id = room_data[0]['room']
+    room_id = room_data[0].room_id
     
     # 1. Save the dialogue to dialogues_stable
     filepath = path.join(DIALOGUES_STABLE, room_id)
@@ -32,19 +32,20 @@ def trigger_finish(room_data):
     # 2. Mark room as closed
     existing_rooms = read_rooms_from_file()
     for room in existing_rooms:
-        if room[1] == room_id:
-            room[2] = True
+        if room.room_id == room_id:
+            room.is_done = True
     write_rooms_to_file(existing_rooms)
     
-    # 3. Archive data folder
-    add_new_archive()
-    
-    # 4. Sync with amazon s3
-    
-    
-    # 5. Send via email ?
-    
-    pass
+    # return
+    # # 3. Archive data folder
+    # add_new_archive()
+    #
+    # # 4. Sync with amazon s3
+    #
+    #
+    # # 5. Send via email ?
+    #
+    # pass
 
 # A welcome message to test our server
 @app.route('/')
@@ -71,15 +72,11 @@ def chatroom(room_id):
     current_user = generate_user([d[0] for d in logged_users])
     m = Message(origin_name=current_user['user_name'], message_type='JOIN_ROOM', room_id=room_id,
                 origin_id=current_user['user_id'])
+    
     CONVERSATION_LOGS[room_id].append(m)
     socketio.emit('response', m.to_json(), room=room_id)
     
-    wason_initial = [d['message'] for d in running_dialogue if d['type'] == 'WASON_INITIAL']
-    if len(wason_initial) > 0:
-        wason_initial = wason_initial[0]
-        wason_final_state = [d['message'] for d in running_dialogue if d['type'] == 'WASON_GAME']
-        if len(wason_final_state) > 0:
-            wason_initial = wason_final_state[-1]
+    wason_initial = [d['message'] for d in running_dialogue if d['type'] == 'WASON_INITIAL'][0]
     
     if len(wason_initial) == 0:
         wason_game = generate_wason_cards()
@@ -105,6 +102,9 @@ def create_room():
         existing_rooms = read_rooms_from_file()
         existing_rooms.append(room)
         write_rooms_to_file(existing_rooms)
+        wason_game = generate_wason_cards()
+        m = Message(origin_name='SYSTEM', message_type='WASON_INITIAL', room_id=room.room_id,
+                    origin_id='-1', content=wason_game)
         return redirect('/')
 
 
@@ -138,8 +138,7 @@ def check_finished(room_history):
         elif item.message_type == 'AGREE_WASON_GAME':
             logged_users[item.origin_id] = True
         elif item.message_type == 'WASON_GAME':
-            for key in logged_users.keys():
-                logged_users[key] = False
+            logged_users[item.origin_id] = False
     
     for user, outcome in logged_users.items():
         if not outcome:
@@ -159,8 +158,8 @@ def handle_response(json, methods=('GET', 'POST')):
     is_finished = check_finished(CONVERSATION_LOGS[room])
     
     if is_finished:
-        m = Message(origin_id=-1, origin_name='SYSTEM', message_type='WASON_FINISHED', room_id=room,
-                    content=json['message'])
+        m = Message(origin_id=-1, origin_name='SYSTEM', message_type='WASON_FINISHED', room_id=room)
+        CONVERSATION_LOGS[room].append(m)
         trigger_finish(CONVERSATION_LOGS[room])
         socketio.emit('response', m.to_json(), room=room)
 
