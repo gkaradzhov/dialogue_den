@@ -11,6 +11,7 @@ from message import Room, Message
 from utils import generate_user, generate_wason_cards
 from sys_config import DIALOGUES_STABLE
 from os import path
+import signal
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
@@ -160,11 +161,21 @@ def handle_response(json, methods=('GET', 'POST')):
     if is_finished:
         m = Message(origin_id=-1, origin_name='SYSTEM', message_type='WASON_FINISHED', room_id=room,
                     content=json['message'])
-        triger_finish(CONVERSATION_LOGS[room])
+        trigger_finish(CONVERSATION_LOGS[room])
         socketio.emit('response', m.to_json(), room=room)
 
 
+def receiveSignal(signal_num, frame):
+    print("Exiting signally")
+    print(signal_num, frame)
+
+
 if __name__ == '__main__':
-    socketio.run(host='localhost', port=8898, app=app)
+    signal.signal(signal.SIGTERM, receiveSignal)
+    try:
+        socketio.run(host='localhost', port=8898, app=app)
+    finally:
+        print("Exiting gracefully")
+    
     # Threaded option to enable multiple instances for multiple user access support
     # app.run(threaded=True, port=5000)
