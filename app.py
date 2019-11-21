@@ -1,3 +1,4 @@
+import datetime
 import signal
 from collections import defaultdict
 from os import path
@@ -129,6 +130,9 @@ def on_leave(data):
 def check_finished(room_history, usr_status):
     logged_users = {}
     for item in room_history:
+        if usr_status == USR_ONBOARDING and item.message_type == FINISHED_ONBOARDING:
+            # No need to check, already finished onboarding
+            return False
         if item.message_type == LEAVE_ROOM and item.origin_id in logged_users:
             del logged_users[item.origin_id]
         elif item.message_type == WASON_AGREE and item.user_status == usr_status:
@@ -141,7 +145,6 @@ def check_finished(room_history, usr_status):
             return False
     return True
 
-import datetime
 
 @socketio.on('response')
 def handle_response(json, methods=('GET', 'POST')):
@@ -159,11 +162,12 @@ def handle_response(json, methods=('GET', 'POST')):
     if finished_onboarding:
         after_5mins = datetime.datetime.utcnow() + datetime.timedelta(minutes=5)
         date_str = after_5mins.isoformat()
-        m = Message(origin_id=-1, origin_name='SYSTEM', message_type=FINISHED_ONBOARDING, room_id=room, content=date_str)
+        m = Message(origin_id=-1, origin_name='SYSTEM', message_type=FINISHED_ONBOARDING, room_id=room,
+                    content=date_str)
         print(m.to_json())
         CONVERSATION_LOGS[room].append(m)
         socketio.emit('response', m.to_json(), room=room)
-
+    
     finished_game = check_finished(CONVERSATION_LOGS[room], USR_PLAYING)
     if finished_game:
         m = Message(origin_id=-1, origin_name='SYSTEM', message_type=WASON_FINISHED, room_id=room)
