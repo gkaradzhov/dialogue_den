@@ -185,5 +185,6 @@
 }
 
 .timer_holder{
+    margin-left: 10px;
     color: red !important;
 }

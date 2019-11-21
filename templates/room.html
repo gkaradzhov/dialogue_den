@@ -293,9 +293,9 @@ $(function() {
                 var user_name = $('input#user_name').val();
                 var user_id = $('input#user_id').val();
                 var user_status = $('input#user_status').val()
-
-                socket.emit('leave', { user_name: user_name, room: room_id, user_id:user_id, user_status: user_status});
                 $('#result_holder').append("<h1 class='finish'>Game Finished! Thank you for playing</h1>")
+                $('.timer_holder').toggle();
+                socket.emit('leave', { user_name: user_name, room: room_id, user_id:user_id, user_status: user_status});
                 break;
             case WASON_AGREE:
                 target_user_id = msg.user_id;
