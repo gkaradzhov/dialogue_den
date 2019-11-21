@@ -25,13 +25,19 @@ class Room:
 
 
 class Message:
-    def __init__(self, origin_name, room_id, message_type, content='', origin_id=None, user_status='UKN'):
+    def __init__(self, origin_name, room_id, message_type, content='', origin_id=None, user_status='UKN', unique_id=None, timestamp=None):
         self.origin = origin_name
         self.origin_id = origin_id
         self.message_type = message_type
         self.content = content
-        self.timestamp = datetime.datetime.now()
-        self.unique_id = uuid.uuid4().hex
+        if not timestamp:
+            self.timestamp = datetime.datetime.now()
+        else:
+            self.timestamp = timestamp
+        if not unique_id:
+            self.unique_id = uuid.uuid4()
+        else:
+            self.unique_id = unique_id
         self.room_id = room_id
         self.user_status = user_status
         
