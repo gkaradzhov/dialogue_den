@@ -65,7 +65,7 @@
     <div id="chat_container" class="col-7 hidden">
         <div class="chatbox">
             {% for item in room_data.messages %}
-            <div class="message msg-other"><b>{{item['user_name']}}: </b>{{item['message']}}</div>
+            <div class="message msg-other"><b>{{item.origin}}: </b>{{item.content}}</div>
             {%endfor%}
         </div>
         <form class="sumbission" action="" method="POST">
