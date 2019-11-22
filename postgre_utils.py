@@ -3,14 +3,24 @@ import json
 import psycopg2
 import select
 import time
+import os
 
 from message import Room, Message
 
 
 class PostgreConnection:
     def __init__(self, path_to_credentials):
-        with open(path_to_credentials, 'r') as rf:
-            creds = json.load(rf)
+        if os.path.exists(path_to_credentials):
+            with open(path_to_credentials, 'r') as rf:
+                creds = json.load(rf)
+        else:
+            creds = {
+                'user': os.environ.get('DB_USER'),
+                'database': os.environ.get('DB_NAME'),
+                'password': os.environ.get('DB_PASS'),
+                'host': os.environ.get('DB_HOST')
+            }
+
         self.creds = creds
         
         self.connection, self.cursor = self.create_cursor()
@@ -80,7 +90,7 @@ class PostgreConnection:
         return messages
     
     def mark_room_done(self, room_id):
-        self.__execute("UPDATE room SET is_done=True WHERE id=%s", (room_id,))
+        self.__execute("UPDATE room SET is_done=True WHERE id=%s RETURNING ID", (room_id,))
 
 #pg = PostgreConnection('creds.json', True)
 
