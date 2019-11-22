@@ -181,7 +181,7 @@ def receiveSignal(signal_num, frame):
 if __name__ == '__main__':
     signal.signal(signal.SIGTERM, receiveSignal)
     try:
-        socketio.run(host='localhost', port=8898, app=app, threaded=False, processes=3)
+        socketio.run(host='localhost', port=8898, app=app)
     finally:
         print("Exiting gracefully")
         sync_everything()

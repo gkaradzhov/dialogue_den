@@ -5,6 +5,8 @@ import select
 import time
 import os
 
+from psycopg2.pool import ThreadedConnectionPool
+
 from message import Room, Message
 
 
@@ -23,43 +25,44 @@ class PostgreConnection:
 
         self.creds = creds
         
-        self.connection, self.cursor = self.create_cursor()
-
-    def wait(self):
-        while True:
-            state = self.connection.poll()
-            print(state)
-            if state == psycopg2.extensions.POLL_OK:
-                break
-            elif state == psycopg2.extensions.POLL_WRITE:
-                select.select([], [self.connection.fileno()], [])
-            elif state == psycopg2.extensions.POLL_READ:
-                select.select([self.connection.fileno()], [], [])
-            else:
-                raise psycopg2.OperationalError("poll() returned %s" % state)
+        self.pool = self.create_pool()
     
-    def create_cursor(self):
-        connection = psycopg2.connect(user=self.creds['user'],
+    def create_pool(self):
+        pool = ThreadedConnectionPool(1, 20, user=self.creds['user'],
                                       database=self.creds['database'],
                                       password=self.creds['password'],
                                       host=self.creds['host'])
+        # connection = psycopg2.connect(user=self.creds['user'],
+        #                               database=self.creds['database'],
+        #                               password=self.creds['password'],
+        #                               host=self.creds['host'])
+        
+        return pool
+        
+    def get_cursor(self):
+        connection = self.pool.getconn()
         connection.set_session(autocommit=True)
         cursor = connection.cursor()
         return connection, cursor
     
     def __execute(self, query, params=()):
         try:
-            self.cursor.execute(query, params)
-            results = self.cursor.fetchall()
+            conn, cursor = self.get_cursor()
+            cursor.execute(query, params)
+            results = cursor.fetchall()
+            cursor.close()
+            self.pool.putconn(conn)
             return results
         except psycopg2.OperationalError as err:
             print(err)
             # Try a single retry after 3 secs
             time.sleep(3)
-            self.connection, self.cursor = self.create_cursor()
-            self.cursor.execute(query, params)
-
-            results = self.cursor.fetchall()
+            self.pool = self.create_pool()
+            conn, cursor = self.get_cursor()
+            cursor.execute(query, params)
+            results = cursor.fetchall()
+            cursor.close()
+            self.pool.putconn(conn)
             return results
         except Exception as e:
             print("Query: {}; Params: {}".format(query, params))
