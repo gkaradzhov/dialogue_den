@@ -1,7 +1,6 @@
 import datetime
 import json
 import signal
-from collections import defaultdict
 from os import path
 
 import flask_socketio
@@ -16,12 +15,9 @@ from message import Room, Message
 from postgre_utils import PostgreConnection
 from sys_config import DIALOGUES_STABLE
 from utils import generate_user, generate_wason_cards
-
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 socketio = flask_socketio.SocketIO(app, cors_allowed_origins='*', async_mode='eventlet')
-
-CONVERSATION_LOGS = defaultdict(list)
 
 PG = PostgreConnection('aws_creds.json')
 
@@ -44,16 +40,8 @@ def trigger_finish(room_data):
             room.is_done = True
     write_rooms_to_file(existing_rooms)
     
-    # return
-    # # 3. Archive data folder
-    # add_new_archive()
-    #
-    # # 4. Sync with amazon s3
-    #
-    #
-    # # 5. Send via email ?
-    #
-    # pass
+    # Sync with amazon
+    
 
 
 # A welcome message to test our server
@@ -81,7 +69,6 @@ def chatroom(room_id):
     m = Message(origin_name=current_user['user_name'], message_type=JOIN_ROOM, room_id=room_id,
                 origin_id=current_user['user_id'], user_status=USR_ONBOARDING)
     PG.insert_message(m)
-    CONVERSATION_LOGS[room_id].append(m)
     socketio.emit('response', m.to_json(), room=room_id)
     
     wason_initial = [d.content for d in running_dialogue if d.message_type == WASON_INITIAL][0]
@@ -111,7 +98,6 @@ def create_room():
         wason_game = generate_wason_cards()
         m = Message(origin_name='SYSTEM', message_type=WASON_INITIAL, room_id=room.room_id,
                     origin_id='-1', content=json.dumps(wason_game))
-        CONVERSATION_LOGS[room.room_id].append(m)
         PG.insert_message(m)
         return redirect('/')
 
@@ -130,7 +116,6 @@ def on_leave(data):
     room = data['room']
     leave_room(room)
     m = Message(origin_name=username, message_type=LEAVE_ROOM, room_id=room, origin_id=user_id)
-    CONVERSATION_LOGS[room].append(m)
     PG.insert_message(m)
     print("User {} has left the room {}".format(username, room))
     socketio.emit('response', m.to_json(), room=room)
@@ -162,25 +147,24 @@ def handle_response(json, methods=('GET', 'POST')):
     m = Message(origin_id=json['user_id'], origin_name=json['user_name'], message_type=json['type'], room_id=room,
                 content=json['message'], user_status=json['user_status'])
     
-    CONVERSATION_LOGS[room].append(m)
     socketio.emit('response', m.to_json(), room=room)
     PG.insert_message(m)
-    finished_onboarding = check_finished(CONVERSATION_LOGS[room], USR_ONBOARDING)
+    
+    all_messages = PG.get_messages(room)
+    finished_onboarding = check_finished(all_messages, USR_ONBOARDING)
     
     if finished_onboarding:
         after_5mins = datetime.datetime.utcnow() + datetime.timedelta(minutes=5)
         date_str = after_5mins.isoformat()
         m = Message(origin_id=-1, origin_name='SYSTEM', message_type=FINISHED_ONBOARDING, room_id=room,
                     content=date_str)
-        CONVERSATION_LOGS[room].append(m)
         socketio.emit('response', m.to_json(), room=room)
         PG.insert_message(m)
     
-    finished_game = check_finished(CONVERSATION_LOGS[room], USR_PLAYING)
+    finished_game = check_finished(all_messages, USR_PLAYING)
     if finished_game:
         m = Message(origin_id=-1, origin_name='SYSTEM', message_type=WASON_FINISHED, room_id=room)
-        CONVERSATION_LOGS[room].append(m)
-        trigger_finish(CONVERSATION_LOGS[room])
+        trigger_finish(all_messages)
         socketio.emit('response', m.to_json(), room=room)
         PG.insert_message(m)
 
