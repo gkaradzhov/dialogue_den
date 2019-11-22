@@ -24,6 +24,18 @@ class PostgreConnection:
         self.creds = creds
         
         self.connection, self.cursor = self.create_cursor()
+
+    def wait(self):
+        while True:
+            state = self.connection.poll()
+            if state == psycopg2.extensions.POLL_OK:
+                break
+            elif state == psycopg2.extensions.POLL_WRITE:
+                select.select([], [self.connection.fileno()], [])
+            elif state == psycopg2.extensions.POLL_READ:
+                select.select([self.connection.fileno()], [], [])
+            else:
+                raise psycopg2.OperationalError("poll() returned %s" % state)
     
     def create_cursor(self):
         connection = psycopg2.connect(user=self.creds['user'],
@@ -36,6 +48,7 @@ class PostgreConnection:
     
     def __execute(self, query, params=()):
         try:
+            self.wait()
             self.cursor.execute(query, params)
 
             results = self.cursor.fetchall()
