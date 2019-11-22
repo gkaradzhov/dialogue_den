@@ -11,7 +11,7 @@ class Room:
         self.name = name
         
         if room_id is None:
-            self.room_id = uuid.uuid4().hex
+            self.room_id = str(uuid.uuid4())
         else:
             self.room_id = room_id
         self.is_done = is_done == 'True'
@@ -35,7 +35,7 @@ class Message:
         else:
             self.timestamp = timestamp
         if not unique_id:
-            self.unique_id = uuid.uuid4()
+            self.unique_id = str(uuid.uuid4())
         else:
             self.unique_id = unique_id
         self.room_id = room_id
