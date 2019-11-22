@@ -49,9 +49,7 @@ class PostgreConnection:
     
     def __execute(self, query, params=()):
         try:
-            self.wait()
             self.cursor.execute(query, params)
-            self.wait()
             results = self.cursor.fetchall()
             return results
         except psycopg2.OperationalError as err:
