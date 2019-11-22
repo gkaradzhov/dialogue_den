@@ -28,6 +28,7 @@ class PostgreConnection:
     def wait(self):
         while True:
             state = self.connection.poll()
+            print(state)
             if state == psycopg2.extensions.POLL_OK:
                 break
             elif state == psycopg2.extensions.POLL_WRITE:
@@ -50,7 +51,7 @@ class PostgreConnection:
         try:
             self.wait()
             self.cursor.execute(query, params)
-
+            self.wait()
             results = self.cursor.fetchall()
             return results
         except psycopg2.OperationalError as err:
