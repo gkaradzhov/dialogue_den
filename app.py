@@ -10,10 +10,10 @@ from flask_socketio import send
 
 from constants import JOIN_ROOM, CHAT_MESSAGE, LEAVE_ROOM, WASON_INITIAL, WASON_AGREE, WASON_GAME, WASON_FINISHED, \
     USR_ONBOARDING, USR_PLAYING, FINISHED_ONBOARDING
-from data_persistency_utils import read_rooms_from_file, write_rooms_to_file
+from data_persistency_utils import read_rooms_from_file, write_rooms_to_file, sync_everything, save_file
 from message import Room, Message
 from postgre_utils import PostgreConnection
-from sys_config import DIALOGUES_STABLE
+from sys_config import DIALOGUES_STABLE, ROOM_PATH
 from utils import generate_user, generate_wason_cards
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
@@ -32,6 +32,9 @@ def trigger_finish(room_data):
     with open(filepath, 'w') as wf:
         for item in room_data:
             wf.writelines(item.to_json() + '\n')
+            
+    #Sync file to Amazon
+    save_file(filepath)
     
     # 2. Mark room as closed
     existing_rooms = read_rooms_from_file()
@@ -40,9 +43,8 @@ def trigger_finish(room_data):
             room.is_done = True
     write_rooms_to_file(existing_rooms)
     
-    # Sync with amazon
-    
-
+    # Sync rooms to amazon
+    save_file(ROOM_PATH)
 
 # A welcome message to test our server
 @app.route('/')
@@ -171,7 +173,7 @@ def handle_response(json, methods=('GET', 'POST')):
 
 def receiveSignal(signal_num, frame):
     print("Exiting signally")
-    print(signal_num, frame)
+    sync_everything()
 
 
 if __name__ == '__main__':
@@ -180,6 +182,7 @@ if __name__ == '__main__':
         socketio.run(host='localhost', port=8898, app=app)
     finally:
         print("Exiting gracefully")
+        sync_everything()
     
     # Threaded option to enable multiple instances for multiple user access support
     # app.run(threaded=True, port=5000)
