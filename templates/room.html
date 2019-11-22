@@ -182,7 +182,7 @@ $(function() {
         var user_id = $('input#user_id').val();
         var user_status = $('input#user_status').val();
         socket.emit('leave', { user_name: user_name, room: room_id, user_id:user_id, user_status: user_status});
-        window.location.replace("/");
+        window.location.href = "/";
     });
 
     $('form').on('submit', function(e) {
