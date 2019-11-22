@@ -15,6 +15,11 @@ from message import Room, Message
 from postgre_utils import PostgreConnection
 from sys_config import DIALOGUES_STABLE, ROOM_PATH
 from utils import generate_user, generate_wason_cards
+
+from eventlet.support import psycopg2_patcher
+psycopg2_patcher.make_psycopg_green()
+
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 socketio = flask_socketio.SocketIO(app, cors_allowed_origins='*', async_mode='eventlet')
