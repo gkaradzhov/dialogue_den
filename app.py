@@ -174,7 +174,7 @@ def handle_response(json, methods=('GET', 'POST')):
 
 
 def receiveSignal(signal_num, frame):
-    print("Exiting signally")
+    print("Exiting signally: {0}; {1}".format(signal_num, frame))
     sync_everything()
 
 
