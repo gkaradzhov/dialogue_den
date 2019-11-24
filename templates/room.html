@@ -325,10 +325,23 @@ $(function() {
                     if (distance < 0) {
                         clearInterval(x);
                         $('#timer').text("Out of time");
+                        var selection = get_card_selection();
+                        var user_name = $('input#user_name').val();
+                        var user_id = $('input#user_id').val();
+                        var user_status = $('input#user_status').val()
+                        socket.emit('response', {
+                            user_id: user_id,
+                            user_name: user_name,
+                            type: 'OUT_OF_TIME',
+                            message: selection,
+                            room: room_id,
+                            user_status: user_status
+                        });
                     }
                 }, 1000);
                 break
             default:
+                break
             // code block
         }
     });

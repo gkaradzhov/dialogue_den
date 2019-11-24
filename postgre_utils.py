@@ -55,6 +55,7 @@ class PostgreConnection:
             return results
         except psycopg2.OperationalError as err:
             print(err)
+            print("Query: {}; Params: {}".format(query, params))
             # Try a single retry after 3 secs
             time.sleep(3)
             self.pool = self.create_pool()
