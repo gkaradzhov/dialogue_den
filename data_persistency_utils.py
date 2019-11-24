@@ -71,6 +71,6 @@ def sync_everything():
     rooms_file = "data/rooms.tsv"
     save_file(rooms_file)
     stable_files = [join(DIALOGUES_STABLE, f) for f in listdir(DIALOGUES_STABLE) if isfile(join(DIALOGUES_STABLE, f))]
-    
+    print(stable_files)
     for file in stable_files:
         save_file(file)
