@@ -9,7 +9,7 @@ from flask_socketio import join_room, leave_room
 from flask_socketio import send
 
 from constants import JOIN_ROOM, CHAT_MESSAGE, LEAVE_ROOM, WASON_INITIAL, WASON_AGREE, WASON_GAME, WASON_FINISHED, \
-    USR_ONBOARDING, USR_PLAYING, FINISHED_ONBOARDING
+    USR_ONBOARDING, USR_PLAYING, FINISHED_ONBOARDING, USR_MODERATING
 from data_persistency_utils import read_rooms_from_file, write_rooms_to_file, sync_everything, save_file
 from message import Room, Message
 from postgre_utils import PostgreConnection
@@ -55,12 +55,16 @@ def index():
     return render_template('home.html', chat_rooms=existing_rooms)
 
 
-@app.route('/room/<room_id>')
-def chatroom(room_id):
+@app.route('/room')
+def chatroom():
+    room_id = request.args.get('room_id')
+    is_moderator = request.args.get('moderator', False)
+    is_moderator = is_moderator == "True"
+
     room_name = PG.get_single_room(room_id).name
     running_dialogue = PG.get_messages(room_id)
-    
     messages = [d for d in running_dialogue if d.message_type == CHAT_MESSAGE]
+
     logged_users = set()
     for item in running_dialogue:
         if item.message_type == JOIN_ROOM:
@@ -68,10 +72,14 @@ def chatroom(room_id):
         elif item.message_type == LEAVE_ROOM and (item.origin, item.origin_id) in logged_users:
             logged_users.remove((item.origin, item.origin_id))
     
-    current_user = generate_user([d[0] for d in logged_users])
+    current_user = generate_user([d[0] for d in logged_users], is_moderator)
     
+    if is_moderator:
+        status = USR_MODERATING
+    else:
+        status = USR_ONBOARDING
     m = Message(origin_name=current_user['user_name'], message_type=JOIN_ROOM, room_id=room_id,
-                origin_id=current_user['user_id'], user_status=USR_ONBOARDING)
+                origin_id=current_user['user_id'], user_status=status)
     PG.insert_message(m)
     socketio.emit('response', m.to_json(), room=room_id)
     
@@ -81,9 +89,7 @@ def chatroom(room_id):
                                                    'messages': messages, 'existing_users': logged_users,
                                                    'current_user': current_user['user_name'],
                                                    'current_user_id': current_user['user_id'],
-                                                   'current_user_status': USR_ONBOARDING})
-
-
+                                                   'current_user_status': status})
 
 
 @app.route('/create_room', methods=('GET', 'POST'))
@@ -128,6 +134,8 @@ def on_leave(data):
 def check_finished(room_history, usr_status):
     logged_users = {}
     for item in room_history:
+        if item.user_status == USR_MODERATING:
+            continue
         if usr_status == USR_ONBOARDING and item.message_type == FINISHED_ONBOARDING:
             # No need to check, already finished onboarding
             return False
@@ -137,7 +145,6 @@ def check_finished(room_history, usr_status):
             logged_users[item.origin_id] = True
         elif item.message_type == WASON_GAME or item.message_type == JOIN_ROOM:
             logged_users[item.origin_id] = False
-    
     for user, outcome in logged_users.items():
         if not outcome:
             return False

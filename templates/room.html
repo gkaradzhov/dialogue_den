@@ -95,6 +95,7 @@ const WASON_FINISHED = 'WASON_FINISHED';
 
 const USR_ONBOARDING = 'USR_ONBOARDING';
 const USR_PLAYING = 'USR_PLAYING';
+const USR_MODERATING = 'USR_MODERATING';
 
 $(function() {
     function boldMentions(str){
@@ -185,6 +186,13 @@ $(function() {
         window.location.href = "/";
     });
 
+    var user_status = $('input#user_status').val()
+
+    if (user_status == USR_MODERATING){
+        $('#chat_container').removeClass('hidden');
+        $('.play_prompt').removeClass('hidden');
+    }
+
     $('form').on('submit', function(e) {
         var user_name = $('input#user_name').val();
         var user_id = $('input#user_id').val();
@@ -218,6 +226,8 @@ $(function() {
             user_status: user_status,
             room: room_id
         });
+
+        $('#btn-agree').prop('disabled', false);
     });
 
 

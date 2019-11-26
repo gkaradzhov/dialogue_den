@@ -6,11 +6,13 @@ ANIMALS = {"Cat", "Guinea pig", "Alpaca", "Bat", "Beaver", "Bee", "Chipmunk", "D
 # COLOURS = {"Red", "Orange", "Purple", "Yellow", "Green", "Blue", "Pink", "Cyan", "Black", "White"}
 
 
-def generate_user(exclude_list):
-    exclude_animals = set([a for a in exclude_list])
-    
-    animals = list(ANIMALS.difference(exclude_animals))
-    user_name = "{}".format(random.choice(animals))
+def generate_user(exclude_list, is_moderator=False):
+    if is_moderator:
+        user_name = "Moderating Owl"
+    else:
+        exclude_animals = set([a for a in exclude_list])
+        animals = list(ANIMALS.difference(exclude_animals))
+        user_name = "{}".format(random.choice(animals))
     return {'user_name': user_name, 'user_id': uuid.uuid4().hex}
 
 

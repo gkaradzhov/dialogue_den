@@ -29,7 +29,9 @@
       {% for room in chat_rooms %}
       <tr>
         <td>{{ room.name }}</td>
-        <td><a role="button" class="btn btn-primary" href="room/{{room.room_id}}">Join</a></td>
+        <td>
+          <a role="button" class="btn btn-success" href="room?room_id={{room.room_id}}&moderator=True">Join as Moderator</a>
+          <a role="button" class="btn btn-primary" href="room?room_id={{room.room_id}}">Join</a></td>
       </tr>
       {% endfor %}
 
