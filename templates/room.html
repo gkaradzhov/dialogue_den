@@ -27,7 +27,13 @@
 <div class="row">
     <div class="col-5">
         <div class="task">
-            <h3>Task: </h3>
+            <h5>Instructions: </h5>
+            <div class="instructions">
+                You will be discussing the solution to the reasoning task.
+                First you will complete the task by yourself. Once you have completed the task and you have read the instructions carefully you will ve to collaborate with a group and solve the task again.
+                You have a maximum of 5 minutes to come to a group conclusion and submit your responses.
+                Please all remember your animal name for the debrief form.
+            </div>
             <div class="task_description">
                 You are presented with four cards. Each card has a letter on one side and a number on the other.
                 <b> Which card(s) must you turn to test the rule: <br/>
@@ -61,6 +67,12 @@
                 <div class="logged_user" id="{{item[1]}}"><b>{{item[0]}}</b></div>
                 {% endfor %}
             </div>
+
+        <div>
+            <b>Disclaimer:</b>
+        Please remember that these transcripts may be used in future research, and therefore you have the right to withdraw from this study at any given time. To do so, close the webchat tab.
+        Please ensure you do not use any offensive language or disclose any personal information which would make you identifiable to others as it’s important that your anonymity is maintained. Any information which may reveal your identity will be deleted from this chat.
+        </div>
     </div>
     <div id="chat_container" class="col-7 hidden">
         <div class="chatbox">
@@ -75,6 +87,7 @@
         </form>
     </div>
 </div>
+<div class="footer"><a href="https://gkaradzhov.com">Georgi Karadzhov</a> All Rigths Reserved 2019</div>
 </body>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
