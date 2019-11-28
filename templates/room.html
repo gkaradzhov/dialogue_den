@@ -27,6 +27,12 @@
     <div id="timer"></div>
 </div>
 
+{% if room_data.current_user_status == 'USR_MODERATING'%}
+<div class="row"> Moderating buttons:
+    <button type="button" id="group_start" class="btn btn-success">Group phase started</button> &nbsp;
+    <button type="button" id="group_ended" class="btn btn-success">Group phase ended</button>
+</div>
+{% endif %}
 <div class="row">
     <div class="col-6">
         <div class="task">
@@ -117,6 +123,7 @@
 </html>
 <script type="text/javascript">
 
+
 const JOIN_ROOM = 'JOIN_ROOM';
 const CHAT_MESSAGE = 'CHAT_MESSAGE';
 const LEAVE_ROOM = 'LEAVE_ROOM';
@@ -133,7 +140,7 @@ const USR_MODERATING = 'USR_MODERATING';
 $(function() {
     function boldMentions(str){
         var regex = new RegExp("@\\w*", 'gi');
-        str = str.replace(regex, function(str) {return '<b>'+str+'</b>'})
+        str = str.replace(regex, function(str) {return '<b>'+str+'</b>'});
         return str;
     }
 
@@ -155,7 +162,7 @@ $(function() {
     }
 
     function get_card_selection(){
-        let selection = []
+        var selection = [];
         $("input:checkbox").each(function(){
             selection.push({'value': $(this).val(), 'checked': $(this).is(":checked")});
         });
@@ -170,7 +177,7 @@ $(function() {
         source: function( request, response ) {
             // delegate back to autocomplete, but extract the last term
             var lastword = extractLast(request.term);
-            if (lastword.length == 0){
+            if (lastword.length === 0){
                 return;
             }
             // Regexp for filtering those labels that start with '@'
@@ -197,7 +204,7 @@ $(function() {
           this.value = terms.join(" ");
           return false;
         }
-      }
+      };
 
     var socket = io.connect('http://' + document.domain + ':' + location.port, { transports: ['websocket'] });
     var room_id = $('input#chat_id').val();
@@ -219,11 +226,21 @@ $(function() {
         }
     });
 
+    $('#group_start').on('click', function(e){
+      $('#group_start').prop('disabled', true);
+      socket.emit('response', { user_name: 'SYSTEM_MODERATOR', room: room_id, user_id: -1, user_status: USR_MODERATING, type: "MODERATION", message: "GROUP_PHASE_STARTED"});
+    });
+
+    $('#group_ended').on('click', function(e){
+      $('#group_ended').prop('disabled', true);
+      socket.emit('response', { user_name: 'SYSTEM_MODERATOR', room: room_id, user_id: -1, user_status: USR_MODERATING, type: "MODERATION", message: "GROUP_PHASE_ENDED"});
+    });
+
     $('.kick').on('click', function(e){
         e.preventDefault();
         if (confirm('Are you sure you want kick this user?.')) {
             var user_id = $(this).val();
-            var user_name = $(this).attr('name')
+            var user_name = $(this).attr('name');
             socket.emit('leave', { user_name: user_name, room: room_id, user_id: user_id, user_status: 'KICKED'});
 
             $('#'+user_id).remove();
@@ -237,7 +254,7 @@ $(function() {
         }
     });
 
-    var user_status = $('input#user_status').val()
+    var user_status = $('input#user_status').val();
 
     if (user_status == USR_MODERATING){
         $('#chat_container').removeClass('hidden');
@@ -247,9 +264,9 @@ $(function() {
     $('form').on('submit', function(e) {
         var user_name = $('input#user_name').val();
         var user_id = $('input#user_id').val();
-        var user_status = $('input#user_status').val()
+        var user_status = $('input#user_status').val();
         e.preventDefault();
-        let message = $('input#message').val();
+        var message = $('input#message').val();
         if (message!=""){
             socket.emit( 'response', {
                 user_id: user_id,
@@ -268,7 +285,7 @@ $(function() {
         var selection = get_card_selection();
         var user_name = $('input#user_name').val();
         var user_id = $('input#user_id').val();
-        var user_status = $('input#user_status').val()
+        var user_status = $('input#user_status').val();
         socket.emit( 'response', {
             user_id: user_id,
             user_name: user_name,
@@ -286,7 +303,7 @@ $(function() {
         var selection = get_card_selection();
         var user_name = $('input#user_name').val();
         var user_id = $('input#user_id').val();
-        var user_status = $('input#user_status').val()
+        var user_status = $('input#user_status').val();
 
         socket.emit('response', {
             user_id: user_id,
@@ -306,24 +323,22 @@ $(function() {
             $('#btn-agree').prop('disabled', true);
         }
     });
-
     socket.on('response', function(message_str) {
         msg =  JSON.parse(message_str);
         console.log(msg);
-
         switch(msg.type) {
             case CHAT_MESSAGE:
                 if(typeof msg.user_name !== 'undefined' ) {
                         var user_name = $('input#user_name').val();
                         var user_id = $('input#user_id').val();
-                        local_name = msg.user_name
-                        local_id = msg.user_id
+                        local_name = msg.user_name;
+                        local_id = msg.user_id;
 
                         processed_message = boldMentions(msg.message);
                         if (local_id == user_id){
-                            $( 'div.chatbox' ).append('<div class="message msg-mine"><b>' + local_name +': </b> ' + processed_message +'</div>' )
+                            $( 'div.chatbox' ).append('<div class="message msg-mine"><b>' + local_name +': </b> ' + processed_message +'</div>' );
                         }else{
-                            $( 'div.chatbox' ).append('<div class="message msg-other"><b>' + local_name +': </b> ' + processed_message + '</div>' )
+                            $( 'div.chatbox' ).append('<div class="message msg-other"><b>' + local_name +': </b> ' + processed_message + '</div>');
                         }
                         $('div.chatbox').scrollTop($('div.chatbox')[0].scrollHeight);
                     }
@@ -429,9 +444,9 @@ $(function() {
                         });
                     }
                 }, 1000);
-                break
+                break;
             default:
-                break
+                break;
             // code block
         }
     });
