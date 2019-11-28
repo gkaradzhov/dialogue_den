@@ -31,7 +31,7 @@
             <div class="instructions">
                 You will be discussing the solution to the reasoning task.
                 First you will complete the task by yourself. Once you have completed the task and you have read the instructions carefully you will ve to collaborate with a group and solve the task again.
-                You have a maximum of 5 minutes to come to a group conclusion and submit your responses.
+                You have a maximum of 7 minutes to come to a group conclusion and submit your responses.
                 Please all remember your animal name for the debrief form.
             </div>
             <br/>
@@ -321,14 +321,13 @@ $(function() {
                 var user_status = $('input#user_status').val()
                 $('#result_holder').append("<h1 class='finish'>Game Finished! Thank you for playing</h1>")
                 $('.timer_holder').toggle();
-                socket.emit('leave', { user_name: user_name, room: room_id, user_id:user_id, user_status: user_status});
                 break;
             case WASON_AGREE:
                 target_user_id = msg.user_id;
                 if (msg.user_status == USR_PLAYING){
                     $('#' + target_user_id).addClass('wason-agreed');
                 }
-                break
+                break;
             case FINISHED_ONBOARDING:
                 $('.timer_holder').toggle();
                 var date = msg.message;

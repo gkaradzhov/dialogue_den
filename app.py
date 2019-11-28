@@ -165,7 +165,7 @@ def handle_response(json, methods=('GET', 'POST')):
     finished_onboarding = check_finished(all_messages, USR_ONBOARDING)
     
     if finished_onboarding:
-        after_5mins = datetime.datetime.utcnow() + datetime.timedelta(minutes=5)
+        after_5mins = datetime.datetime.utcnow() + datetime.timedelta(minutes=7)
         date_str = after_5mins.isoformat()
         m = Message(origin_id=-1, origin_name='SYSTEM', message_type=FINISHED_ONBOARDING, room_id=room,
                     content=date_str)
