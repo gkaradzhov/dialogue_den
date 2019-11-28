@@ -177,7 +177,7 @@
 }
 
 .hidden{
-    display: none;
+    display: none !important;
 }
 
 .play_prompt{
