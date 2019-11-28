@@ -309,6 +309,7 @@ $(function() {
 
     socket.on('response', function(message_str) {
         msg =  JSON.parse(message_str);
+        console.log(msg);
 
         switch(msg.type) {
             case CHAT_MESSAGE:
@@ -319,7 +320,6 @@ $(function() {
                         local_id = msg.user_id
 
                         processed_message = boldMentions(msg.message);
-                        console.log(processed_message);
                         if (local_id == user_id){
                             $( 'div.chatbox' ).append('<div class="message msg-mine"><b>' + local_name +': </b> ' + processed_message +'</div>' )
                         }else{
@@ -384,6 +384,8 @@ $(function() {
                 var user_status = $('input#user_status').val()
                 $('#result_holder').removeClass('hidden');
                 $('.timer_holder').addClass('hidden');
+                $(window).scrollTop(0);
+
                 break;
             case WASON_AGREE:
                 target_user_id = msg.user_id;

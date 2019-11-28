@@ -175,9 +175,11 @@ def handle_response(json, methods=('GET', 'POST')):
     finished_game = check_finished(all_messages, USR_PLAYING)
     if finished_game:
         m = Message(origin_id=-1, origin_name='SYSTEM', message_type=WASON_FINISHED, room_id=room)
-        trigger_finish(all_messages)
         socketio.emit('response', m.to_json(), room=room)
         PG.insert_message(m)
+        all_messages.append(m)
+        trigger_finish(all_messages)
+
 
 
 def receiveSignal(signal_num, frame):
