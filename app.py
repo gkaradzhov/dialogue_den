@@ -51,9 +51,25 @@ def trigger_finish(room_data):
 # A welcome message to test our server
 @app.route('/')
 def index():
+    #TODO: Create a landing page HTML
+    return render_template('landing.html')
+
+@app.route('/route')
+def route_to_room():
+    campaing = request.args.get('campaign')
+
+    #TODO: Get active rooms for campaing.
+
+    #TODO: If none - create new room
+
+    #TODO: Redirect to room, start onboarding
+    pass
+
+
+# @app.route('/list_rooms')
+def list_rooms():
     existing_rooms = PG.get_active_rooms()
     return render_template('home.html', chat_rooms=existing_rooms)
-
 
 @app.route('/room')
 def chatroom():
@@ -92,7 +108,7 @@ def chatroom():
                                                    'current_user_status': status})
 
 
-@app.route('/create_room', methods=('GET', 'POST'))
+# @app.route('/create_room', methods=('GET', 'POST'))
 def create_room():
     room_name = request.form.get('room_name', None)
     if room_name is None:
@@ -179,6 +195,7 @@ def handle_response(json, methods=('GET', 'POST')):
         PG.insert_message(m)
         all_messages.append(m)
         trigger_finish(all_messages)
+        #TODO: if in campaign - generate authentication code
 
 
 
