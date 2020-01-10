@@ -110,3 +110,26 @@ class PostgreConnection:
 
 #pg = PostgreConnection('creds.json', True)
 
+
+
+class PostgreMock:
+    def __init__(self, path_to_credentials=None):
+        print("Init PostgreMock")
+
+    def create_room(self, room):
+        pass
+
+    def get_active_rooms(self):
+        return []
+
+    def get_single_room(self, room_id):
+        return Room(name='Test')
+
+    def insert_message(self, message):
+        pass
+
+    def get_messages(self, room_id):
+        return []
+
+    def mark_room_done(self, room_id):
+        pass
