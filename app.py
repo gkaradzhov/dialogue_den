@@ -2,6 +2,7 @@ import datetime
 import json
 import signal
 from os import path
+import os
 
 import flask_socketio
 from flask import Flask, request, render_template, redirect
@@ -15,13 +16,68 @@ from message import Room, Message
 from postgre_utils import PostgreConnection
 from sys_config import DIALOGUES_STABLE, ROOM_PATH
 from utils import generate_user, generate_wason_cards
+import flask_login
+import hashlib
 
+login_manager = flask_login.LoginManager()
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'secret!'
+app.config['SECRET_KEY'] = 'this_secret_key_potato_21_kaxvhsdferfx3d34'
 socketio = flask_socketio.SocketIO(app, cors_allowed_origins='*', async_mode='eventlet')
 
-PG = PostgreConnection('aws_creds.json')
+login_manager.init_app(app)
+
+PG = PostgreConnection('local_cred.json')
+
+admin_pass = os.environ.get('ADMIN')
+salt = os.environ.get('SALT')
+
+class User(flask_login.UserMixin):
+    pass
+
+@login_manager.user_loader
+def user_loader(email):
+
+    user = User()
+    user.id = 'georgi'
+    return user
+
+@login_manager.request_loader
+def request_loader(request):
+    user = request.form.get('user')
+    if user != 'georgi':
+        return
+
+    user = User()
+    user.id = 'georgi'
+
+    form_pass = request.form['password']
+    adm = hashlib.sha512((admin_pass + salt).encode())
+    user.is_authenticated = hashlib.sha512(form_pass + salt).hexdigest() == adm.hexdigest()
+
+    return user
+
+@app.route('/def_not_login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'GET':
+        return '''
+               <form action='login' method='POST'>
+                <input type='text' name='user' id='user' placeholder='user'/>
+                <input type='password' name='password' id='password' placeholder='password'/>
+                <input type='submit' name='submit'/>
+               </form>
+               '''
+
+    email = request.form['user']
+    form_pass = request.form['password']
+    adm = hashlib.sha512((admin_pass + salt).encode())
+    if hashlib.sha512((form_pass + salt).encode()).hexdigest() == adm.hexdigest():
+        user = User()
+        user.id = email
+        flask_login.login_user(user)
+        return redirect('/')
+
+    return 'Bad login'
 
 
 def trigger_finish(room_data):
@@ -66,7 +122,8 @@ def route_to_room():
     pass
 
 
-# @app.route('/list_rooms')
+@app.route('/')
+@flask_login.login_required
 def list_rooms():
     existing_rooms = PG.get_active_rooms()
     return render_template('home.html', chat_rooms=existing_rooms)
@@ -108,7 +165,8 @@ def chatroom():
                                                    'current_user_status': status})
 
 
-# @app.route('/create_room', methods=('GET', 'POST'))
+@app.route('/create_room', methods=('GET', 'POST'))
+@flask_login.login_required
 def create_room():
     room_name = request.form.get('room_name', None)
     if room_name is None:
@@ -201,7 +259,7 @@ def handle_response(json, methods=('GET', 'POST')):
 
 def receiveSignal(signal_num, frame):
     print("Exiting signally: {0}; {1}".format(signal_num, frame))
-    sync_everything()
+    # sync_everything()
 
 
 if __name__ == '__main__':
@@ -210,7 +268,7 @@ if __name__ == '__main__':
         socketio.run(host='localhost', port=8898, app=app)
     finally:
         print("Exiting gracefully")
-        sync_everything()
+        # sync_everything()
     
     # Threaded option to enable multiple instances for multiple user access support
     # app.run(threaded=True, port=5000)
