@@ -105,10 +105,10 @@ def trigger_finish(room_data):
     save_file(ROOM_PATH)
 
 # A welcome message to test our server
-@app.route('/')
-def index():
-    #TODO: Create a landing page HTML
-    return render_template('landing.html')
+# @app.route('/')
+# def index():
+#     #TODO: Create a landing page HTML
+#     return render_template('landing.html')
 
 @app.route('/route')
 def route_to_room():

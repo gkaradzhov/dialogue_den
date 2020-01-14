@@ -36,20 +36,12 @@
 <div class="row">
     <div class="col-6">
         <div class="task">
-            <h5>Instructions: </h5>
-            <div class="instructions">
-                You will be discussing the solution to the reasoning task.
-                First you will complete the task by yourself. Once you have completed the task and you have read the
-                instructions carefully you will have to collaborate with a group and solve the task again.
-                You have a maximum of 7 minutes to come to a group conclusion and submit your responses.
-                Please all remember your animal name for the debrief form.
-            </div>
-            <br/>
             <div class="task_description">
                 You are presented with four cards. Each card has a letter on one side and a number on the other.
-                <b> Which card(s) must you turn to test the rule: <br/>
-                    All cards with vowels on one side have an even number on the other.</b>
-                To successfully finish the game you all have to agree on the final answer by pressing the <b>Submit</b>
+                Which card(s) must you turn to test the rule: <br/>
+                <b>All cards with vowels on one side have an even number on the other.</b> <br/>
+                NB: Turn only the cards that are required to verify the rule.
+                To successfully finish the game you all have to submit your final answer by pressing the <b>Submit</b>
                 button.
             </div>
             <div class="play_prompt hidden">Thank you! Now you have to <b>collaborate</b> with the other participants in
@@ -100,6 +92,17 @@
             reveal your identity will be deleted from this chat.
         </div>
     </div>
+    <div id="detailed_instructions" class="col-6 ">
+        <h5>Guidelines: </h5>
+        <ol>
+            <li>You will be discussing the solution to a reasoning task.</li>
+            <li>Please read the task description carefully.</li>
+            <li>First you will complete the task by yourself. Take as much time as you need, and when you are happy with your choice - press the Submit button.</li>
+            <li>Once every participant finishes their solo phase, you will have to discuss your solutions in the chat and complete the task again. Note, that although most groups reach a unanimous decision, if you don't agree with the group decision, you could submit different solution.</li>
+            <li>You have 7 minutes to complete the task, but solutions submitted afterwards will still be recorded.</li>
+            <li>If you like to leave the experiment, please press the "Leave room" button on the bottom left. </li>
+        </ol>
+    </div>
     <div id="chat_container" class="col-6 hidden">
         <div class="chatbox">
             {% for item in room_data.messages %}
@@ -113,7 +116,7 @@
         </form>
     </div>
 </div>
-<div class="footer"><a href="https://gkaradzhov.com">Georgi Karadzhov</a> All Rigths Reserved 2019</div>
+<div class="footer"><a href="https://gkaradzhov.com">Georgi Karadzhov</a></div>
 </body>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
@@ -259,6 +262,7 @@ $(function() {
     if (user_status == USR_MODERATING){
         $('#chat_container').removeClass('hidden');
         $('.play_prompt').removeClass('hidden');
+        $('#detailed_instructions').addClass('hidden');
     }
 
     $('form').on('submit', function(e) {
@@ -316,6 +320,7 @@ $(function() {
 
         if (user_status == USR_ONBOARDING){
             $('input#user_status').val(USR_PLAYING);
+            $('#detailed_instructions').addClass('hidden');
             $('#chat_container').removeClass('hidden');
             $('.play_prompt').removeClass('hidden');
         }
