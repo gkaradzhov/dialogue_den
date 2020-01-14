@@ -189,6 +189,11 @@
     color: red !important;
 }
 
+#wait_onboarding{
+    margin-left: 10px;
+    color: red !important;
+}
+
 
 .footer {
   padding-top: 50px;

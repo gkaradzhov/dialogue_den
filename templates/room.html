@@ -27,6 +27,10 @@
     <div id="timer"></div>
 </div>
 
+<div id="wait_onboarding" class="hidden">
+    Thank you for submitting your solo solution. Please wait for all of the participants to complete their solo phase.
+</div>
+
 {% if room_data.current_user_status == 'USR_MODERATING'%}
 <div class="row"> Moderating buttons:
     <button type="button" id="group_start" class="btn btn-success">Group phase started</button> &nbsp;
@@ -44,7 +48,7 @@
                 To successfully finish the game you all have to submit your final answer by pressing the <b>Submit</b>
                 button.
             </div>
-            <div class="play_prompt hidden">Thank you! Now you have to <b>collaborate</b> with the other participants in
+            <div class="play_prompt hidden">Now you have to <b>collaborate</b> with the other participants in
                 this conversation to solve the task together.
             </div>
             <div class='cards_list'>
@@ -261,7 +265,6 @@ $(function() {
 
     if (user_status == USR_MODERATING){
         $('#chat_container').removeClass('hidden');
-        $('.play_prompt').removeClass('hidden');
         $('#detailed_instructions').addClass('hidden');
     }
 
@@ -322,7 +325,7 @@ $(function() {
             $('input#user_status').val(USR_PLAYING);
             $('#detailed_instructions').addClass('hidden');
             $('#chat_container').removeClass('hidden');
-            $('.play_prompt').removeClass('hidden');
+            $('#wait_onboarding').removeClass('hidden');
         }
         else{
             $('#btn-agree').prop('disabled', true);
@@ -415,6 +418,9 @@ $(function() {
                 break;
             case FINISHED_ONBOARDING:
                 $('.timer_holder').removeClass('hidden');
+                $('.play_prompt').removeClass('hidden');
+                $('#wait_onboarding').addClass('hidden');
+
                 var date = msg.message;
                 var countDownDate = new Date(date).getTime();
 
