@@ -28,7 +28,7 @@
 </div>
 
 <div id="wait_onboarding" class="hidden">
-    Thank you for submitting your solo solution. Please wait for all of the participants to complete their solo phase.
+    Thank you for submitting your solution. Please wait for the other participants to submit their selections.
 </div>
 
 {% if room_data.current_user_status == 'USR_MODERATING'%}
@@ -40,12 +40,13 @@
 <div class="row">
     <div class="col-6">
         <div class="task">
+            <h3>Task Description:</h3>
             <div class="task_description">
                 You are presented with four cards. Each card has a letter on one side and a number on the other.
-                Which card(s) must you turn to test the rule: <br/>
+                Which card(s) do you need to turn to test the rule: <br/>
                 <b>All cards with vowels on one side have an even number on the other.</b> <br/>
-                NB: Turn only the cards that are required to verify the rule.
-                To successfully finish the game you all have to submit your final answer by pressing the <b>Submit</b>
+                NB: Select only the card(s) that you need to verify the rule.
+                To successfully finish the game you have to submit your final answer by pressing the <b>Submit</b>
                 button.
             </div>
             <div class="play_prompt hidden">Now you have to <b>collaborate</b> with the other participants in
@@ -90,7 +91,7 @@
             <br/>
             <b>Disclaimer:</b>
             Please remember that these transcripts may be used in future research, and therefore you have the right to
-            withdraw from this study at any given time. To do so, close the webchat tab.
+            withdraw from this study at any given time. To do so, press the "Leave room" button above.
             Please ensure you do not use any offensive language or disclose any personal information which would make
             you identifiable to others as it’s important that your anonymity is maintained. Any information which may
             reveal your identity will be deleted from this chat.
@@ -101,10 +102,11 @@
         <ol>
             <li>You will be discussing the solution to a reasoning task.</li>
             <li>Please read the task description carefully.</li>
-            <li>First you will complete the task by yourself. Take as much time as you need, and when you are happy with your choice - press the Submit button.</li>
-            <li>Once every participant finishes their solo phase, you will have to discuss your solutions in the chat and complete the task again. Note, that although most groups reach a unanimous decision, if you don't agree with the group decision, you could submit different solution.</li>
-            <li>You have 7 minutes to complete the task, but solutions submitted afterwards will still be recorded.</li>
-            <li>If you like to leave the experiment, please press the "Leave room" button on the bottom left. </li>
+            <li>First you will complete the task by yourself. When you are happy with your choice - press the Submit button.</li>
+            <li>Once every participant completes the task by themselves, you will have to discuss your solutions in the
+                chat and possibly revise your selection. Note, that although many groups reach a unanimous decision, if you can submit a different solution.</li>
+            <li>We have a timer set for 7 minutes, but you can take more time if needed.</li>
+            <li>You can leave the experiment at any time by pressing the "Leave room" button on the bottom left. </li>
         </ol>
     </div>
     <div id="chat_container" class="col-6 hidden">
