@@ -57,7 +57,7 @@ def request_loader(request):
 
     return user
 
-@app.route('/def_not_login', methods=['GET', 'POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'GET':
         return '''
