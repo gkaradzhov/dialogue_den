@@ -112,12 +112,14 @@ def trigger_finish(room_data):
 
 @app.route('/route')
 def route_to_room():
-    campaing = request.args.get('campaign')
+    campaign_id = request.args.get('campaign')
 
-    #TODO: Get active rooms for campaing.
-
-    #TODO: If none - create new room
-
+    campaign = PG.get_campaign(campaign_id)
+    #TODO: Add campaign checks
+    
+    active_room = PG.get_create_campaign_room(campaign_id)
+    
+    
     #TODO: Redirect to room, start onboarding
     pass
 

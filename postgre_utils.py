@@ -108,6 +108,16 @@ class PostgreConnection:
     def mark_room_done(self, room_id):
         self.__execute("UPDATE room SET is_done=True WHERE id=%s RETURNING ID", (room_id,))
 
+    def get_campaign(self, campaign_id):
+        pass
+    
+    def update_campaign(self, increment_participants, increment_rooms):
+        pass
+
+    def get_campaign_room(self, campaign_id):
+        pass
+
+
 #pg = PostgreConnection('creds.json', True)
 
 
