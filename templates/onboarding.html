@@ -16,19 +16,24 @@
 
 </head>
 <body>
-    <h1>Please answer the questions bellow</h1>
-    <form>
+    <div class="container">
+            <h1>Please answer the questions bellow</h1>
+    <form action="{{url_for('route_to_room')}}" method="post">
+        <input type="hidden" name="campaign_id" value="{{campaign_id}}">
         <div>Please enter at least 3 of the vowels in the English language (comma separated):</div>
         <input type="text" name="vowels">
         <hr/>
         <div>Please enter all even numbers from 1-5 (comma separated):</div>
         <input type="text" name="even">
         <hr/>
-        <div>I spread the cloth on the table in order to protect it. <b>What am I protecting</b></div>
-        <input type="radio" name="vino" value="table"> <b>The table</b>
-        <input type="radio" name="vino" value="cloth"> <b>The cloth</b>
+        <div>I spread the cloth on the table in order to protect it. <b>What am I protecting?</b></div>
+        <input id="table" type="radio" name="vino" value="table"> <label for="table"><b>The table</b></label> <br/>
+        <input id="cloth" type="radio" name="vino" value="cloth"> <label for="cloth"><b>The cloth</b></label> <br/>
         <input type="submit" value="Submit">
     </form>
+
+    </div>
+
 
 </body>
 </html>
