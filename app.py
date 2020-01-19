@@ -8,7 +8,7 @@ from os import path
 
 import flask_login
 import flask_socketio
-from flask import Flask, request, render_template, redirect
+from flask import Flask, request, render_template, redirect, make_response, url_for
 from flask_socketio import join_room, leave_room
 from flask_socketio import send
 
@@ -117,30 +117,36 @@ def trigger_finish(room_data):
 
 @app.route('/route', methods=['GET', 'POST'])
 def route_to_room():
+    if request.cookies.get('onboarding_status', None) == False:
+        return render_template('unsuccessful_onboarding.html')
     if request.method == 'GET':
         campaign_id = request.args.get('campaign')
-        # campaign = PG.get_campaign(campaign_id)
-        campaign = True
-        # TODO: Add campaign checks
+        campaign = PG.get_campaign(campaign_id)
         if campaign:
             return render_template('onboarding.html', campaign_id=campaign_id)
     else:
+        successful_onboarding = True
         campaign_id = request.form.get('campaign_id')
         vowels = request.form.get('vowels')
         if not verify_text(vowels, ['a', 'o', 'u', 'i', 'e']):
-            print(vowels)
-            return None
+            successful_onboarding = False
         even = request.form.get('even')
         if not verify_text(even, ['2', '4']):
-            print(even)
-            return None
+            successful_onboarding = False
         vino = request.form.get('vino')
         if not verify_text(vino, 'table'):
-            print(vino)
-            return None
-        print(campaign_id, vowels, even, vino)
-        return redirect('/')
-        # active_room = PG.get_create_campaign_room(campaign_id)
+            successful_onboarding = False
+
+        if successful_onboarding:
+            active_room = PG.get_create_campaign_room(campaign_id)
+    
+            resp = make_response(redirect(url_for('room', room_id=active_room.room_id)))
+            resp.set_cookie('onboarding_status', 'true')
+        else:
+            resp = make_response(render_template('unsuccessful_onboarding.html'))
+            resp.set_cookie('onboarding_status', 'false')
+
+        return resp
     
     # TODO: Redirect to room, start onboarding
     pass
@@ -166,6 +172,7 @@ def list_rooms():
 
 @app.route('/room')
 def chatroom():
+    username = request.cookies.get('onboarding_status')
     room_id = request.args.get('room_id')
     is_moderator = request.args.get('moderator', False)
     is_moderator = is_moderator == "True"
