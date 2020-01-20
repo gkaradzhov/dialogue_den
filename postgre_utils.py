@@ -73,7 +73,7 @@ class PostgreConnection:
     
 
     def create_room(self, room):
-        self.__execute("INSERT INTO room (id, name, is_done) VALUES (%s, %s, %s) RETURNING ID", (room.room_id, room.name, room.is_done))
+        self.__execute("INSERT INTO room (id, name, is_done, campaign_id) VALUES (%s, %s, %s, %s) RETURNING ID", (room.room_id, room.name, room.is_done, room.campaign))
         wason_game = generate_wason_cards()
         m = Message(origin_name='SYSTEM', message_type=WASON_INITIAL, room_id=room.room_id,
                     origin_id='-1', content=json.dumps(wason_game))
