@@ -117,7 +117,7 @@ def trigger_finish(room_data):
 
 @app.route('/route', methods=['GET', 'POST'])
 def route_to_room():
-    if request.cookies.get('onboarding_status', None) == False:
+    if request.cookies.get('onboarding_status', None) == 'false':
         return render_template('unsuccessful_onboarding.html')
     if request.method == 'GET':
         campaign_id = request.args.get('campaign')
@@ -138,18 +138,15 @@ def route_to_room():
             successful_onboarding = False
 
         if successful_onboarding:
-            active_room = PG.get_create_campaign_room(campaign_id)
+            active_room_id = PG.get_create_campaign_room(campaign_id)
     
-            resp = make_response(redirect(url_for('room', room_id=active_room.room_id)))
+            resp = make_response(redirect(url_for('room', room_id=active_room_id)))
             resp.set_cookie('onboarding_status', 'true')
         else:
             resp = make_response(render_template('unsuccessful_onboarding.html'))
             resp.set_cookie('onboarding_status', 'false')
 
         return resp
-    
-    # TODO: Redirect to room, start onboarding
-    pass
 
 
 def verify_text(suggested, gold, exact=False):
@@ -172,7 +169,10 @@ def list_rooms():
 
 @app.route('/room')
 def chatroom():
-    username = request.cookies.get('onboarding_status')
+    onboarding_status = request.cookies.get('onboarding_status', None)
+    if onboarding_status != 'true':
+        return redirect('/')
+    
     room_id = request.args.get('room_id')
     is_moderator = request.args.get('moderator', False)
     is_moderator = is_moderator == "True"
@@ -222,10 +222,6 @@ def create_room():
         existing_rooms = read_rooms_from_file()
         existing_rooms.append(room)
         write_rooms_to_file(existing_rooms)
-        wason_game = generate_wason_cards()
-        m = Message(origin_name='SYSTEM', message_type=WASON_INITIAL, room_id=room.room_id,
-                    origin_id='-1', content=json.dumps(wason_game))
-        PG.insert_message(m)
         return redirect('/')
 
 

@@ -7,7 +7,9 @@ import os
 
 from psycopg2.pool import ThreadedConnectionPool
 
+from constants import WASON_INITIAL
 from message import Room, Message
+from utils import generate_wason_cards
 
 
 class PostgreConnection:
@@ -72,6 +74,10 @@ class PostgreConnection:
 
     def create_room(self, room):
         self.__execute("INSERT INTO room (id, name, is_done) VALUES (%s, %s, %s) RETURNING ID", (room.room_id, room.name, room.is_done))
+        wason_game = generate_wason_cards()
+        m = Message(origin_name='SYSTEM', message_type=WASON_INITIAL, room_id=room.room_id,
+                    origin_id='-1', content=json.dumps(wason_game))
+        self.insert_message(m)
     
     def get_active_rooms(self):
         db_rooms = self.__execute("SELECT id, name, is_done FROM room WHERE is_done=false")
@@ -109,13 +115,33 @@ class PostgreConnection:
         self.__execute("UPDATE room SET is_done=True WHERE id=%s RETURNING ID", (room_id,))
 
     def get_campaign(self, campaign_id):
-        pass
-    
-    def update_campaign(self, increment_participants, increment_rooms):
-        pass
+        campaign = self.__execute("SELECT id FROM campaign WHERE id=%s", (campaign_id,))
+        return campaign[0]
 
-    def get_campaign_room(self, campaign_id):
-        pass
+    def get_create_campaign_room(self, campaign_id):
+        get_room_sql = """
+            SELECT r.id FROM message m
+            JOIN room r on m.room_id = r.id
+            WHERE m.room_id NOT IN (
+                SELECT room_id
+                from message
+                WHERE message_type ='FINISHED_ONBOARDING')
+            AND r.is_done = false
+            AND r.campaign_id = %s
+            GROUP BY r.id
+            ORDER BY MAX(m.timestamp) DESC"""
+        
+        rooms = self.__execute(get_room_sql, (campaign_id,))
+        
+        if len(rooms) == 0:
+            room_name = "{}_{}".format(time.time(), campaign_id)
+            r = Room(room_name, campaign=campaign_id)
+            self.create_room(r)
+            return r.room_id
+        else:
+            return rooms[0]
+        
+        
 
 
 #pg = PostgreConnection('creds.json', True)
