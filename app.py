@@ -140,7 +140,7 @@ def route_to_room():
         if successful_onboarding:
             active_room_id = PG.get_create_campaign_room(campaign_id)
     
-            resp = make_response(redirect(url_for('room', room_id=active_room_id)))
+            resp = make_response(redirect(url_for('chatroom', room_id=active_room_id)))
             resp.set_cookie('onboarding_status', 'true')
         else:
             resp = make_response(render_template('unsuccessful_onboarding.html'))
