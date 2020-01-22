@@ -146,6 +146,8 @@ const USR_ONBOARDING = 'USR_ONBOARDING';
 const USR_PLAYING = 'USR_PLAYING';
 const USR_MODERATING = 'USR_MODERATING';
 
+ROUTING_TIMER_STARTED = 'ROUTING_TIMER_STARTED'
+
 $(function() {
     function boldMentions(str){
         var regex = new RegExp("@\\w*", 'gi');
@@ -426,22 +428,8 @@ $(function() {
                 var date = msg.message;
                 var countDownDate = new Date(date).getTime();
 
-                var x = setInterval(function() {
-                    var now = new Date().getTime();
 
-                    // Find the distance between now and the count down date
-                    var distance = countDownDate - now;
-
-                    // Time calculations for days, hours, minutes and seconds
-
-                    var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                    var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-                    $('#timer').text(minutes + " minutes " + seconds + " seconds");
-
-                    // If the count down is finished, write some text
-                    if (distance < 0) {
-                        clearInterval(x);
+                var x = setInterval(start_timer(count_date, date, function(){
                         $('#timer').text("Out of time");
                         var selection = get_card_selection();
                         var user_name = $('input#user_name').val();
@@ -454,9 +442,8 @@ $(function() {
                             message: selection,
                             room: room_id,
                             user_status: user_status
-                        });
-                    }
-                }, 1000);
+                        })
+                        ;}), 1000);
                 break;
             default:
                 break;
@@ -464,6 +451,26 @@ $(function() {
         }
     });
 
+
+    function start_timer(started, duration, callback) {
+        var now = new Date().getTime();
+
+        // Find the distance between now and the count down date
+        var distance = countDownDate - now;
+
+        // Time calculations for days, hours, minutes and seconds
+
+        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        $('#timer').text(minutes + " minutes " + seconds + " seconds");
+
+        // If the count down is finished, write some text
+        if (distance < 0) {
+            clearInterval(x);
+            callback();
+        }
+    }
 
     $("#message").bind("keydown", function( event ) {
         if (event.keyCode === $.ui.keyCode.TAB &&

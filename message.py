@@ -9,7 +9,7 @@ from sys_config import DIALOGUES_RUNNING
 class Room:
     def __init__(self, name, room_id=None, is_done=False, campaign=None):
         self.name = name
-        self.campaign=campaign
+        self.campaign = campaign
         if room_id is None:
             self.room_id = str(uuid.uuid4())
         else:

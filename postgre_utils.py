@@ -87,10 +87,10 @@ class PostgreConnection:
         return rooms
     
     def get_single_room(self, room_id):
-        room = self.__execute("SELECT id, name, is_done FROM room WHERE id=%s", (room_id,))
+        room = self.__execute("SELECT id, name, is_done, campaign_id FROM room WHERE id=%s", (room_id,))
         if len(room) != 0:
             room = room[0]
-            return Room(room_id=room[0], name=room[1], is_done=room[2])
+            return Room(room_id=room[0], name=room[1], is_done=room[2], campaign=room[3])
         else:
             raise ValueError('No room with that ID')
             
@@ -115,19 +115,26 @@ class PostgreConnection:
         self.__execute("UPDATE room SET is_done=True WHERE id=%s RETURNING ID", (room_id,))
 
     def get_campaign(self, campaign_id):
-        campaign = self.__execute("SELECT id FROM campaign WHERE id=%s", (campaign_id,))
-        return campaign[0]
+        campaign = self.__execute("SELECT id, start_threshold, start_time, close_threshold FROM campaign WHERE id=%s AND is_active=true", (campaign_id,))
+        if len(campaign) > 0:
+            campaign = campaign[0]
+        else:
+            return None
+        
+        return {'id': campaign[0], 'start_threhold': campaign[1], 'start_time': campaign[2], 'close_threshold': campaign[3]}
 
     def get_create_campaign_room(self, campaign_id):
         get_room_sql = """
             SELECT r.id FROM message m
             JOIN room r on m.room_id = r.id
+            JOIN campaign c on c.id = r.campaign_id
             WHERE m.room_id NOT IN (
                 SELECT room_id
                 from message
                 WHERE message_type ='FINISHED_ONBOARDING')
             AND r.is_done = false
             AND r.campaign_id = %s
+            AND c.is_active = true
             GROUP BY r.id
             ORDER BY MAX(m.timestamp) DESC"""
         

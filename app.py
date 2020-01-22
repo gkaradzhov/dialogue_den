@@ -13,12 +13,12 @@ from flask_socketio import join_room, leave_room
 from flask_socketio import send
 
 from constants import JOIN_ROOM, CHAT_MESSAGE, LEAVE_ROOM, WASON_INITIAL, WASON_AGREE, WASON_GAME, WASON_FINISHED, \
-    USR_ONBOARDING, USR_PLAYING, FINISHED_ONBOARDING, USR_MODERATING
+    USR_ONBOARDING, USR_PLAYING, FINISHED_ONBOARDING, USR_MODERATING, ROUTING_TIMER_STARTED, SYSTEM_USER, SYSTEM_ID
 from data_persistency_utils import read_rooms_from_file, write_rooms_to_file, save_file
 from message import Room, Message
 from postgre_utils import PostgreConnection
 from sys_config import DIALOGUES_STABLE, ROOM_PATH
-from utils import generate_user, generate_wason_cards
+from utils import generate_user
 
 login_manager = flask_login.LoginManager()
 
@@ -123,7 +123,9 @@ def route_to_room():
         campaign_id = request.args.get('campaign')
         campaign = PG.get_campaign(campaign_id)
         if campaign:
-            return render_template('onboarding.html', campaign_id=campaign_id)
+            return render_template('onboarding.html', campaign_id=campaign['id'])
+        else:
+            return redirect('/')
     else:
         successful_onboarding = True
         campaign_id = request.form.get('campaign_id')
@@ -136,16 +138,16 @@ def route_to_room():
         vino = request.form.get('vino')
         if not verify_text(vino, 'table'):
             successful_onboarding = False
-
+        
         if successful_onboarding:
             active_room_id = PG.get_create_campaign_room(campaign_id)
-    
+            
             resp = make_response(redirect(url_for('chatroom', room_id=active_room_id)))
             resp.set_cookie('onboarding_status', 'true')
         else:
             resp = make_response(render_template('unsuccessful_onboarding.html'))
             resp.set_cookie('onboarding_status', 'false')
-
+        
         return resp
 
 
@@ -167,6 +169,22 @@ def list_rooms():
     return render_template('home.html', chat_rooms=existing_rooms)
 
 
+def handle_routing(messages, logged_users, start_threshold, start_time, close_threshold, room_id):
+    timer_started = False
+    for m in messages:
+        if m.message_type == ROUTING_TIMER_STARTED:
+            timer_started = True
+    if timer_started is False and logged_users == start_threshold:
+        m = Message(origin_name=SYSTEM_USER, message_type=ROUTING_TIMER_STARTED, room_id=room_id,
+                    origin_id=SYSTEM_ID, content=start_time)
+        create_broadcast_message(m)
+    
+    if logged_users == close_threshold:
+        m = Message(origin_name=SYSTEM_USER, message_type=FINISHED_ONBOARDING, room_id=room_id,
+                    origin_id=SYSTEM_ID)
+        create_broadcast_message(m)
+
+
 @app.route('/room')
 def chatroom():
     onboarding_status = request.cookies.get('onboarding_status', None)
@@ -177,8 +195,8 @@ def chatroom():
     is_moderator = request.args.get('moderator', False)
     is_moderator = is_moderator == "True"
     
-    room_name = PG.get_single_room(room_id).name
-    running_dialogue = PG.get_messages(room_id)
+    room = PG.get_single_room(room_id)
+    running_dialogue = PG.get_messages(room.room_id)
     messages = [d for d in running_dialogue if d.message_type == CHAT_MESSAGE]
     
     logged_users = set()
@@ -189,23 +207,34 @@ def chatroom():
             logged_users.remove((item.origin, item.origin_id))
     
     current_user = generate_user([d[0] for d in logged_users], is_moderator)
-    
     if is_moderator:
         status = USR_MODERATING
     else:
         status = USR_ONBOARDING
     m = Message(origin_name=current_user['user_name'], message_type=JOIN_ROOM, room_id=room_id,
                 origin_id=current_user['user_id'], user_status=status)
-    PG.insert_message(m)
-    socketio.emit('response', m.to_json(), room=room_id)
+    
+    create_broadcast_message(m)
+    
+    logged_users.add((current_user['user_name'], current_user['user_id']))
     
     wason_initial = [d.content for d in running_dialogue if d.message_type == WASON_INITIAL][0]
     
-    return render_template("room.html", room_data={'id': room_id, 'name': room_name, 'game': json.loads(wason_initial),
+    campaign = PG.get_campaign(room.campaign)
+    
+    handle_routing(logged_users, logged_users, campaign['start_threshold'], campaign['start_time'],
+                   campaign['close_threshold'], room.room_id)
+    
+    return render_template("room.html", room_data={'id': room_id, 'name': room.name, 'game': json.loads(wason_initial),
                                                    'messages': messages, 'existing_users': logged_users,
                                                    'current_user': current_user['user_name'],
                                                    'current_user_id': current_user['user_id'],
                                                    'current_user_status': status})
+
+
+def create_broadcast_message(message):
+    PG.insert_message(message)
+    socketio.emit('response', message.to_json(), room=message.room_id)
 
 
 @app.route('/create_room', methods=('GET', 'POST'))
@@ -239,9 +268,8 @@ def on_leave(data):
     room = data['room']
     leave_room(room)
     m = Message(origin_name=username, message_type=LEAVE_ROOM, room_id=room, origin_id=user_id)
-    PG.insert_message(m)
+    create_broadcast_message(m)
     print("User {} has left the room {}".format(username, room))
-    socketio.emit('response', m.to_json(), room=room)
 
 
 def check_finished(room_history, usr_status):
@@ -271,25 +299,21 @@ def handle_response(json, methods=('GET', 'POST')):
     m = Message(origin_id=json['user_id'], origin_name=json['user_name'], message_type=json['type'], room_id=room,
                 content=json['message'], user_status=json['user_status'])
     
-    socketio.emit('response', m.to_json(), room=room)
-    PG.insert_message(m)
-    
+    create_broadcast_message(m)
     all_messages = PG.get_messages(room)
     finished_onboarding = check_finished(all_messages, USR_ONBOARDING)
     
     if finished_onboarding:
         after_5mins = datetime.datetime.utcnow() + datetime.timedelta(minutes=7)
         date_str = after_5mins.isoformat()
-        m = Message(origin_id=-1, origin_name='SYSTEM', message_type=FINISHED_ONBOARDING, room_id=room,
+        m = Message(origin_id=SYSTEM_ID, origin_name=SYSTEM_USER, message_type=FINISHED_ONBOARDING, room_id=room,
                     content=date_str)
-        socketio.emit('response', m.to_json(), room=room)
-        PG.insert_message(m)
+        create_broadcast_message(m)
     
     finished_game = check_finished(all_messages, USR_PLAYING)
     if finished_game:
-        m = Message(origin_id=-1, origin_name='SYSTEM', message_type=WASON_FINISHED, room_id=room)
-        socketio.emit('response', m.to_json(), room=room)
-        PG.insert_message(m)
+        m = Message(origin_id=SYSTEM_ID, origin_name=SYSTEM_USER, message_type=WASON_FINISHED, room_id=room)
+        create_broadcast_message(m)
         all_messages.append(m)
         trigger_finish(all_messages)
         # TODO: if in campaign - generate authentication code
