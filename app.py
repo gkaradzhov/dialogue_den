@@ -13,7 +13,8 @@ from flask_socketio import join_room, leave_room
 from flask_socketio import send
 
 from constants import JOIN_ROOM, CHAT_MESSAGE, LEAVE_ROOM, WASON_INITIAL, WASON_AGREE, WASON_GAME, WASON_FINISHED, \
-    USR_ONBOARDING, USR_PLAYING, FINISHED_ONBOARDING, USR_MODERATING, ROUTING_TIMER_STARTED, SYSTEM_USER, SYSTEM_ID
+    USR_ONBOARDING, USR_PLAYING, FINISHED_ONBOARDING, USR_MODERATING, ROUTING_TIMER_STARTED, SYSTEM_USER, SYSTEM_ID, \
+    ROUTING_TIMER_ELAPSED, EXTENSION_ELAPSED
 from data_persistency_utils import read_rooms_from_file, write_rooms_to_file, save_file
 from message import Room, Message
 from postgre_utils import PostgreConnection
@@ -174,12 +175,12 @@ def handle_routing(messages, logged_users, start_threshold, start_time, close_th
     for m in messages:
         if m.message_type == ROUTING_TIMER_STARTED:
             timer_started = True
-    if timer_started is False and logged_users == start_threshold:
+    if timer_started is False and (len(logged_users) + 1) == start_threshold:
         m = Message(origin_name=SYSTEM_USER, message_type=ROUTING_TIMER_STARTED, room_id=room_id,
                     origin_id=SYSTEM_ID, content=start_time)
         create_broadcast_message(m)
     
-    if logged_users == close_threshold:
+    if (len(logged_users) + 1) == close_threshold:
         m = Message(origin_name=SYSTEM_USER, message_type=FINISHED_ONBOARDING, room_id=room_id,
                     origin_id=SYSTEM_ID)
         create_broadcast_message(m)
@@ -216,13 +217,12 @@ def chatroom():
     
     create_broadcast_message(m)
     
-    logged_users.add((current_user['user_name'], current_user['user_id']))
     
     wason_initial = [d.content for d in running_dialogue if d.message_type == WASON_INITIAL][0]
     
     campaign = PG.get_campaign(room.campaign)
     
-    handle_routing(logged_users, logged_users, campaign['start_threshold'], campaign['start_time'],
+    handle_routing(running_dialogue, logged_users, campaign['start_threshold'], campaign['start_time'],
                    campaign['close_threshold'], room.room_id)
     
     return render_template("room.html", room_data={'id': room_id, 'name': room.name, 'game': json.loads(wason_initial),
@@ -292,27 +292,56 @@ def check_finished(room_history, usr_status):
     return True
 
 
+def handle_room_events(room_messages, room_id, last_message):
+    logged_users = set()
+    
+    for item in room_messages:
+        if item.message_type == JOIN_ROOM:
+            logged_users.add(item.origin_id)
+        elif item.message_type == LEAVE_ROOM:
+            logged_users.remove(item.origin_id)
+    
+    campaign_id = PG.get_single_room(room_id).campaign
+    campaign = PG.get_campaign(campaign_id)
+    
+    if last_message.message_type == ROUTING_TIMER_ELAPSED:
+        if campaign['start_threshold'] == len(logged_users):
+            #TODO: remove room lock
+            pass
+        else:
+            #TODO: grant extension
+            pass
+    elif last_message.message_type == EXTENSION_ELAPSED:
+        #TODO: remove room lock
+        pass
+    
+    
+
+
 @socketio.on('response')
 def handle_response(json, methods=('GET', 'POST')):
     print('received my event: ' + str(json))
-    room = json['room']
-    m = Message(origin_id=json['user_id'], origin_name=json['user_name'], message_type=json['type'], room_id=room,
+    room_id = json['room']
+    m = Message(origin_id=json['user_id'], origin_name=json['user_name'], message_type=json['type'], room_id=room_id,
                 content=json['message'], user_status=json['user_status'])
     
     create_broadcast_message(m)
-    all_messages = PG.get_messages(room)
+    all_messages = PG.get_messages(room_id)
+    
+    handle_room_events(all_messages, room_id, m)
+    
     finished_onboarding = check_finished(all_messages, USR_ONBOARDING)
     
     if finished_onboarding:
         after_5mins = datetime.datetime.utcnow() + datetime.timedelta(minutes=7)
         date_str = after_5mins.isoformat()
-        m = Message(origin_id=SYSTEM_ID, origin_name=SYSTEM_USER, message_type=FINISHED_ONBOARDING, room_id=room,
+        m = Message(origin_id=SYSTEM_ID, origin_name=SYSTEM_USER, message_type=FINISHED_ONBOARDING, room_id=room_id,
                     content=date_str)
         create_broadcast_message(m)
     
     finished_game = check_finished(all_messages, USR_PLAYING)
     if finished_game:
-        m = Message(origin_id=SYSTEM_ID, origin_name=SYSTEM_USER, message_type=WASON_FINISHED, room_id=room)
+        m = Message(origin_id=SYSTEM_ID, origin_name=SYSTEM_USER, message_type=WASON_FINISHED, room_id=room_id)
         create_broadcast_message(m)
         all_messages.append(m)
         trigger_finish(all_messages)

@@ -146,7 +146,11 @@ const USR_ONBOARDING = 'USR_ONBOARDING';
 const USR_PLAYING = 'USR_PLAYING';
 const USR_MODERATING = 'USR_MODERATING';
 
-ROUTING_TIMER_STARTED = 'ROUTING_TIMER_STARTED'
+
+const ROUTING_TIMER_STARTED = 'ROUTING_TIMER_STARTED'
+const ROUTING_EXTENSION = 'ROUTING_EXTENSION'
+const ROUTING_TIMER_ELAPSED = 'ROUTING_TIMER_ELAPSED'
+const EXTENSION_ELAPSED = 'EXTENSION_ELAPSED'
 
 $(function() {
     function boldMentions(str){
@@ -219,7 +223,6 @@ $(function() {
 
     var socket = io.connect('http://' + document.domain + ':' + location.port, { transports: ['websocket'] });
     var room_id = $('input#chat_id').val();
-
     socket.on( 'connect', function() {
         user_name = $("#user_name").val();
         var user_status = $('input#user_status').val();
@@ -420,6 +423,34 @@ $(function() {
                     $('#' + target_user_id).addClass('wason-agreed');
                 }
                 break;
+            case ROUTING_TIMER_STARTED:
+                var date = msg.message;
+                var countDownDate = new Date(date).getTime();
+                alert('The game will start in 3 minutes');
+                var timer = setInterval(function(){start_timer(countDownDate, function(){
+                    socket.emit('response', {
+                            user_id: user_id,
+                            user_name: user_name,
+                            type: 'ROUTING_TIMER_ELAPSED',
+                            room: room_id,
+                            user_status: user_status
+                        })
+                })});
+                break;
+            case ROUTING_EXTENSION:
+                var date = msg.message;
+                var countDownDate = new Date(date).getTime();
+                alert('More users joined, the room, as soon as they are finished with their solo phase, the game will begin');
+                var timer = setInterval(function(){start_timer(countDownDate, function(){
+                socket.emit('response', {
+                        user_id: user_id,
+                        user_name: user_name,
+                        type: 'EXTENSION_ELAPSED',
+                        room: room_id,
+                        user_status: user_status
+                    })
+                })});
+                break;
             case FINISHED_ONBOARDING:
                 $('.timer_holder').removeClass('hidden');
                 $('.play_prompt').removeClass('hidden');
@@ -428,8 +459,7 @@ $(function() {
                 var date = msg.message;
                 var countDownDate = new Date(date).getTime();
 
-
-                var x = setInterval(start_timer(count_date, date, function(){
+                var timer = setInterval(function(){start_timer(countDownDate, function(){
                         $('#timer').text("Out of time");
                         var selection = get_card_selection();
                         var user_name = $('input#user_name').val();
@@ -443,7 +473,7 @@ $(function() {
                             room: room_id,
                             user_status: user_status
                         })
-                        ;}), 1000);
+                        ;})}, 1000);
                 break;
             default:
                 break;
@@ -452,11 +482,11 @@ $(function() {
     });
 
 
-    function start_timer(started, duration, callback) {
+    function start_timer(count_down, callback) {
         var now = new Date().getTime();
-
+        console.log('calling timer')
         // Find the distance between now and the count down date
-        var distance = countDownDate - now;
+        var distance = count_down - now;
 
         // Time calculations for days, hours, minutes and seconds
 
@@ -467,7 +497,8 @@ $(function() {
 
         // If the count down is finished, write some text
         if (distance < 0) {
-            clearInterval(x);
+            console.log('distance');
+            clearInterval(timer);
             callback();
         }
     }

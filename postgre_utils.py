@@ -121,7 +121,7 @@ class PostgreConnection:
         else:
             return None
         
-        return {'id': campaign[0], 'start_threhold': campaign[1], 'start_time': campaign[2], 'close_threshold': campaign[3]}
+        return {'id': campaign[0], 'start_threshold': campaign[1], 'start_time': campaign[2], 'close_threshold': campaign[3]}
 
     def get_create_campaign_room(self, campaign_id):
         get_room_sql = """
