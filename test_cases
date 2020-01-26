@@ -13,4 +13,7 @@
 11. Inactive 2: Inactive person/s during gameplay above threshold
 12. Inactive 3: Inactive person/s during onboarding bellow the threshold
 13. Inactive 4: Inactive person/s during gameplay bellow the threshold
-14. Late joiners 1: Someone joins after inactive people in onboarding 
+14. Late joiners 1: Someone joins after inactive people in onboarding
+15. Late joiners 2: Someone joins after inactive people during play
+16. Kick 1: Detect and prompt inactive users
+17. Kick 2: Detect, prompt and kick inactive users
