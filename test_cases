@@ -1,0 +1,16 @@
+
+
+1. Normal workflow: 3 users join promptly and complete their onboarding. Timer elapsed, the game starts.
+2. Normal workflow: 4 users join promptly and complete their onboarding. Extension granted, the game starts
+3. Normal workflow: 5 users join promptly and complete their onboarding. The game starts right away.
+4. Room Overflow: 5 users join and start, the 6th is redirected to new room
+5. Leaver 1: 3 users join, one leave before the timer ends
+6. Leaver 2: 4 users join, one leaves before the timer ends
+7. Leaver 3: 3person game starts, one leave
+8. Leaver 4: 4person game starts, one leaves
+9. Leaver 5: 5person game starts, 1-2 leaves
+10. Inactive 1: Inactive person/s during onboarding above threshold
+11. Inactive 2: Inactive person/s during gameplay above threshold
+12. Inactive 3: Inactive person/s during onboarding bellow the threshold
+13. Inactive 4: Inactive person/s during gameplay bellow the threshold
+14. Late joiners 1: Someone joins after inactive people in onboarding 
