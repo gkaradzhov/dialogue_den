@@ -149,7 +149,9 @@ class PostgreConnection:
             return rooms[0]
         
         
-
+    def set_room_status(self, room_id, status):
+        # possible statuses: RECRUITING, READY_TO_START, PLAYING
+        pass
 
 #pg = PostgreConnection('creds.json', True)
 

@@ -272,8 +272,9 @@ def on_leave(data):
     print("User {} has left the room {}".format(username, room))
 
 
-def check_finished(room_history, usr_status):
+def check_finished(room_history, usr_status, room_status):
     logged_users = {}
+    #TODO: Check ready to start
     for item in room_history:
         if item.user_status == USR_MODERATING:
             continue
@@ -294,7 +295,7 @@ def check_finished(room_history, usr_status):
 
 def handle_room_events(room_messages, room_id, last_message):
     logged_users = set()
-    
+    room_status = None
     for item in room_messages:
         if item.message_type == JOIN_ROOM:
             logged_users.add(item.origin_id)
@@ -305,15 +306,18 @@ def handle_room_events(room_messages, room_id, last_message):
     campaign = PG.get_campaign(campaign_id)
     
     if last_message.message_type == ROUTING_TIMER_ELAPSED:
-        if campaign['start_threshold'] == len(logged_users):
-            #TODO: remove room lock
+        if len(logged_users) == campaign['start_threshold']:
+            PG.set_room_status(room_id, 'READY_TO_START')
+            #TODO: Check finished ?
             pass
-        else:
+        elif len(logged_users) > campaign['start_threshold']:
             #TODO: grant extension
             pass
     elif last_message.message_type == EXTENSION_ELAPSED:
         #TODO: remove room lock
         pass
+
+    return room_status
     
     
 
@@ -328,9 +332,9 @@ def handle_response(json, methods=('GET', 'POST')):
     create_broadcast_message(m)
     all_messages = PG.get_messages(room_id)
     
-    handle_room_events(all_messages, room_id, m)
+    room_status = handle_room_events(all_messages, room_id, m)
     
-    finished_onboarding = check_finished(all_messages, USR_ONBOARDING)
+    finished_onboarding = check_finished(all_messages, USR_ONBOARDING, room_status)
     
     if finished_onboarding:
         after_5mins = datetime.datetime.utcnow() + datetime.timedelta(minutes=7)
@@ -339,13 +343,12 @@ def handle_response(json, methods=('GET', 'POST')):
                     content=date_str)
         create_broadcast_message(m)
     
-    finished_game = check_finished(all_messages, USR_PLAYING)
+    finished_game = check_finished(all_messages, USR_PLAYING, room_status)
     if finished_game:
         m = Message(origin_id=SYSTEM_ID, origin_name=SYSTEM_USER, message_type=WASON_FINISHED, room_id=room_id)
         create_broadcast_message(m)
         all_messages.append(m)
         trigger_finish(all_messages)
-        # TODO: if in campaign - generate authentication code
 
 
 def receiveSignal(signal_num, frame):
