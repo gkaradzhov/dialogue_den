@@ -1,10 +1,8 @@
 import json
-
-import psycopg2
-import select
-import time
 import os
 
+import psycopg2
+import time
 from psycopg2.pool import ThreadedConnectionPool
 
 from constants import WASON_INITIAL
@@ -24,7 +22,7 @@ class PostgreConnection:
                 'password': os.environ.get('DB_PASS'),
                 'host': os.environ.get('DB_HOST')
             }
-
+        
         self.creds = creds
         
         self.pool = self.create_pool()
@@ -40,7 +38,7 @@ class PostgreConnection:
         #                               host=self.creds['host'])
         
         return pool
-        
+    
     def get_cursor(self):
         connection = self.pool.getconn()
         connection.set_session(autocommit=True)
@@ -71,9 +69,10 @@ class PostgreConnection:
             print("Query: {}; Params: {}".format(query, params))
             print(e)
     
-
     def create_room(self, room):
-        self.__execute("INSERT INTO room (id, name, is_done, campaign_id) VALUES (%s, %s, %s, %s) RETURNING ID", (room.room_id, room.name, room.is_done, room.campaign))
+        self.__execute(
+            "INSERT INTO room (id, name, is_done, campaign_id, status) VALUES (%s, %s, %s, %s, 'RECRUITING') RETURNING ID",
+            (room.room_id, room.name, room.is_done, room.campaign))
         wason_game = generate_wason_cards()
         m = Message(origin_name='SYSTEM', message_type=WASON_INITIAL, room_id=room.room_id,
                     origin_id='-1', content=json.dumps(wason_game))
@@ -87,24 +86,27 @@ class PostgreConnection:
         return rooms
     
     def get_single_room(self, room_id):
-        room = self.__execute("SELECT id, name, is_done, campaign_id FROM room WHERE id=%s", (room_id,))
+        #TODO: Remove is done
+        room = self.__execute("SELECT id, name, is_done, campaign_id, status FROM room WHERE id=%s", (room_id,))
         if len(room) != 0:
             room = room[0]
-            return Room(room_id=room[0], name=room[1], is_done=room[2], campaign=room[3])
+            return Room(room_id=room[0], name=room[1], is_done=room[2], campaign=room[3], status=room[4])
         else:
             raise ValueError('No room with that ID')
-            
+    
     def insert_message(self, message):
-        self.__execute("INSERT INTO message (id, origin, origin_id, message_type, content, timestamp, room_id, user_status) "
-                       "VALUES (%s, %s, %s, %s, %s, %s, %s, %s) RETURNING ID",
-                       (message.unique_id, message.origin, message.origin_id, message.message_type, str(message.content),
-                        message.timestamp, message.room_id, message.user_status))
-
+        self.__execute(
+            "INSERT INTO message (id, origin, origin_id, message_type, content, timestamp, room_id, user_status) "
+            "VALUES (%s, %s, %s, %s, %s, %s, %s, %s) RETURNING ID",
+            (message.unique_id, message.origin, message.origin_id, message.message_type, str(message.content),
+             message.timestamp, message.room_id, message.user_status))
+    
     def get_messages(self, room_id):
-        db_messages = self.__execute("SELECT id, origin, origin_id, message_type, content, timestamp, room_id, user_status "
-                                " FROM message"
-                                " WHERE room_id = %s"
-                                " ORDER BY timestamp", (room_id,))
+        db_messages = self.__execute(
+            "SELECT id, origin, origin_id, message_type, content, timestamp, room_id, user_status "
+            " FROM message"
+            " WHERE room_id = %s"
+            " ORDER BY timestamp", (room_id,))
         messages = []
         for r in db_messages:
             messages.append(Message(unique_id=r[0], origin_name=r[1], origin_id=r[2], message_type=r[3], content=r[4],
@@ -113,16 +115,19 @@ class PostgreConnection:
     
     def mark_room_done(self, room_id):
         self.__execute("UPDATE room SET is_done=True WHERE id=%s RETURNING ID", (room_id,))
-
+    
     def get_campaign(self, campaign_id):
-        campaign = self.__execute("SELECT id, start_threshold, start_time, close_threshold FROM campaign WHERE id=%s AND is_active=true", (campaign_id,))
+        campaign = self.__execute(
+            "SELECT id, start_threshold, start_time, close_threshold FROM campaign WHERE id=%s AND is_active=true",
+            (campaign_id,))
         if len(campaign) > 0:
             campaign = campaign[0]
         else:
             return None
         
-        return {'id': campaign[0], 'start_threshold': campaign[1], 'start_time': campaign[2], 'close_threshold': campaign[3]}
-
+        return {'id': campaign[0], 'start_threshold': campaign[1], 'start_time': campaign[2],
+                'close_threshold': campaign[3]}
+    
     def get_create_campaign_room(self, campaign_id):
         get_room_sql = """
             SELECT r.id FROM message m
@@ -147,34 +152,32 @@ class PostgreConnection:
             return r.room_id
         else:
             return rooms[0]
-        
-        
+    
     def set_room_status(self, room_id, status):
-        # possible statuses: RECRUITING, READY_TO_START, PLAYING
-        pass
-
-#pg = PostgreConnection('creds.json', True)
+        self.__execute("UPDATE room SET status=%s WHERE id=%s RETURNING ID", (status, room_id))
 
 
+# pg = PostgreConnection('creds.json', True)
 
-class PostgreMock:
+
+class PostgresMock:
     def __init__(self, path_to_credentials=None):
-        print("Init PostgreMock")
-
+        print("Init PostgresMock")
+    
     def create_room(self, room):
         pass
-
+    
     def get_active_rooms(self):
         return []
-
-    def get_single_room(self, room_id):
+    
+    def get_single(self, room_id):
         return Room(name='Test')
-
+    
     def insert_message(self, message):
         pass
-
+    
     def get_messages(self, room_id):
         return []
-
+    
     def mark_room_done(self, room_id):
         pass

@@ -7,7 +7,7 @@ from sys_config import DIALOGUES_RUNNING
 
 
 class Room:
-    def __init__(self, name, room_id=None, is_done=False, campaign=None):
+    def __init__(self, name, room_id=None, is_done=False, campaign=None, status=None):
         self.name = name
         self.campaign = campaign
         if room_id is None:
@@ -15,6 +15,7 @@ class Room:
         else:
             self.room_id = room_id
         self.is_done = is_done == 'True'
+        self.status = status
     
     @classmethod
     def from_text_representation(cls, data_tuple):
