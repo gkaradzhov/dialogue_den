@@ -176,8 +176,10 @@ def handle_routing(messages, logged_users, start_threshold, start_time, close_th
         if m.message_type == ROUTING_TIMER_STARTED:
             timer_started = True
     if timer_started is False and (len(logged_users) + 1) == start_threshold:
+        after3mins = datetime.datetime.utcnow() + datetime.timedelta(minutes=start_time)
+
         m = Message(origin_name=SYSTEM_USER, message_type=ROUTING_TIMER_STARTED, room_id=room_id,
-                    origin_id=SYSTEM_ID, content=start_time)
+                    origin_id=SYSTEM_ID, content=after3mins)
         create_broadcast_message(m)
     
     if (len(logged_users) + 1) == close_threshold:
@@ -306,13 +308,6 @@ def handle_room_events(room_messages, room_id, last_message):
     if last_message.message_type == ROUTING_TIMER_ELAPSED:
         if len(logged_users) == campaign['start_threshold']:
             PG.set_room_status(room_id, 'READY_TO_START')
-        elif len(logged_users) > campaign['start_threshold']:
-            extension_finish = None
-            m = Message(origin_name=SYSTEM_USER, message_type=ROUTING_EXTENSION, room_id=room_id,
-                        origin_id=SYSTEM_ID, content=extension_finish)
-            create_broadcast_message(m)
-    elif last_message.message_type == EXTENSION_ELAPSED:
-        PG.set_room_status(room_id, 'READY_TO_START')
     return room_status
 
 
