@@ -25,20 +25,21 @@
 
 <div id="result_holder" class="finish hidden">Game Finished! Thank you for playing</div>
 <div class="timer_holder hidden"> Please complete the task within the next:
-        <div id="timer"></div>
+    <div id="timer"></div>
 </div>
 <div id="wait_onboarding" class="notification hidden">
     Thank you for submitting your solution. Please wait for the other participants to submit their solo selections.
 </div>
 
 <div id="start_soon" class="notification hidden">
-    <b>The group phase of the game will start soon!</b> Please submit your card selection. Once everyone does so, the game will start!
+    <b>The group phase of the game will start soon!</b> Please submit your card selection. Once everyone does so, the
+    game will start!
 </div>
 
 <div id="welcome" class="notification">
-    Welcome! Please read the instructions carefully. We are currently recruiting more people to join the room, once we have at least 3 users the game will start.
+    Welcome! Please read the instructions carefully. We are currently recruiting more people to join the room, once we
+    have at least 3 users the game will start.
 </div>
-
 
 
 {% if room_data.current_user_status == 'USR_MODERATING'%}
@@ -112,11 +113,15 @@
         <ol>
             <li>You will be discussing the solution to a reasoning task.</li>
             <li>Please read the task description carefully.</li>
-            <li>First you will complete the task by yourself. When you are happy with your choice - press the Submit button.</li>
+            <li>First you will complete the task by yourself. When you are happy with your choice - press the Submit
+                button.
+            </li>
             <li>Once every participant completes the task by themselves, you will have to discuss your solutions in the
-                chat and possibly revise your selection. Note, that although many groups reach a unanimous decision, if you can submit a different solution.</li>
+                chat and possibly revise your selection. Note, that although many groups reach a unanimous decision, if
+                you can submit a different solution.
+            </li>
             <li>We have a timer set for 7 minutes, but you can take more time if needed.</li>
-            <li>You can leave the experiment at any time by pressing the "Leave room" button on the bottom left. </li>
+            <li>You can leave the experiment at any time by pressing the "Leave room" button on the bottom left.</li>
         </ol>
     </div>
     <div id="chat_container" class="col-6 hidden">
@@ -138,41 +143,17 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 
-
+<script type="text/javascript" src="/static/utils.js"></script>
 <script type="text/javascript">
-
-
-const JOIN_ROOM = 'JOIN_ROOM';
-const CHAT_MESSAGE = 'CHAT_MESSAGE';
-const LEAVE_ROOM = 'LEAVE_ROOM';
-const FINISHED_ONBOARDING = 'FINISHED_ONBOARDING';
-const WASON_INITIAL = 'WASON_INITIAL';
-const WASON_GAME = 'WASON_GAME';
-const WASON_AGREE = 'WASON_SUBMIT';
-const WASON_FINISHED = 'WASON_FINISHED';
-
-const USR_ONBOARDING = 'USR_ONBOARDING';
-const USR_PLAYING = 'USR_PLAYING';
-const USR_MODERATING = 'USR_MODERATING';
-
-
-ROUTING_TIMER_STARTED = 'ROUTING_TIMER_STARTED'
-ROUTING_TIMER_ELAPSED = 'ROUTING_TIMER_ELAPSED'
-
-READY_TO_START = "READY_TO_START"
-ROOM_PLAYING = "ROOM_PLAYING"
-
 $(function() {
+    var socket = io.connect('http://' + document.domain + ':' + location.port, { transports: ['websocket'] });
+    var room_id = $('input#chat_id').val();
     var timer = null;
     var room_status = $('#room_status').val();
     if (room_status == ROUTING_TIMER_STARTED){
         $('#start_soon').removeClass('hidden');
         $('#welcome').addClass('hidden');
-    }
-    function boldMentions(str){
-        var regex = new RegExp("@\\w*", 'gi');
-        str = str.replace(regex, function(str) {return '<b>'+str+'</b>'});
-        return str;
+        activityWatcher(kick);
     }
 
     $('div.chatbox').scrollTop($('div.chatbox')[0].scrollHeight);
@@ -184,22 +165,7 @@ $(function() {
         logged_users.push({'label': "@" + "{{user[0]}}", 'id': "{{user[1]}}"})
     {%endfor%}
 
-    function split(val){
-      return val.split( / \s*/ );
-    }
 
-    function extractLast(term) {
-      return split(term).pop();
-    }
-
-    function get_card_selection(){
-        var selection = [];
-        $("input:checkbox").each(function(){
-            selection.push({'value': $(this).val(), 'checked': $(this).is(":checked")});
-        });
-
-        return selection;
-    }
 
     var autocomplete_options = {
         minLength: 1,
@@ -237,8 +203,7 @@ $(function() {
         }
       };
 
-    var socket = io.connect('http://' + document.domain + ':' + location.port, { transports: ['websocket'] });
-    var room_id = $('input#chat_id').val();
+
     socket.on( 'connect', function() {
         user_name = $("#user_name").val();
         var user_status = $('input#user_status').val();
@@ -269,18 +234,10 @@ $(function() {
     $('.kick').on('click', function(e){
         e.preventDefault();
         if (confirm('Are you sure you want kick this user?.')) {
+
             var user_id = $(this).val();
             var user_name = $(this).attr('name');
-            socket.emit('leave', { user_name: user_name, room: room_id, user_id: user_id, user_status: 'KICKED'});
-
-            $('#'+user_id).remove();
-            logged_users = logged_users.filter(function(el) { return el.label != "@"+user_name; });
-            $("#message").bind("keydown", function( event ) {
-                if (event.keyCode === $.ui.keyCode.TAB &&
-                    $(this).autocomplete("instance").menu.active ) {
-                  event.preventDefault();
-                }
-            }).autocomplete(autocomplete_options);
+            kick_generic(user_id, user_name, room_id);
         }
     });
 
@@ -460,6 +417,8 @@ $(function() {
                         });
                     clearInterval(timer);
                 })}, 1000);
+
+                activityWatcher(kick);
                 break;
             case ROUTING_TIMER_ELAPSED:
                 $('input#room_status').val(READY_TO_START);
@@ -500,25 +459,6 @@ $(function() {
     });
 
 
-    function start_timer(count_down, visualise, callback) {
-        var now = new Date().getTime();
-        // Find the distance between now and the count down date
-        var distance = count_down - now;
-
-        // Time calculations for days, hours, minutes and seconds
-
-        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-        if (visualise == true){
-            $('#timer').text(minutes + " minutes " + seconds + " seconds");
-        }
-        // If the count down is finished, write some text
-        if (distance < 0) {
-            console.log('distance');
-            callback();
-        }
-    }
 
     $("#message").bind("keydown", function( event ) {
         if (event.keyCode === $.ui.keyCode.TAB &&
@@ -541,6 +481,27 @@ $(function() {
 
         socket.emit('leave', { user_name: user_name, room: room_id, user_id:user_id, user_status: user_status});
     }
+    function kick(){
+        var user_name = $('input#user_name').val();
+        var user_id = $('input#user_id').val();
+        kick_generic(user_id, user_name, room_id);
+
+    }
+    function kick_generic(user_id, user_name, room_id, reason){
+
+        var user_name = $(this).attr('name');
+        socket.emit('leave', { user_name: user_name, room: room_id, user_id: user_id, user_status: 'KICKED'});
+
+        $('#'+user_id).remove();
+        logged_users = logged_users.filter(function(el) { return el.label != "@"+user_name; });
+        $("#message").bind("keydown", function( event ) {
+            if (event.keyCode === $.ui.keyCode.TAB &&
+                $(this).autocomplete("instance").menu.active ) {
+              event.preventDefault();
+            }
+        }).autocomplete(autocomplete_options);
+        window.location.href = "/";
+    }
     var prevKey="";
     $(document).keydown(function (e) {
         if (e.key=="F5") {
@@ -558,6 +519,7 @@ $(function() {
         prevKey = e.key.toUpperCase();
     });
 });
+
 
 
 </script>
