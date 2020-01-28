@@ -194,6 +194,10 @@
     color: red !important;
 }
 
+.notification{
+    margin-left: 10px;
+    color: green !important;
+}
 
 .footer {
   padding-top: 50px;

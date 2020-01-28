@@ -140,6 +140,7 @@ class PostgreConnection:
             AND r.is_done = false
             AND r.campaign_id = %s
             AND c.is_active = true
+            AND r.status IN ('RECRUITING', 'ROUTING_TIMER_STARTED')
             GROUP BY r.id
             ORDER BY MAX(m.timestamp) DESC"""
         
