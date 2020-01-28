@@ -442,14 +442,14 @@ $(function() {
                 var countDownDate = new Date(date).getTime();
                 alert('More users joined, the room, as soon as they are finished with their solo phase, the game will begin');
                 var timer = setInterval(function(){start_timer(countDownDate, function(){
-                socket.emit('response', {
-                        user_id: user_id,
-                        user_name: user_name,
-                        type: 'EXTENSION_ELAPSED',
-                        room: room_id,
-                        user_status: user_status
-                    })
-                })});
+                    socket.emit('response', {
+                            user_id: user_id,
+                            user_name: user_name,
+                            type: 'EXTENSION_ELAPSED',
+                            room: room_id,
+                            user_status: user_status
+                        })
+                    })});
                 break;
             case FINISHED_ONBOARDING:
                 $('.timer_holder').removeClass('hidden');

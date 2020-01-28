@@ -14,7 +14,7 @@ from flask_socketio import send
 
 from constants import JOIN_ROOM, CHAT_MESSAGE, LEAVE_ROOM, WASON_INITIAL, WASON_AGREE, WASON_GAME, WASON_FINISHED, \
     USR_ONBOARDING, USR_PLAYING, FINISHED_ONBOARDING, USR_MODERATING, ROUTING_TIMER_STARTED, SYSTEM_USER, SYSTEM_ID, \
-    ROUTING_TIMER_ELAPSED, EXTENSION_ELAPSED
+    ROUTING_TIMER_ELAPSED, EXTENSION_ELAPSED, ROUTING_EXTENSION
 from data_persistency_utils import read_rooms_from_file, write_rooms_to_file, save_file
 from message import Room, Message
 from postgre_utils import PostgreConnection
@@ -217,7 +217,6 @@ def chatroom():
     
     create_broadcast_message(m)
     
-    
     wason_initial = [d.content for d in running_dialogue if d.message_type == WASON_INITIAL][0]
     
     campaign = PG.get_campaign(room.campaign)
@@ -274,7 +273,6 @@ def on_leave(data):
 
 def check_finished(room_history, usr_status, room_status):
     logged_users = {}
-    #TODO: Check ready to start
     for item in room_history:
         if item.user_status == USR_MODERATING:
             continue
@@ -308,18 +306,14 @@ def handle_room_events(room_messages, room_id, last_message):
     if last_message.message_type == ROUTING_TIMER_ELAPSED:
         if len(logged_users) == campaign['start_threshold']:
             PG.set_room_status(room_id, 'READY_TO_START')
-            #TODO: Check finished ?
-            pass
         elif len(logged_users) > campaign['start_threshold']:
-            #TODO: grant extension
-            pass
+            extension_finish = None
+            m = Message(origin_name=SYSTEM_USER, message_type=ROUTING_EXTENSION, room_id=room_id,
+                        origin_id=SYSTEM_ID, content=extension_finish)
+            create_broadcast_message(m)
     elif last_message.message_type == EXTENSION_ELAPSED:
-        #TODO: remove room lock
-        pass
-
+        PG.set_room_status(room_id, 'READY_TO_START')
     return room_status
-    
-    
 
 
 @socketio.on('response')
@@ -332,9 +326,11 @@ def handle_response(json, methods=('GET', 'POST')):
     create_broadcast_message(m)
     all_messages = PG.get_messages(room_id)
     
-    room_status = handle_room_events(all_messages, room_id, m)
+    handle_room_events(all_messages, room_id, m)
     
-    finished_onboarding = check_finished(all_messages, USR_ONBOARDING, room_status)
+    room = PG.get_single_room(room_id)
+    
+    finished_onboarding = check_finished(all_messages, USR_ONBOARDING, room.status)
     
     if finished_onboarding:
         after_5mins = datetime.datetime.utcnow() + datetime.timedelta(minutes=7)
@@ -343,7 +339,7 @@ def handle_response(json, methods=('GET', 'POST')):
                     content=date_str)
         create_broadcast_message(m)
     
-    finished_game = check_finished(all_messages, USR_PLAYING, room_status)
+    finished_game = check_finished(all_messages, USR_PLAYING, room.status)
     if finished_game:
         m = Message(origin_id=SYSTEM_ID, origin_name=SYSTEM_USER, message_type=WASON_FINISHED, room_id=room_id)
         create_broadcast_message(m)
@@ -351,18 +347,15 @@ def handle_response(json, methods=('GET', 'POST')):
         trigger_finish(all_messages)
 
 
-def receiveSignal(signal_num, frame):
-    print("Exiting signally: {0}; {1}".format(signal_num, frame))
-    # sync_everything()
+def handle_signals():
+    print("Handling Signal")
+    # save_state()
 
 
 if __name__ == '__main__':
-    signal.signal(signal.SIGTERM, receiveSignal)
+    signal.signal(signal.SIGTERM, handle_signals)
     try:
         socketio.run(host='localhost', port=8898, app=app)
     finally:
         print("Exiting gracefully")
-        # sync_everything()
-    
-    # Threaded option to enable multiple instances for multiple user access support
-    # app.run(threaded=True, port=5000)
+        # save_state()
