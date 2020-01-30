@@ -4,6 +4,7 @@ import json
 import os
 import signal
 import string
+from datetime import timezone
 from os import path
 
 import flask_login
@@ -269,9 +270,10 @@ def on_leave(data):
     username = data['user_name']
     user_id = data['user_id']
     room = data['room']
+    status = data['user_status']
     leave_room(room)
 
-    m = Message(origin_name=username, message_type=LEAVE_ROOM, room_id=room, origin_id=user_id)
+    m = Message(origin_name=username, message_type=LEAVE_ROOM, room_id=room, origin_id=user_id, user_status=status)
     create_broadcast_message(m)
     
     all_messages = PG.get_messages(room)
@@ -290,7 +292,8 @@ def check_finished(room_history, usr_status, room_status):
             # No need to check, already finished onboarding
             return False
         if item.message_type == LEAVE_ROOM and item.origin_id in logged_users:
-            del logged_users[item.origin_id]
+            if item.origin_id in logged_users:
+                del logged_users[item.origin_id]
         elif item.message_type == WASON_AGREE and item.user_status == usr_status:
             logged_users[item.origin_id] = True
         elif item.message_type == WASON_GAME or item.message_type == JOIN_ROOM:
@@ -302,13 +305,33 @@ def check_finished(room_history, usr_status, room_status):
 
 
 def handle_room_events(room_messages, room_id, last_message):
-    logged_users = set()
+    logged_users = {}
     room_status = None
     for item in room_messages:
         if item.message_type == JOIN_ROOM:
-            logged_users.add(item.origin_id)
+            logged_users[item.origin_id] = item.timestamp
         elif item.message_type == LEAVE_ROOM:
-            logged_users.remove(item.origin_id)
+            if item.origin_id in logged_users:
+                del logged_users[item.origin_id]
+        else:
+            if item.origin_id in logged_users:
+              logged_users[item.origin_id] = item.timestamp
+    
+    # Kick inactive:
+    now = datetime.datetime.now(timezone.utc)
+    for user, last_active in logged_users.items():
+        print("U: {}; LA: {}".format(user, last_active))
+        difference = now - last_active
+        print(difference)
+        if difference.total_seconds() >= 245:
+            print("Kicking")
+            m = Message(origin_name='AUTO_KICKED', message_type=LEAVE_ROOM, room_id=room_id, origin_id=user,
+                        user_status='AUTO_KICKED')
+            create_broadcast_message(m)
+    
+            all_messages = PG.get_messages(room_id)
+            validate_finish_game(all_messages, room_id)
+        pass
     
     campaign_id = PG.get_single_room(room_id).campaign
     campaign = PG.get_campaign(campaign_id)

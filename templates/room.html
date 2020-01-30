@@ -138,22 +138,28 @@
     </div>
 </div>
 <div class="footer"><a href="https://gkaradzhov.com">Georgi Karadzhov</a></div>
+<audio id="audio" src="/static/announcement.mp3" autostart="false" ></audio>
+
 </body>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 
 <script type="text/javascript" src="/static/utils.js"></script>
+<script type="text/javascript" src="/static/notify.min.js"></script>
+
 <script type="text/javascript">
 $(function() {
     var socket = io.connect('http://' + document.domain + ':' + location.port, { transports: ['websocket'] });
     var room_id = $('input#chat_id').val();
     var timer = null;
     var room_status = $('#room_status').val();
+    var sound = document.getElementById("audio");
     if (room_status == ROUTING_TIMER_STARTED){
         $('#start_soon').removeClass('hidden');
         $('#welcome').addClass('hidden');
-        activityWatcher(kick);
+        activityWatcher(wakeup, kick);
+        sound.play()
     }
 
     $('div.chatbox').scrollTop($('div.chatbox')[0].scrollHeight);
@@ -364,6 +370,7 @@ $(function() {
                   }).autocomplete(autocomplete_options);
                 break;
             case LEAVE_ROOM:
+                console.log("triggered leave room: " + msg)
                 var user_id = $('input#user_id').val();
 
                 $('#'+msg.user_id).remove();
@@ -398,7 +405,7 @@ $(function() {
             case ROUTING_TIMER_STARTED:
                 $('#start_soon').removeClass('hidden');
                 $('#welcome').addClass('hidden');
-
+                sound.play()
                 var date = msg.message;
                 var countDownDate = new Date(date).getTime();
 
@@ -418,12 +425,13 @@ $(function() {
                     clearInterval(timer);
                 })}, 1000);
 
-                activityWatcher(kick);
+                activityWatcher(wakeup, kick);
                 break;
             case ROUTING_TIMER_ELAPSED:
                 $('input#room_status').val(READY_TO_START);
                 break;
             case FINISHED_ONBOARDING:
+                sound.play()
                 $('#start_soon').addClass('hidden');
                 clearInterval(timer);
                 $('#detailed_instructions').addClass('hidden');
@@ -458,8 +466,6 @@ $(function() {
         }
     });
 
-
-
     $("#message").bind("keydown", function( event ) {
         if (event.keyCode === $.ui.keyCode.TAB &&
             $(this).autocomplete("instance").menu.active ) {
@@ -474,24 +480,32 @@ $(function() {
     $(window).on('mouseout', (function () {
         window.onbeforeunload = Leave;
     }));
+
     function Leave() {
         var user_name = $('input#user_name').val();
         var user_id = $('input#user_id').val();
-        var user_status = $('input#user_status').val()
+        var user_status = $('input#user_status').val();
 
         socket.emit('leave', { user_name: user_name, room: room_id, user_id:user_id, user_status: user_status});
     }
+
     function kick(){
         var user_name = $('input#user_name').val();
         var user_id = $('input#user_id').val();
         kick_generic(user_id, user_name, room_id);
+    }
+
+    function wakeup(){
+        sound.play();
+        console.log("Sound should be played");
+        $.notify("You have been inactive for a while. Please be mindful, that after a prolonged period of inactivity you will be excluded from the room.", {autoHide: false});
+
 
     }
+
+
     function kick_generic(user_id, user_name, room_id, reason){
-
-        var user_name = $(this).attr('name');
         socket.emit('leave', { user_name: user_name, room: room_id, user_id: user_id, user_status: 'KICKED'});
-
         $('#'+user_id).remove();
         logged_users = logged_users.filter(function(el) { return el.label != "@"+user_name; });
         $("#message").bind("keydown", function( event ) {

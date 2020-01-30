@@ -63,14 +63,7 @@ function get_card_selection(){
 }
 
 
-function wakeup(){
-    alert("You've been inactive for a while, the game is starting soon.");
-}
-
-
-
-
-function activityWatcher(kick_callback){
+function activityWatcher(wakeup_callback, kick_callback){
 
     var secondsSinceLastActivity = 0;
 
@@ -78,12 +71,14 @@ function activityWatcher(kick_callback){
     var notification_inactivity = (30 * 5)
     //Setup the setInterval method to run
     //every second. 1000 milliseconds = 1 second.
+
     setInterval(function(){
         secondsSinceLastActivity++;
         if(secondsSinceLastActivity > notification_inactivity){
             console.log('User has been inactive for more than ' + kick_inactivity + ' seconds');
             //Redirect them to your logout.php page.
-            wakeup();
+            wakeup_callback();
+            notification_inactivity = notification_inactivity * 2
         }
 
         if(secondsSinceLastActivity > kick_inactivity){
@@ -98,6 +93,7 @@ function activityWatcher(kick_callback){
         //reset the secondsSinceLastActivity variable
         //back to 0
         secondsSinceLastActivity = 0;
+        notification_inactivity = (30 * 5)
     }
 
     //An array of DOM events that should be interpreted as
