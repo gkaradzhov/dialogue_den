@@ -12,6 +12,7 @@ import flask_socketio
 from flask import Flask, request, render_template, redirect, make_response, url_for
 from flask_socketio import join_room, leave_room
 from flask_socketio import send
+from flask_talisman import Talisman
 
 from constants import JOIN_ROOM, CHAT_MESSAGE, LEAVE_ROOM, WASON_INITIAL, WASON_AGREE, WASON_GAME, WASON_FINISHED, \
     USR_ONBOARDING, USR_PLAYING, FINISHED_ONBOARDING, USR_MODERATING, ROUTING_TIMER_STARTED, SYSTEM_USER, SYSTEM_ID, \
@@ -21,7 +22,6 @@ from message import Room, Message
 from postgre_utils import PostgreConnection
 from sys_config import DIALOGUES_STABLE, ROOM_PATH
 from utils import generate_user
-from flask_talisman import Talisman
 
 login_manager = flask_login.LoginManager()
 
@@ -32,7 +32,9 @@ csp = {
         'cdnjs.cloudflare.com',
         'maxcdn.bootstrapcdn.com',
         'ajax.googleapis.com'
-    ]
+    ],
+    'script-src': 'nonce-a9d09b55f2b66e00f4d27f8b453003e6',
+    'style-src': 'nonce-a9d09b55f2b66e00f4d27f8b453003e6'
 }
 Talisman(app, content_security_policy=csp)
 app.config['SECRET_KEY'] = 'this_secret_key_potato_21_kaxvhsdferfx3d34'
