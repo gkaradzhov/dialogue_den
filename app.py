@@ -12,6 +12,7 @@ import flask_socketio
 from flask import Flask, request, render_template, redirect, make_response, url_for
 from flask_socketio import join_room, leave_room
 from flask_socketio import send
+from flask_talisman import Talisman
 
 from constants import JOIN_ROOM, CHAT_MESSAGE, LEAVE_ROOM, WASON_INITIAL, WASON_AGREE, WASON_GAME, WASON_FINISHED, \
     USR_ONBOARDING, USR_PLAYING, FINISHED_ONBOARDING, USR_MODERATING, ROUTING_TIMER_STARTED, SYSTEM_USER, SYSTEM_ID, \
@@ -26,6 +27,7 @@ login_manager = flask_login.LoginManager()
 
 app = Flask(__name__)
 
+Talisman(app, content_security_policy=None)
 app.config['SECRET_KEY'] = 'this_secret_key_potato_21_kaxvhsdferfx3d34'
 socketio = flask_socketio.SocketIO(app, cors_allowed_origins='*', async_mode='eventlet')
 
@@ -41,13 +43,6 @@ class User(flask_login.UserMixin):
     pass
 
 
-@app.before_request
-def before_request():
-    if not request.url.contains('https://') and app.env != "development":
-        url = request.url.replace("http://", "https://", 1)
-        code = 301
-        return redirect(url, code=code)
-    
 @login_manager.user_loader
 def user_loader(email):
     user = User()
