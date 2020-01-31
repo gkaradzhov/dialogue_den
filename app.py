@@ -26,7 +26,14 @@ from flask_talisman import Talisman
 login_manager = flask_login.LoginManager()
 
 app = Flask(__name__)
-Talisman(app)
+csp = {
+ 'default-src': [
+        '\'self\'',
+        'cdnjs.cloudflare.com',
+        'maxcdn.bootstrapcdn.com'
+    ]
+}
+Talisman(app, content_security_policy=csp)
 app.config['SECRET_KEY'] = 'this_secret_key_potato_21_kaxvhsdferfx3d34'
 socketio = flask_socketio.SocketIO(app, cors_allowed_origins='*', async_mode='eventlet')
 
