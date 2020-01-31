@@ -320,11 +320,8 @@ def handle_room_events(room_messages, room_id, last_message):
     # Kick inactive:
     now = datetime.datetime.now(timezone.utc)
     for user, last_active in logged_users.items():
-        print("U: {}; LA: {}".format(user, last_active))
         difference = now - last_active
-        print(difference)
         if difference.total_seconds() >= 245:
-            print("Kicking")
             m = Message(origin_name='AUTO_KICKED', message_type=LEAVE_ROOM, room_id=room_id, origin_id=user,
                         user_status='AUTO_KICKED')
             create_broadcast_message(m)
@@ -337,8 +334,7 @@ def handle_room_events(room_messages, room_id, last_message):
     campaign = PG.get_campaign(campaign_id)
     
     if last_message.message_type == ROUTING_TIMER_ELAPSED:
-        if len(logged_users) == campaign['start_threshold']:
-            PG.set_room_status(room_id, 'READY_TO_START')
+        PG.set_room_status(room_id, 'READY_TO_START')
     return room_status
 
 
