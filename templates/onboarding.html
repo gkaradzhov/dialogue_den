@@ -8,8 +8,10 @@
 <!--    <meta http-equiv="Content-Security-Policy" content="default-src https:">-->
 <!--    <meta http-equiv="Content-Security-Policy" content="default-src 'self' *; script-src 'unsafe-inline' 'self' *;style-src 'unsafe-inline' 'self' *;img-src 'unsafe-inline' 'self' *"> -->
 
-    <meta http-equiv="Content-Security-Policy" content="default-src *; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval' *.bootstrapcdn.com/*">
-
+<meta http-equiv="Content-Security-Policy"
+  content="default-src 'self' 'unsafe-eval' ws:;
+  style-src 'self' 'unsafe-inline';
+  script-src 'self' https://dialogueden.herokuapp.com 'unsafe-inline' 'unsafe-eval';">
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
