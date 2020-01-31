@@ -67,8 +67,8 @@ function activityWatcher(wakeup_callback, kick_callback){
 
     var secondsSinceLastActivity = 0;
 
-    var kick_inactivity = (60 * 4);
-    var notification_inactivity = (30 * 5)
+    var kick_inactivity = (60 * 3);
+    var notification_inactivity = (30 * 3)
     //Setup the setInterval method to run
     //every second. 1000 milliseconds = 1 second.
 
@@ -93,7 +93,7 @@ function activityWatcher(wakeup_callback, kick_callback){
         //reset the secondsSinceLastActivity variable
         //back to 0
         secondsSinceLastActivity = 0;
-        notification_inactivity = (30 * 5)
+        notification_inactivity = (30 * 3)
     }
 
     //An array of DOM events that should be interpreted as
