@@ -30,7 +30,8 @@ csp = {
  'default-src': [
         '\'self\'',
         'cdnjs.cloudflare.com',
-        'maxcdn.bootstrapcdn.com'
+        'maxcdn.bootstrapcdn.com',
+        'ajax.googleapis.com'
     ]
 }
 Talisman(app, content_security_policy=csp)
