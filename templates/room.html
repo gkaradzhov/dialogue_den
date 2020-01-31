@@ -158,7 +158,7 @@ $(function() {
     var timer = null;
     var room_status = $('#room_status').val();
     var sound = document.getElementById("audio");
-    if (room_status == ROUTING_TIMER_STARTED){
+    if (room_status == ROUTING_TIMER_STARTED || room_status == READY_TO_START){
         $('#start_soon').removeClass('hidden');
         $('#welcome').addClass('hidden');
         activityWatcher(wakeup, kick);
