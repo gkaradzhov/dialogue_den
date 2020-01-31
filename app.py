@@ -21,10 +21,12 @@ from message import Room, Message
 from postgre_utils import PostgreConnection
 from sys_config import DIALOGUES_STABLE, ROOM_PATH
 from utils import generate_user
+from flask_talisman import Talisman
 
 login_manager = flask_login.LoginManager()
 
 app = Flask(__name__)
+Talisman(app)
 app.config['SECRET_KEY'] = 'this_secret_key_potato_21_kaxvhsdferfx3d34'
 socketio = flask_socketio.SocketIO(app, cors_allowed_origins='*', async_mode='eventlet')
 
