@@ -115,10 +115,9 @@ def trigger_finish(room_data):
 
 
 # A welcome message to test our server
-# @app.route('/')
-# def index():
-#     #TODO: Create a landing page HTML
-#     return render_template('landing.html')
+@app.route('/')
+def index():
+    return render_template('index.html')
 
 @app.route('/route', methods=['GET', 'POST'])
 def route_to_room():
