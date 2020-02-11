@@ -364,12 +364,16 @@ def validate_finish_game(all_messages, room_id):
         m = Message(origin_id=SYSTEM_ID, origin_name=SYSTEM_USER, message_type=FINISHED_ONBOARDING, room_id=room_id,
                     content=date_str)
         create_broadcast_message(m)
+        PG.set_room_status(room_id, 'FINISHED_ONBOARDING')
+
     finished_game = check_finished(all_messages, USR_PLAYING, room.status)
     if finished_game:
         m = Message(origin_id=SYSTEM_ID, origin_name=SYSTEM_USER, message_type=WASON_FINISHED, room_id=room_id)
         create_broadcast_message(m)
         all_messages.append(m)
         trigger_finish(all_messages)
+        PG.set_room_status(room_id, 'FINISHED_GAME')
+
 
 
 def handle_signals():

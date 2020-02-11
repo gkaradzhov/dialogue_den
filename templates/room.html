@@ -24,28 +24,9 @@
 <input id="user_status" type="hidden" value="{{room_data.current_user_status}}"/>
 <input id="room_status" type="hidden" value="{{room_data.room_status}}"/>
 
-<div id="result_holder" class="finish hidden">Game Finished! Thank you for playing</div>
 <div class="timer_holder hidden"> Please complete the task within the next:
     <div id="timer"></div>
 </div>
-<div id="wait_onboarding" class="notification hidden">
-    Thank you for submitting your solution. Please wait for the other participants to submit their solo selections.
-</div>
-
-<div id="start_soon" class="notification hidden">
-    <b>The group phase of the game will start soon!</b> Please submit your card selection. Once everyone does so, the
-    game will start!
-</div>
-
-<div id="welcome" class="notification">
-    Welcome! Please read the instructions carefully. We are currently recruiting more people to join the room, once we
-    have at least 3 users the game will start.
-</div>
-
-<div class="play_prompt hidden">Now you have to <b>collaborate</b> with the other participants in
-    this conversation to solve the task together.
-</div>
-
 
 {% if room_data.current_user_status == 'USR_MODERATING'%}
 <div class="row"> Moderating buttons:
@@ -57,10 +38,21 @@
     <div class="col-6">
         <div class="task">
             <h3>Task Description:</h3>
+                <div id="detailed_instructions">
+                    <ol>
+                        <li>First you will complete the task by yourself. When you are happy with your choice - press the Submit
+                            button.
+                        </li>
+                        <li>Once every participant completes the task by themselves, you will have to discuss your solutions in the
+                            chat and possibly revise your selection. Note, that although many groups reach a unanimous decision, you can submit a different solution.
+                        </li>
+                        <li>We have a timer set for 7 minutes, but you can take more time if needed.</li>
+                    </ol>
+                </div>
             <div class="task_description">
-                You are presented with four cards. Each card has a letter on one side and a number on the other.
-                Which card(s) do you need to turn to test the rule: <br/>
-                <b>All cards with vowels on one side have an even number on the other.</b> <br/>
+                Each of the <b>4 cards bellow</b> has a letter on one side and a number on the other.
+                <b>Which card(s) do you need to turn to test the rule: <br/>
+                All cards with vowels on one side have an even number on the other.</b> <br/>
                 NB: Select only the card(s) that you need to verify the rule.
                 To successfully finish the game you have to submit your final answer by pressing the <b>Submit</b>
                 button.
@@ -113,24 +105,6 @@
             reveal your identity will be deleted from this chat.
         </div>
     </div>
-    <div id="detailed_instructions" class="col-6 ">
-        <h5>Guidelines: </h5>
-        <ol>
-            <li>You will be discussing the solution to a reasoning task.</li>
-            <li>Please read the task description carefully.</li>
-            <li>First you will complete the task by yourself. When you are happy with your choice - press the Submit
-                button.
-            </li>
-            <li>Once every participant completes the task by themselves, you will have to discuss your solutions in the
-                chat and possibly revise your selection. Note, that although many groups reach a unanimous decision, you can submit a different solution.
-            </li>
-            <li>We have a timer set for 7 minutes, but you can take more time if needed.</li>
-            <li>You can leave the experiment at any time by pressing the "Leave room" button on the bottom left.</li>
-            <li>If you are inactive for a prolonged period of time, you will be excluded from the chat room.</li>
-            <li>You are expected to give your best effort at solving the task. Discuss possible solutions with the other participants.</li>
-
-        </ol>
-    </div>
     <div id="chat_container" class="col-6 hidden">
         <div class="chatbox">
             {% for item in room_data.messages %}
@@ -157,16 +131,19 @@
 
 <script type="text/javascript">
 $(function() {
+
     var socket = io.connect('http://' + document.domain + ':' + location.port, { transports: ['websocket'] });
     var room_id = $('input#chat_id').val();
     var timer = null;
     var room_status = $('#room_status').val();
     var sound = document.getElementById("audio");
     if (room_status == ROUTING_TIMER_STARTED || room_status == READY_TO_START){
-        $('#start_soon').removeClass('hidden');
-        $('#welcome').addClass('hidden');
+        $.notify("The group phase of the game will start soon! Please submit your card selection. Once everyone does so, the game will start!", 'info', {autoHide: false});
         activityWatcher(wakeup, kick);
         sound.play()
+    }
+    else{
+        $.notify("Welcome! Please read the instructions carefully. We are currently recruiting more people to join the room, once there are at least 3 users, the game will start.", 'info', {autoHide: false});
     }
 
     $('div.chatbox').scrollTop($('div.chatbox')[0].scrollHeight);
@@ -315,13 +292,10 @@ $(function() {
         });
 
         if (user_status == USR_ONBOARDING){
-            $('input#user_status').val(USR_PLAYING);
-            $('#wait_onboarding').removeClass('hidden');
-            $('#start_soon').addClass('hidden');
+            $.notify("Thank you for submitting your solution. Please wait for the other participants to submit their solo selections.", 'info', {autoHide: false});
         }
-        else{
-            $('#btn-agree').prop('disabled', true);
-        }
+        $('#btn-agree').prop('disabled', true);
+
     });
     socket.on('response', function(message_str) {
         msg =  JSON.parse(message_str);
@@ -398,8 +372,9 @@ $(function() {
                 var user_name = $('input#user_name').val();
                 var user_id = $('input#user_id').val();
                 var user_status = $('input#user_status').val()
-                $('#result_holder').removeClass('hidden');
                 $('.timer_holder').addClass('hidden');
+                $.notify("Game Finished! Thank you for playing", 'success', {autoHide: false});
+
                 $(window).scrollTop(0);
 
                 break;
@@ -410,8 +385,7 @@ $(function() {
                 }
                 break;
             case ROUTING_TIMER_STARTED:
-                $('#start_soon').removeClass('hidden');
-                $('#welcome').addClass('hidden');
+                $.notify("The group phase of the game will start soon! Please submit your card selection. Once everyone does so, the game will start!", 'info', {autoHide: false});
                 sound.play()
                 var date = msg.message;
                 var countDownDate = new Date(date).getTime();
@@ -438,15 +412,15 @@ $(function() {
                 $('input#room_status').val(READY_TO_START);
                 break;
             case FINISHED_ONBOARDING:
+                $('input#user_status').val(USR_PLAYING);
+                $('#btn-agree').prop('disabled', false);
+
                 sound.play()
-                $('#start_soon').addClass('hidden');
                 clearInterval(timer);
                 $('#detailed_instructions').addClass('hidden');
                 $('#chat_container').removeClass('hidden');
                 $('.timer_holder').removeClass('hidden');
-                $('.play_prompt').removeClass('hidden');
-                $('#wait_onboarding').addClass('hidden');
-
+                $.notify('Now you have to collaborate with the other participants in this conversation to solve the task together.', 'info',  {autoHide: false});
                 var date = msg.message;
                 var countDownDate = new Date(date).getTime();
 
@@ -504,10 +478,7 @@ $(function() {
 
     function wakeup(){
         sound.play();
-        console.log("Sound should be played");
-        $.notify("You have been inactive for a while. Please be mindful, that after a prolonged period of inactivity you will be excluded from the room.", {autoHide: false});
-
-
+        $.notify("You have been inactive for a while. Please be mindful, that after a prolonged period of inactivity you will be excluded from the room.", "error", {autoHide: false});
     }
 
 
