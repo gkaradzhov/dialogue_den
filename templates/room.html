@@ -415,12 +415,16 @@ $(function() {
                 $('input#user_status').val(USR_PLAYING);
                 $('#btn-agree').prop('disabled', false);
 
-                sound.play()
+                var room_status = $('input#room_status').val()
+
+                if (room_status != ROOM_PLAYING){
+                    sound.play()
+                    $.notify('Now you have to collaborate with the other participants in this conversation to solve the task together.',  {autoHide: false, className: 'info'});
+                }
                 clearInterval(timer);
                 $('#detailed_instructions').addClass('hidden');
                 $('#chat_container').removeClass('hidden');
                 $('.timer_holder').removeClass('hidden');
-                $.notify('Now you have to collaborate with the other participants in this conversation to solve the task together.',  {autoHide: false, className: 'info'});
                 var date = msg.message;
                 var countDownDate = new Date(date).getTime();
 
@@ -440,6 +444,8 @@ $(function() {
                         })
                         clearInterval(timer);
                         ;})}, 1000);
+                $('input#room_status').val(ROOM_PLAYING);
+
                 break;
             default:
                 break;
