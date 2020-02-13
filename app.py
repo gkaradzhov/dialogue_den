@@ -28,17 +28,10 @@ login_manager = flask_login.LoginManager()
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'this_secret_key_potato_21_kaxvhsdferfx3d34'
 
-def _force_https(app):
-    def wrapper(environ, start_response):
-        environ['wsgi.url_scheme'] = 'https'
-        return app(environ, start_response)
-    return wrapper
 
 app.config.update(dict(
   PREFERRED_URL_SCHEME='https'
 ))
-
-app = _force_https(app)
 
 talisman = Talisman(app, content_security_policy=None)
 socketio = flask_socketio.SocketIO(app, cors_allowed_origins='*', async_mode='eventlet')
@@ -162,7 +155,7 @@ def route_to_room():
         if successful_onboarding:
             active_room_id = PG.get_create_campaign_room(campaign_id)
             
-            resp = make_response(redirect(url_for('chatroom', room_id=active_room_id)))
+            resp = make_response(redirect(url_for('chatroom', room_id=active_room_id, _scheme='https')))
             resp.set_cookie('onboarding_status', 'true')
         else:
             resp = make_response(render_template('unsuccessful_onboarding.html'))
