@@ -27,6 +27,10 @@ login_manager = flask_login.LoginManager()
 
 app = Flask(__name__)
 
+app.config.update(dict(
+  PREFERRED_URL_SCHEME='https'
+))
+
 talisman = Talisman(app, content_security_policy=None)
 app.config['SECRET_KEY'] = 'this_secret_key_potato_21_kaxvhsdferfx3d34'
 socketio = flask_socketio.SocketIO(app, cors_allowed_origins='*', async_mode='eventlet')
