@@ -138,12 +138,12 @@ $(function() {
     var room_status = $('#room_status').val();
     var sound = document.getElementById("audio");
     if (room_status == ROUTING_TIMER_STARTED || room_status == READY_TO_START){
-        $.notify("The group phase of the game will start soon! Please submit your card selection. Once everyone does so, the game will start!", 'info', {autoHide: false});
+        $.notify("The group phase of the game will start soon! Please submit your card selection. Once everyone does so, the game will start!",  {autoHide: false, className: 'info'});
         activityWatcher(wakeup, kick);
         sound.play()
     }
     else{
-        $.notify("Welcome! Please read the instructions carefully. We are currently recruiting more people to join the room, once there are at least 3 users, the game will start.", 'info', {autoHide: false});
+        $.notify("Welcome! Please read the instructions carefully. We are currently recruiting more people to join the room, once there are at least 3 users, the game will start.", {autoHide: false, className: 'info'});
     }
 
     $('div.chatbox').scrollTop($('div.chatbox')[0].scrollHeight);
@@ -292,7 +292,7 @@ $(function() {
         });
 
         if (user_status == USR_ONBOARDING){
-            $.notify("Thank you for submitting your solution. Please wait for the other participants to submit their solo selections.", 'info', {autoHide: false});
+            $.notify("Thank you for submitting your solution. Please wait for the other participants to submit their solo selections.", {autoHide: false, className: 'info'});
         }
         $('#btn-agree').prop('disabled', true);
 
@@ -373,7 +373,7 @@ $(function() {
                 var user_id = $('input#user_id').val();
                 var user_status = $('input#user_status').val()
                 $('.timer_holder').addClass('hidden');
-                $.notify("Game Finished! Thank you for playing", 'success', {autoHide: false});
+                $.notify("Game Finished! Thank you for playing", {autoHide: false, className: 'success'});
 
                 $(window).scrollTop(0);
 
@@ -385,7 +385,7 @@ $(function() {
                 }
                 break;
             case ROUTING_TIMER_STARTED:
-                $.notify("The group phase of the game will start soon! Please submit your card selection. Once everyone does so, the game will start!", 'info', {autoHide: false});
+                $.notify("The group phase of the game will start soon! Please submit your card selection. Once everyone does so, the game will start!", {autoHide: false, className: 'info'});
                 sound.play()
                 var date = msg.message;
                 var countDownDate = new Date(date).getTime();
@@ -420,7 +420,7 @@ $(function() {
                 $('#detailed_instructions').addClass('hidden');
                 $('#chat_container').removeClass('hidden');
                 $('.timer_holder').removeClass('hidden');
-                $.notify('Now you have to collaborate with the other participants in this conversation to solve the task together.', 'info',  {autoHide: false});
+                $.notify('Now you have to collaborate with the other participants in this conversation to solve the task together.',  {autoHide: false, className: 'info'});
                 var date = msg.message;
                 var countDownDate = new Date(date).getTime();
 
@@ -478,7 +478,7 @@ $(function() {
 
     function wakeup(){
         sound.play();
-        $.notify("You have been inactive for a while. Please be mindful, that after a prolonged period of inactivity you will be excluded from the room.", "error", {autoHide: false});
+        $.notify("You have been inactive for a while. Please be mindful, that after a prolonged period of inactivity you will be excluded from the room.", {autoHide: false, className: 'error'});
     }
 
 
@@ -516,4 +516,3 @@ $(function() {
 
 </script>
 </html>
-
