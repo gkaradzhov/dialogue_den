@@ -120,6 +120,10 @@ def index():
     return render_template('index.html')
 
 @app.route('/route', methods=['GET', 'POST'])
+@talisman(
+    frame_options='ALLOW-FROM',
+    frame_options_allow_from='https://mturk.com',
+)
 def route_to_room():
     if request.cookies.get('onboarding_status', None) == 'false':
         return render_template('unsuccessful_onboarding.html')
