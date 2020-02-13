@@ -27,7 +27,7 @@ login_manager = flask_login.LoginManager()
 
 app = Flask(__name__)
 
-Talisman(app, content_security_policy=None)
+talisman = Talisman(app, content_security_policy=None)
 app.config['SECRET_KEY'] = 'this_secret_key_potato_21_kaxvhsdferfx3d34'
 socketio = flask_socketio.SocketIO(app, cors_allowed_origins='*', async_mode='eventlet')
 
@@ -195,6 +195,10 @@ def handle_routing(messages, logged_users, start_threshold, start_time, close_th
 
 
 @app.route('/room')
+@talisman(
+    frame_options='ALLOW-FROM',
+    frame_options_allow_from='https://mturk.com',
+)
 def chatroom():
     onboarding_status = request.cookies.get('onboarding_status', None)
     if onboarding_status != 'true':
