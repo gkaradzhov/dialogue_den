@@ -51,18 +51,18 @@ class User(flask_login.UserMixin):
 @login_manager.user_loader
 def user_loader(email):
     user = User()
-    user.id = 'georgi'
+    user.id = 'moderator'
     return user
 
 
 @login_manager.request_loader
 def request_loader(request):
     user = request.form.get('user')
-    if user != 'georgi':
+    if user != 'moderator':
         return
     
     user = User()
-    user.id = 'georgi'
+    user.id = 'moderator'
     
     form_pass = request.form['password']
     adm = hashlib.sha512((admin_pass + salt).encode())
@@ -133,6 +133,13 @@ def route_to_room():
     if request.cookies.get('onboarding_status', None) == 'false':
         return render_template('unsuccessful_onboarding.html')
     if request.method == 'GET':
+        # Get Mturk data
+        assignment = request.args.get('assignmentId', None)
+        hit = request.args.get('hitId', None)
+        worker = request.args.get('workerId', None)
+        return_url = request.args.get('turkSubmitTo', None)
+        ###
+        
         campaign_id = request.args.get('campaign')
         campaign = PG.get_campaign(campaign_id)
         if campaign:
@@ -205,10 +212,6 @@ def handle_routing(messages, logged_users, start_threshold, start_time, close_th
     frame_options_allow_from='https://mturk.com',
 )
 def chatroom():
-    onboarding_status = request.cookies.get('onboarding_status', None)
-    if onboarding_status != 'true':
-        return redirect('/')
-    
     room_id = request.args.get('room_id')
     is_moderator = request.args.get('moderator', False)
     is_moderator = is_moderator == "True"
