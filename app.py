@@ -89,7 +89,7 @@ def login():
         user = User()
         user.id = email
         flask_login.login_user(user)
-        return redirect('/')
+        return redirect('/rooms')
     
     return 'Bad login'
 
@@ -182,7 +182,7 @@ def verify_text(suggested, gold, exact=False):
         return suggested_clean.issubset(gold)
 
 
-@app.route('/')
+@app.route('/rooms')
 @flask_login.login_required
 def list_rooms():
     existing_rooms = PG.get_active_rooms()
@@ -273,7 +273,7 @@ def create_room():
         existing_rooms = read_rooms_from_file()
         existing_rooms.append(room)
         write_rooms_to_file(existing_rooms)
-        return redirect('/')
+        return redirect('/rooms')
 
 
 @socketio.on('join')

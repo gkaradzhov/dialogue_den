@@ -70,6 +70,10 @@ class PostgreConnection:
             print(e)
     
     def create_room(self, room):
+        if not room.campaign:
+            campaign_id = self.__execute("SELECT id FROM campaign WHERE name LIKE 'local_beta'")
+            if len(campaign_id) > 0:
+                room.campaign = campaign_id[0]
         self.__execute(
             "INSERT INTO room (id, name, is_done, campaign_id, status) VALUES (%s, %s, %s, %s, 'RECRUITING') RETURNING ID",
             (room.room_id, room.name, room.is_done, room.campaign))
