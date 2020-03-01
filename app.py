@@ -240,11 +240,11 @@ def chatroom():
 
     current_user = generate_user([d[0] for d in logged_users], is_moderator)
 
-    mturk_return_url = None
+    formated_return_url = None
     if mturk_info_id:
         PG.update_mturk_user_id(mturk_info_id, current_user['user_id'])
-        mturk_return_url = PG.get_mturk_return_url(mturk_info_id)
-        mturk_return_url += '/mturk/externalSubmit'
+        mturk_info = PG.get_mturk_info(mturk_info_id)
+        formated_return_url = '{}/mturk/externalSubmit?assignmentId={}&user_id={}'.format(mturk_info[1], mturk_info[0], current_user['user_id'])
 
     if is_moderator:
         status = USR_MODERATING
@@ -270,7 +270,7 @@ def chatroom():
                                                    'messages': messages, 'existing_users': logged_users,
                                                    'current_user': current_user['user_name'],
                                                    'current_user_id': current_user['user_id'],
-                                                   'current_user_status': status, 'room_status': room.status, 'mturk_return_url': mturk_return_url})
+                                                   'current_user_status': status, 'room_status': room.status, 'mturk_return_url': formated_return_url})
 
 
 def create_broadcast_message(message):

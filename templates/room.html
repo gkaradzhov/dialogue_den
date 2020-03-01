@@ -97,7 +97,6 @@
             <hr>
             {% if room_data.mturk_return_url%}
                 <form action="{{room_data.mturk_return_url}}" method="post">
-                    <input type="hidden" name="user_id" value="{{room_data.current_user_id}}">
                     <input type="submit" value="Submit">
                 </form>
             {% endif %}
