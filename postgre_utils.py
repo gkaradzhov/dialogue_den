@@ -168,7 +168,7 @@ class PostgreConnection:
         self.__execute(
             "INSERT INTO mturk_info (id, assignment_id, campaign_id, hit_id, worker_id, redirect_url) "
             "VALUES (%s, %s, %s, %s, %s, %s) RETURNING ID",
-            (mturk_info_id, assignment_id, hit_id, turk_id, campaign_id, return_url))
+            (mturk_info_id, assignment_id, campaign_id, hit_id, turk_id, return_url))
 
         return mturk_info_id
 
