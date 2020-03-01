@@ -96,10 +96,8 @@
             <br/>
             <hr>
             {% if room_data.mturk_return_url%}
-                <form action="{{room_data.mturk_return_url}}" method="post">
-                    <input type="hidden" value="{{room_data.current_user_id}}">
-                    <input type="submit" value="Submit">
-                </form>
+                <input id="return_url" type="hidden" value="{{room_data.mturk_return_url}}">
+                <button id="submit_to_mturk" class="btn btn-success" value="{{room_data.current_user_id}}">Submit Hit</button>
             {% endif %}
             <hr>
             <b>Disclaimer:</b>
@@ -241,7 +239,7 @@ $(function() {
         e.preventDefault();
         var return_url = $('#return_url').val();
         var user_id = $(this).val();
-        $.post(return_url, function(data) {
+        $.post(return_url + '/externalSubmit?user='+user_id, function(data) {
           console.log(data);
         });
     });
