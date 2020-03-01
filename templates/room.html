@@ -96,8 +96,9 @@
             <br/>
             <hr>
             {% if room_data.mturk_return_url%}
-                <input id="return_url" type="hidden" value="{{room_data.mturk_return_url}}">
-                <button id="submit_to_mturk" class="btn btn-success" value="{{room_data.current_user_id}}">Submit Hit</button>
+                <form action="{{room_data.mturk_return_url}}" method="post">
+                    <input type="submit" value="Submit">
+                </form>
             {% endif %}
             <hr>
             <b>Disclaimer:</b>
