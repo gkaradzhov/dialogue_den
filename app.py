@@ -155,7 +155,7 @@ def route_to_room():
     else:
         successful_onboarding = True
         campaign_id = request.form.get('campaign_id')
-        mturk_info = request.form.get('mturk_info')
+        mturk_info = request.form.get('mturk_info', None)
         vowels = request.form.get('vowels')
         if not verify_text(vowels, ['a', 'o', 'u', 'i', 'e']):
             successful_onboarding = False
@@ -170,7 +170,7 @@ def route_to_room():
             active_room_id = PG.get_create_campaign_room(campaign_id)
 
             resp = make_response(redirect(
-                url_for('chatroom', values={'room_id': active_room_id, 'mturk_info': mturk_info}, _scheme='https',
+                url_for('chatroom', room_id=active_room_id, mturk_info=mturk_info, _scheme='https',
                         _external=True)))
             resp.set_cookie('onboarding_status', 'true')
         else:
