@@ -115,7 +115,7 @@
             <div class="message msg-other"><b>{{item.origin}}: </b>{{item.content}}</div>
             {%endfor%}
         </div>
-        <form class="sumbission" action="" method="POST">
+        <form id="chat_form" class="sumbission" action="" method="POST">
             <input type="text" id="message" placeholder="Type a message"/>
             <input class="btn btn-primary" type="submit"/>
             <div class="note">TIP: You can @mention the other participants.</div>
@@ -235,16 +235,6 @@ $(function() {
         }
     });
 
-
-    $('#submit_to_mturk').on('click', function(e){
-        e.preventDefault();
-        var return_url = $('#return_url').val();
-        var user_id = $(this).val();
-        $.post(return_url + '/externalSubmit?user='+user_id, function(data) {
-          console.log(data);
-        });
-    });
-
     var user_status = $('input#user_status').val();
 
     if (user_status == USR_MODERATING){
@@ -252,7 +242,7 @@ $(function() {
         $('#detailed_instructions').addClass('hidden');
     }
 
-    $('form').on('submit', function(e) {
+    $('form#chat_form').on('submit', function(e) {
         var user_name = $('input#user_name').val();
         var user_id = $('input#user_id').val();
         var user_status = $('input#user_status').val();

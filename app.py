@@ -244,7 +244,7 @@ def chatroom():
     if mturk_info_id:
         PG.update_mturk_user_id(mturk_info_id, current_user['user_id'])
         mturk_return_url = PG.get_mturk_return_url(mturk_info_id)
-        mturk_return_url += 'externalSubmit?user_id=' + current_user['user_id']
+        mturk_return_url += '/externalSubmit?user_id=' + current_user['user_id']
 
     if is_moderator:
         status = USR_MODERATING
