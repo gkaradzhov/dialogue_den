@@ -1,5 +1,6 @@
 import json
 import os
+import uuid
 
 import psycopg2
 import time
@@ -161,6 +162,22 @@ class PostgreConnection:
     def set_room_status(self, room_id, status):
         self.__execute("UPDATE room SET status=%s WHERE id=%s RETURNING ID", (status, room_id))
 
+    def add_initial_mturk_info(self, assignment_id, hit_id, turk_id, campaign_id, return_url):
+        mturk_info_id = str(uuid.uuid4())
+
+        self.__execute(
+            "INSERT INTO mturk_info (id, assignment_id, campaign_id, hit_id, worker_id, redirect_url) "
+            "VALUES (%s, %s, %s, %s, %s, %s) RETURNING ID",
+            (mturk_info_id, assignment_id, hit_id, turk_id, campaign_id, return_url))
+
+        return mturk_info_id
+
+    def update_mturk_user_id(self, mturk_info_id, user_id):
+        self.__execute("UPDATE mturk_info SET user_id = %s WHERE id= %s", (user_id, mturk_info_id))
+
+    def get_mturk_return_url(self, mturk_info_id):
+        return_url = self.__execute("SELECT redirect_url FROM mturk_info WHERE id=%s", (mturk_info_id,))
+        return return_url[0][0]
 
 # pg = PostgreConnection('creds.json', True)
 

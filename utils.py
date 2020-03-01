@@ -26,3 +26,5 @@ def generate_wason_cards():
     random.shuffle(cards_array)
     cards_obj = [{'value': str(a), 'checked': False} for a in cards_array]
     return cards_obj
+
+
