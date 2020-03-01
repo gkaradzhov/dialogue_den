@@ -95,7 +95,10 @@
         <div>
             <br/>
             <hr>
-            <h4>Your confirmation code is: {{room_data.current_user_id}}</h4>
+            {% if room_data.mturk_return_url%}
+                <input id="return_url" type="hidden" value="{{room_data.mturk_return_url}}">
+                <button id="submit_to_mturk" class="btn btn-success" value="{{room_data.current_user_id}}">Submit Hit</button>
+            {% endif %}
             <hr>
             <b>Disclaimer:</b>
             Please remember that these transcripts may be used in future research, and therefore you have the right to
@@ -229,6 +232,16 @@ $(function() {
             var user_name = $(this).attr('name');
             kick_generic(user_id, user_name, room_id);
         }
+    });
+
+
+    $('#submit_to_mturk').on('click', function(e){
+        e.preventDefault();
+        var return_url = $('#return_url').val();
+        var user_id = $(this).val();
+        $.post(return_url, function(data) {
+          console.log(data);
+        });
     });
 
     var user_status = $('input#user_status').val();

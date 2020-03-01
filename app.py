@@ -240,7 +240,10 @@ def chatroom():
 
     current_user = generate_user([d[0] for d in logged_users], is_moderator)
 
-    PG.update_mturk_user_id(mturk_info_id, current_user['user_id'])
+    mturk_return_url = None
+    if mturk_info_id:
+        PG.update_mturk_user_id(mturk_info_id, current_user['user_id'])
+        mturk_return_url = PG.get_mturk_return_url(mturk_info_id)
 
     if is_moderator:
         status = USR_MODERATING
@@ -260,12 +263,13 @@ def chatroom():
 
     # Have to get the room again, in case the status changed
     room = PG.get_single_room(room_id)
+    
 
     return render_template("room.html", room_data={'id': room_id, 'name': room.name, 'game': json.loads(wason_initial),
                                                    'messages': messages, 'existing_users': logged_users,
                                                    'current_user': current_user['user_name'],
                                                    'current_user_id': current_user['user_id'],
-                                                   'current_user_status': status, 'room_status': room.status})
+                                                   'current_user_status': status, 'room_status': room.status, 'mturk_return_url': mturk_return_url})
 
 
 def create_broadcast_message(message):
