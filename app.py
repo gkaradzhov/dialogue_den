@@ -21,7 +21,7 @@ from data_persistency_utils import read_rooms_from_file, write_rooms_to_file, sa
 from message import Room, Message
 from postgre_utils import PostgreConnection
 from sys_config import DIALOGUES_STABLE, ROOM_PATH
-from utils import generate_user
+from utils import generate_user, MTurkManagement
 
 login_manager = flask_login.LoginManager()
 
@@ -38,7 +38,7 @@ socketio = flask_socketio.SocketIO(app, cors_allowed_origins='*', async_mode='ev
 login_manager.init_app(app)
 
 PG = PostgreConnection('local_cred.json')
-
+MTURK_MANAGEMENT = MTurkManagement('local_cred.json')
 admin_pass = os.environ.get('ADMIN')
 salt = os.environ.get('SALT')
 
@@ -155,7 +155,7 @@ def route_to_room():
     else:
         successful_onboarding = True
         campaign_id = request.form.get('campaign_id')
-        mturk_info = request.form.get('mturk_info', None)
+        mturk_info_id = request.form.get('mturk_info', None)
         vowels = request.form.get('vowels')
         if not verify_text(vowels, ['a', 'o', 'u', 'i', 'e']):
             successful_onboarding = False
@@ -170,10 +170,13 @@ def route_to_room():
             active_room_id = PG.get_create_campaign_room(campaign_id)
 
             resp = make_response(redirect(
-                url_for('chatroom', room_id=active_room_id, mturk_info=mturk_info, _scheme='https',
+                url_for('chatroom', room_id=active_room_id, mturk_info=mturk_info_id, _scheme='https',
                         _external=True)))
             resp.set_cookie('onboarding_status', 'true')
         else:
+            if mturk_info_id and mturk_info_id != 0:
+                mturk_info = PG.get_mturk_info(mturk_info_id)
+                MTURK_MANAGEMENT.grant_qualification(mturk_info[2])
             resp = make_response(render_template('unsuccessful_onboarding.html'))
             resp.set_cookie('onboarding_status', 'false')
 

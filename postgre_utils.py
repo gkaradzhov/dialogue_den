@@ -176,7 +176,7 @@ class PostgreConnection:
         self.__execute("UPDATE mturk_info SET user_id = %s WHERE id= %s", (user_id, mturk_info_id))
 
     def get_mturk_info(self, mturk_info_id):
-        return_url = self.__execute("SELECT assignment_id, redirect_url FROM mturk_info WHERE id=%s", (mturk_info_id,))
+        return_url = self.__execute("SELECT assignment_id, redirect_url, worker_id FROM mturk_info WHERE id=%s", (mturk_info_id,))
         return return_url[0]
 
 # pg = PostgreConnection('creds.json', True)
