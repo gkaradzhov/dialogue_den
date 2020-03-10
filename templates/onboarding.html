@@ -43,7 +43,7 @@
         <div>I spread the cloth on the table in order to protect it. <b>What am I protecting?</b></div>
         <input id="table" type="radio" name="vino" value="table"> <label for="table"><b>The table</b></label> <br/>
         <input id="cloth" type="radio" name="vino" value="cloth"> <label for="cloth"><b>The cloth</b></label> <br/>
-        {% if {{data.preview_only}}%}
+        {% if data.preview_only %}
             <b>You have to accept the HIT in order to submit your solution</b>
         {% else %}
             <input type="submit" value="Submit">
