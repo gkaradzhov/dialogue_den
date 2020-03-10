@@ -50,6 +50,7 @@
                     </ol>
                 </div>
             <div class="task_description">
+                <h3>Task:</h3>
                 Each of the <b>4 cards below</b> has a letter on one side and a number on the other.
                 <b>Which card(s) do you need to turn to test the rule: <br/>
                 All cards with vowels on one side have an even number on the other.</b> <br/>
@@ -97,7 +98,7 @@
             <hr>
             {% if room_data.mturk_return_url%}
                 <form action="{{room_data.mturk_return_url}}" method="post">
-                    <input type="submit" value="Submit">
+                    <input type="submit" value="Complete HIT">
                 </form>
             {% endif %}
             <hr>

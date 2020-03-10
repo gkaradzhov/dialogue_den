@@ -146,10 +146,14 @@ def route_to_room():
         else:
             mturk_info_id = 0
         ###
-
+        if assignment == 'ASSIGNMENT_ID_NOT_AVAILABLE':
+            preview_only = True
+        else:
+            preview_only = False
+            
         campaign = PG.get_campaign(campaign_id)
         if campaign:
-            return render_template('onboarding.html', data={'campaign_id': campaign['id'], 'mturk_info': mturk_info_id})
+            return render_template('onboarding.html', data={'campaign_id': campaign['id'], 'mturk_info': mturk_info_id, 'preview_only': preview_only})
         else:
             return redirect('/')
     else:
