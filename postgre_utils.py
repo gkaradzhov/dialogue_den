@@ -177,7 +177,10 @@ class PostgreConnection:
 
     def get_mturk_info(self, mturk_info_id):
         return_url = self.__execute("SELECT assignment_id, redirect_url, worker_id FROM mturk_info WHERE id=%s", (mturk_info_id,))
-        return return_url[0]
+        if len(return_url) > 0:
+            return return_url[0]
+        else:
+            return None
 
 # pg = PostgreConnection('creds.json', True)
 

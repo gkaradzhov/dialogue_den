@@ -180,7 +180,8 @@ def route_to_room():
         else:
             if mturk_info_id and mturk_info_id != 0:
                 mturk_info = PG.get_mturk_info(mturk_info_id)
-                MTURK_MANAGEMENT.grant_qualification(mturk_info[2])
+                if mturk_info:
+                    MTURK_MANAGEMENT.grant_qualification(mturk_info[2])
             resp = make_response(render_template('unsuccessful_onboarding.html'))
             resp.set_cookie('onboarding_status', 'false')
 
@@ -251,7 +252,8 @@ def chatroom():
     if mturk_info_id:
         PG.update_mturk_user_id(mturk_info_id, current_user['user_id'])
         mturk_info = PG.get_mturk_info(mturk_info_id)
-        formated_return_url = '{}/mturk/externalSubmit?assignmentId={}&user_id={}'.format(mturk_info[1], mturk_info[0], current_user['user_id'])
+        if mturk_info:
+            formated_return_url = '{}/mturk/externalSubmit?assignmentId={}&user_id={}'.format(mturk_info[1], mturk_info[0], current_user['user_id'])
 
     if is_moderator:
         status = USR_MODERATING
