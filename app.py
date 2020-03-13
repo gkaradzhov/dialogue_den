@@ -373,7 +373,7 @@ def handle_room_events(room_messages, room_id, last_message):
 
     active_users = sum(value is True for value in user_activity.values())
 
-    if len(active_users) >= 2:
+    if active_users >= 2:
         for user, activity in active_users.items():
             if not activity:
                 m = Message(origin_name='AUTO_KICKED', message_type=LEAVE_ROOM, room_id=room_id, origin_id=user,
