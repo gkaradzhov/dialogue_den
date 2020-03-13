@@ -240,7 +240,6 @@ $(function() {
 
     if (user_status == USR_MODERATING){
         $('#chat_container').removeClass('hidden');
-        $('#detailed_instructions').addClass('hidden');
     }
 
     $('form#chat_form').on('submit', function(e) {
@@ -297,7 +296,7 @@ $(function() {
         });
 
         if (user_status == USR_ONBOARDING){
-            $.notify("Thank you for submitting your solution. Please wait for the other participants to submit their solo selections.", {autoHide: false, className: 'info'});
+            $.notify("Thank you for submitting your solution. The game will start soon! Please wait for the other participants to submit their solo selections.", {autoHide: false, className: 'info'});
         }
         $('#btn-agree').prop('disabled', true);
 
@@ -378,10 +377,8 @@ $(function() {
                 var user_id = $('input#user_id').val();
                 var user_status = $('input#user_status').val()
                 $('.timer_holder').addClass('hidden');
-                $.notify("Game Finished! Thank you for playing", {autoHide: false, className: 'success'});
-
+                $.notify("Game Finished! Thank you for playing! Please press the 'Submit HIT' button", {autoHide: false, className: 'success'});
                 $(window).scrollTop(0);
-
                 break;
             case WASON_AGREE:
                 target_user_id = msg.user_id;
@@ -427,7 +424,6 @@ $(function() {
                     $.notify('Now you have to collaborate with the other participants in this conversation to solve the task together.',  {autoHide: false, className: 'info'});
                 }
                 clearInterval(timer);
-                $('#detailed_instructions').addClass('hidden');
                 $('#chat_container').removeClass('hidden');
                 $('.timer_holder').removeClass('hidden');
                 var date = msg.message;
@@ -491,7 +487,6 @@ $(function() {
         sound.play();
         $.notify("You have been inactive for a while. Please be mindful, that after a prolonged period of inactivity you will be excluded from the room.", {autoHide: false, className: 'error'});
     }
-
 
     function kick_generic(user_id, user_name, room_id, reason){
         socket.emit('leave', { user_name: user_name, room: room_id, user_id: user_id, user_status: 'KICKED'});
