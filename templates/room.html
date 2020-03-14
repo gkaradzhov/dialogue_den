@@ -378,6 +378,7 @@ $(function() {
                 var user_status = $('input#user_status').val()
                 $('.timer_holder').addClass('hidden');
                 $.notify("Game Finished! Thank you for playing! Please press the 'Submit HIT' button", {autoHide: false, className: 'success'});
+                $('input#room_status').val('GAME_FINISHED');
                 $(window).scrollTop(0);
                 break;
             case WASON_AGREE:
@@ -478,14 +479,20 @@ $(function() {
     }
 
     function kick(){
-        var user_name = $('input#user_name').val();
-        var user_id = $('input#user_id').val();
-        kick_generic(user_id, user_name, room_id);
+        status = $('input#room_status').val();
+        if(status != 'GAME_FINISHED'){
+            var user_name = $('input#user_name').val();
+            var user_id = $('input#user_id').val();
+            kick_generic(user_id, user_name, room_id);
+        }
     }
 
     function wakeup(){
-        sound.play();
-        $.notify("You have been inactive for a while. Please be mindful, that after a prolonged period of inactivity you will be excluded from the room.", {autoHide: false, className: 'error'});
+        status = $('input#room_status').val();
+        if(status != 'GAME_FINISHED'){
+            sound.play();
+            $.notify("You have been inactive for a while. Please be mindful, that after a prolonged period of inactivity you will be excluded from the room.", {autoHide: false, className: 'error'});
+        }
     }
 
     function kick_generic(user_id, user_name, room_id, reason){
