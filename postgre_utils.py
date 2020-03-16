@@ -49,26 +49,30 @@ class PostgreConnection:
     def __execute(self, query, params=()):
         try:
             conn, cursor = self.get_cursor()
-            cursor.execute(query, params)
-            results = cursor.fetchall()
-            cursor.close()
-            self.pool.putconn(conn)
-            return results
-        except psycopg2.OperationalError as err:
-            print(err)
-            print("Query: {}; Params: {}".format(query, params))
-            # Try a single retry after 3 secs
+        except:
+            print("Connection not available. Trying again")
             time.sleep(3)
             self.pool = self.create_pool()
             conn, cursor = self.get_cursor()
+
+        try:
             cursor.execute(query, params)
             results = cursor.fetchall()
-            cursor.close()
-            self.pool.putconn(conn)
+            return results
+        except psycopg2.OperationalError as err:
+            print(err)
+            print("[Inner Exception] Query: {}; Params: {}".format(query, params))
+            time.sleep(3)
+            cursor.execute(query, params)
+            results = cursor.fetchall()
             return results
         except Exception as e:
-            print("Query: {}; Params: {}".format(query, params))
+            print("[Outer Exception] Query: {}; Params: {}".format(query, params))
             print(e)
+        finally:
+            cursor.close()
+            self.pool.putconn(conn)
+
     
     def create_room(self, room):
         if not room.campaign:
