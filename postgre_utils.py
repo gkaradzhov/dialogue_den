@@ -29,7 +29,7 @@ class PostgreConnection:
         self.pool = self.create_pool()
     
     def create_pool(self):
-        pool = ThreadedConnectionPool(15, 50, user=self.creds['user'],
+        pool = ThreadedConnectionPool(15, 150, user=self.creds['user'],
                                       database=self.creds['database'],
                                       password=self.creds['password'],
                                       host=self.creds['host'])
