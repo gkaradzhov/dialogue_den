@@ -75,8 +75,7 @@ function activityWatcher(wakeup_callback, kick_callback){
     setInterval(function(){
         secondsSinceLastActivity++;
         if(secondsSinceLastActivity > notification_inactivity){
-            console.log('User has been inactive for more than ' + kick_inactivity + ' seconds');
-            //Redirect them to your logout.php page.
+            console.log('User has been inactive for more than ' + notification_inactivity + ' seconds');
             wakeup_callback();
             notification_inactivity = notification_inactivity * 2
         }

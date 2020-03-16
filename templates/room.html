@@ -479,8 +479,11 @@ $(function() {
     }
 
     function kick(){
+        console.log('kicking1')
+
         status = $('input#room_status').val();
         if(status != 'GAME_FINISHED'){
+            console.log('kicking2')
             var user_name = $('input#user_name').val();
             var user_id = $('input#user_id').val();
             kick_generic(user_id, user_name, room_id);
@@ -495,7 +498,7 @@ $(function() {
         }
     }
 
-    function kick_generic(user_id, user_name, room_id, reason){
+    function kick_generic(user_id, user_name, room_id){
         socket.emit('leave', { user_name: user_name, room: room_id, user_id: user_id, user_status: 'KICKED'});
         $('#'+user_id).remove();
         logged_users = logged_users.filter(function(el) { return el.label != "@"+user_name; });
