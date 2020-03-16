@@ -177,12 +177,16 @@ class PostgreConnection:
         return mturk_info_id
 
     def update_mturk_user_id(self, mturk_info_id, user_id):
-        self.__execute("UPDATE mturk_info SET user_id = %s WHERE id= %s", (user_id, mturk_info_id))
+        if mturk_info_id and mturk_info_id != 0:
+            self.__execute("UPDATE mturk_info SET user_id = %s WHERE id= %s", (user_id, mturk_info_id))
 
     def get_mturk_info(self, mturk_info_id):
-        return_url = self.__execute("SELECT assignment_id, redirect_url, worker_id FROM mturk_info WHERE id=%s", (mturk_info_id,))
-        if return_url:
-            return return_url[0]
+        if mturk_info_id and mturk_info_id != 0:
+            return_url = self.__execute("SELECT assignment_id, redirect_url, worker_id FROM mturk_info WHERE id=%s", (mturk_info_id,))
+            if return_url:
+                return return_url[0]
+            else:
+                return None
         else:
             return None
 
