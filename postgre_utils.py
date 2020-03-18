@@ -142,7 +142,8 @@ class PostgreConnection:
 
         campaign_data = self.get_campaign(campaign_id)
 
-        before_1_hour = datetime.utcnow() - timedelta(minutes=campaign_data['start_time'] - 1)
+        before_start_time = datetime.utcnow() - timedelta(minutes=campaign_data['start_time'] - 1)
+        before_1_hour = datetime.utcnow() - timedelta(hours=1)
 
         get_room_sql = """
             SELECT r.id FROM message m
@@ -153,13 +154,14 @@ class PostgreConnection:
                 from message
                 WHERE message_type = 'FINISHED_ONBOARDING'
                 OR (message_type = 'ROUTING_TIMER_STARTED' AND timestamp < '{0}')
+                OR timestamp < '{1}'
                 )
             AND r.is_done = false
             AND r.campaign_id = %s
             AND c.is_active = true
             AND r.status IN ('RECRUITING', 'ROUTING_TIMER_STARTED')
             GROUP BY r.id
-            ORDER BY MAX(m.timestamp) DESC""".format(before_1_hour.isoformat())
+            ORDER BY MAX(m.timestamp) DESC""".format(before_start_time.isoformat(), before_1_hour.isoformat())
         
         rooms = self.__execute(get_room_sql, (campaign_id,))
         
