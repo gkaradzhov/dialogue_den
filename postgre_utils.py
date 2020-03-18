@@ -152,7 +152,7 @@ class PostgreConnection:
                 SELECT room_id
                 from message
                 WHERE message_type = 'FINISHED_ONBOARDING'
-                OR (message_type = 'ROUTING_TIMER_STARTED' AND timestamp < {0})
+                OR (message_type = 'ROUTING_TIMER_STARTED' AND timestamp < '{0}')
                 )
             AND r.is_done = false
             AND r.campaign_id = %s
