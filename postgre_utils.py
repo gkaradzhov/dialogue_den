@@ -154,7 +154,12 @@ class PostgreConnection:
                 from message
                 WHERE message_type = 'FINISHED_ONBOARDING'
                 OR (message_type = 'ROUTING_TIMER_STARTED' AND timestamp < '{0}')
-                OR timestamp < '{1}'
+                )
+            AND m.room_id NOT IN (
+                SELECT room_id, MAX(timestamp)
+                FROM message
+                GROUP BY room_id
+                WHERE timestamp < '{1}'
                 )
             AND r.is_done = false
             AND r.campaign_id = %s
