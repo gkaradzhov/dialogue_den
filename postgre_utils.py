@@ -1,6 +1,7 @@
 import json
 import os
 import uuid
+from datetime import datetime, timezone, timedelta
 
 import psycopg2
 import time
@@ -138,6 +139,11 @@ class PostgreConnection:
                 'close_threshold': campaign[3]}
     
     def get_create_campaign_room(self, campaign_id):
+
+        campaign_data = self.get_campaign(campaign_id)
+
+        before_1_hour = datetime.utcnow() - timedelta(minutes=campaign_data['start_time'] - 1)
+
         get_room_sql = """
             SELECT r.id FROM message m
             JOIN room r on m.room_id = r.id
@@ -145,13 +151,15 @@ class PostgreConnection:
             WHERE m.room_id NOT IN (
                 SELECT room_id
                 from message
-                WHERE message_type ='FINISHED_ONBOARDING')
+                WHERE message_type = 'FINISHED_ONBOARDING'
+                OR (message_type = 'ROUTING_TIMER_STARTED' AND timestamp < {0})
+                )
             AND r.is_done = false
             AND r.campaign_id = %s
             AND c.is_active = true
             AND r.status IN ('RECRUITING', 'ROUTING_TIMER_STARTED')
             GROUP BY r.id
-            ORDER BY MAX(m.timestamp) DESC"""
+            ORDER BY MAX(m.timestamp) DESC""".format(before_1_hour.isoformat())
         
         rooms = self.__execute(get_room_sql, (campaign_id,))
         
