@@ -353,12 +353,15 @@ def check_finished(room_history, usr_status, room_status):
 def handle_room_events(room_messages, room_id, last_message):
     logged_users = {}
     room_status = None
+    routing_timer_timestamp = None
     for item in room_messages:
         if item.message_type == JOIN_ROOM:
             logged_users[item.origin_id] = item.timestamp
         elif item.message_type == LEAVE_ROOM:
             if item.origin_id in logged_users:
                 del logged_users[item.origin_id]
+        elif item.message_type == ROUTING_TIMER_STARTED:
+            routing_timer_timestamp = item.timestamp
         else:
             if item.origin_id in logged_users:
                 logged_users[item.origin_id] = item.timestamp
@@ -366,14 +369,17 @@ def handle_room_events(room_messages, room_id, last_message):
     # Kick inactive:
     user_activity = {}
     now = datetime.datetime.now(timezone.utc)
+    if routing_timer_timestamp:
+        routing_threshold = now - routing_timer_timestamp
+        routing_threshold = routing_threshold.total_seconds() <= 120
+    else:
+        routing_threshold = None
 
     for user, last_active in logged_users.items():
         difference = now - last_active
         user_activity[user] = difference.total_seconds() <= 245
 
-    active_users = sum(value is True for value in user_activity.values())
-
-    if active_users >= 2:
+    if routing_threshold is not None and routing_threshold is True:
         for user, activity in user_activity.items():
             if not activity:
                 m = Message(origin_name='AUTO_KICKED', message_type=LEAVE_ROOM, room_id=room_id, origin_id=user,
