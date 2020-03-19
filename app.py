@@ -371,7 +371,7 @@ def handle_room_events(room_messages, room_id, last_message):
     now = datetime.datetime.now(timezone.utc)
     if routing_timer_timestamp:
         routing_threshold = now - routing_timer_timestamp
-        routing_threshold = routing_threshold.total_seconds() <= 120
+        routing_threshold = routing_threshold.total_seconds() >= 120
     else:
         routing_threshold = None
 
