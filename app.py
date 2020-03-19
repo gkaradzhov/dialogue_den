@@ -18,7 +18,7 @@ from flask_talisman import Talisman
 from constants import JOIN_ROOM, CHAT_MESSAGE, LEAVE_ROOM, WASON_INITIAL, WASON_AGREE, WASON_GAME, WASON_FINISHED, \
     USR_ONBOARDING, USR_PLAYING, FINISHED_ONBOARDING, USR_MODERATING, ROUTING_TIMER_STARTED, SYSTEM_USER, SYSTEM_ID, \
     ROUTING_TIMER_ELAPSED, ROOM_READY_TO_START
-from data_persistency_utils import read_rooms_from_file, write_rooms_to_file, save_file
+from data_persistency_utils import read_rooms_from_file, write_rooms_to_file
 from message import Room, Message
 from sys_config import DIALOGUES_STABLE, ROOM_PATH
 from utils import generate_user, MTurkManagement
@@ -104,9 +104,6 @@ def trigger_finish(room_data):
         for item in room_data:
             wf.writelines(item.to_json() + '\n')
 
-    # Sync file to Amazon
-    save_file(filepath)
-
     # 2. Mark room as closed
     existing_rooms = read_rooms_from_file()
     for room in existing_rooms:
@@ -114,8 +111,6 @@ def trigger_finish(room_data):
             room.is_done = True
     write_rooms_to_file(existing_rooms)
 
-    # Sync rooms to amazon
-    save_file(ROOM_PATH)
 
 
 # A welcome message to test our server
