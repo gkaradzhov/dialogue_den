@@ -392,6 +392,7 @@ $(function() {
                 $.notify("The group phase of the game will start soon! Please submit your card selection. Once everyone does so, the game will start!", {autoHide: false, className: 'info'});
                 sound.play()
                 var date = msg.message;
+                $('.timer_holder').removeClass('hidden');
 
                 var now = new Date();
                 var after_x_min = new Date(now);
@@ -433,8 +434,13 @@ $(function() {
                 clearInterval(timer);
                 $('#chat_container').removeClass('hidden');
                 $('.timer_holder').removeClass('hidden');
+
                 var date = msg.message;
-                var countDownDate = new Date(date).getTime();
+                var now = new Date();
+                var after_x_min = new Date(now);
+                after_x_min.setMinutes (now.getMinutes() + date);
+                alert(after_x_min);
+                var countDownDate = after_x_min.getTime()
 
                 var timer = setInterval(function(){start_timer(countDownDate, true, function(){
                         $('#timer').text("Out of time");

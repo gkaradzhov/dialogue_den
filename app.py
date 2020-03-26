@@ -345,6 +345,10 @@ def check_finished(room_history, usr_status, room_status):
 
 
 def handle_room_events(room_messages, room_id, last_message):
+    room = PG.get_single_room(room_id)
+    campaign = PG.get_campaign(room.campaign)
+
+
     logged_users = {}
     room_status = None
     routing_timer_timestamp = None
@@ -383,7 +387,15 @@ def handle_room_events(room_messages, room_id, last_message):
                 all_messages = PG.get_messages(room_id)
                 validate_finish_game(all_messages, room_id)
 
-    if last_message.message_type == ROUTING_TIMER_ELAPSED:
+    if routing_timer_timestamp:
+        time_since_start = now - routing_timer_timestamp
+        auto_ellapse = time_since_start.total_seconds() >= (campaign['start_threshold']*60 + 10)
+        m = Message(origin_id=-1, origin_name="SYSTEM", message_type=ROUTING_TIMER_ELAPSED, room_id=room_id, user_status='SYSTEM')
+        create_broadcast_message(m)
+    else:
+        auto_ellapse = False
+
+    if last_message.message_type == ROUTING_TIMER_ELAPSED or auto_ellapse:
         PG.set_room_status(room_id, 'READY_TO_START')
     return room_status
 
@@ -407,10 +419,8 @@ def validate_finish_game(all_messages, room_id):
     room = PG.get_single_room(room_id)
     finished_onboarding = check_finished(all_messages, USR_ONBOARDING, room.status)
     if finished_onboarding:
-        after_5mins = datetime.datetime.utcnow() + datetime.timedelta(minutes=7)
-        date_str = after_5mins.isoformat()
         m = Message(origin_id=SYSTEM_ID, origin_name=SYSTEM_USER, message_type=FINISHED_ONBOARDING, room_id=room_id,
-                    content=date_str)
+                    content=7)
         create_broadcast_message(m)
         PG.set_room_status(room_id, 'FINISHED_ONBOARDING')
 
