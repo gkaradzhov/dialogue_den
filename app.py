@@ -209,9 +209,8 @@ def handle_routing(messages, logged_users, start_threshold, start_time, close_th
     if timer_started is False and (len(logged_users) + 1) == start_threshold:
         PG.set_room_status(room_id, ROUTING_TIMER_STARTED)
 
-        after3mins = datetime.datetime.utcnow() + datetime.timedelta(minutes=start_time)
         m = Message(origin_name=SYSTEM_USER, message_type=ROUTING_TIMER_STARTED, room_id=room_id,
-                    origin_id=SYSTEM_ID, content=after3mins.isoformat())
+                    origin_id=SYSTEM_ID, content=start_time)
         create_broadcast_message(m)
 
     if (len(logged_users) + 1) == close_threshold:
