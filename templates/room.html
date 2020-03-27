@@ -146,7 +146,7 @@ $(function() {
     var room_status = $('#room_status').val();
     var sound = document.getElementById("audio");
     var user_name = $('input#user_name').val();
-    var user_id = $('input#user_id').val();
+    var global_user_id = $('input#user_id').val();
     var user_status = $('input#user_status').val();
 
 
@@ -163,7 +163,7 @@ $(function() {
                 $('#game_start_timer').removeClass('hidden');
                 var timer = setInterval(function(){start_timer(countDownDate, true, function(){
                 socket.emit('response', {
-                            user_id: user_id,
+                            user_id: global_user_id,
                             user_name: user_name,
                             type: ROUTING_TIMER_ELAPSED,
                             room: room_id,
@@ -234,7 +234,7 @@ $(function() {
     $('#leave_room').on('click', function(e){
         if (confirm('Are you sure you want to leave? Leaving the room will exclude you from participation.')) {
             var user_status = $('input#user_status').val();
-            socket.emit('leave', { user_name: user_name, room: room_id, user_id:user_id, user_status: user_status});
+            socket.emit('leave', { user_name: user_name, room: room_id, user_id:global_user_id, user_status: user_status});
             window.location.href = "/";
         }
     });
@@ -271,7 +271,7 @@ $(function() {
         var message = $('input#message').val();
         if (message!=""){
             socket.emit( 'response', {
-                user_id: user_id,
+                user_id: global_user_id,
                 user_name: user_name,
                 type: CHAT_MESSAGE,
                 message: message,
@@ -287,7 +287,7 @@ $(function() {
         var selection = get_card_selection();
         var user_status = $('input#user_status').val();
         socket.emit( 'response', {
-            user_id: user_id,
+            user_id: global_user_id,
             user_name: user_name,
             type: WASON_GAME,
             message: selection,
@@ -303,7 +303,7 @@ $(function() {
         var selection = get_card_selection();
         room_status = $('input#room_status').val();
         socket.emit('response', {
-            user_id: user_id,
+            user_id: global_user_id,
             user_name: user_name,
             type: WASON_AGREE,
             message: selection,
@@ -327,7 +327,7 @@ $(function() {
                         local_id = msg.user_id;
 
                         processed_message = boldMentions(msg.message);
-                        if (local_id == user_id){
+                        if (local_id == global_user_id){
                             $( 'div.chatbox' ).append('<div class="message msg-mine"><b>' + local_name +': </b> ' + processed_message +'</div>' );
                         }else{
                             $( 'div.chatbox' ).append('<div class="message msg-other"><b>' + local_name +': </b> ' + processed_message + '</div>');
@@ -370,7 +370,6 @@ $(function() {
                 break;
             case LEAVE_ROOM:
                 console.log("triggered leave room: " + msg)
-                var user_id = $('input#user_id').val();
 
                 $('#'+msg.user_id).remove();
                 logged_users = logged_users.filter(function(el) { return el.label != "@"+msg.user_name; });
@@ -380,7 +379,7 @@ $(function() {
                       event.preventDefault();
                     }
                 }).autocomplete(autocomplete_options);
-                if (msg.user_id == user_id){
+                if (msg.user_id == global_user_id){
                     window.location.href = "/";
                 }
                 break;
@@ -413,7 +412,7 @@ $(function() {
                 var user_status = $('input#user_status').val()
                 var timer = setInterval(function(){start_timer(countDownDate, true, function(){
                     socket.emit('response', {
-                            user_id: user_id,
+                            user_id: global_user_id,
                             user_name: user_name,
                             type: ROUTING_TIMER_ELAPSED,
                             room: room_id,
@@ -456,7 +455,7 @@ $(function() {
                         var selection = get_card_selection();
                         var user_status = $('input#user_status').val()
                         socket.emit('response', {
-                            user_id: user_id,
+                            user_id: global_user_id,
                             user_name: user_name,
                             type: 'OUT_OF_TIME',
                             message: selection,
@@ -492,13 +491,13 @@ $(function() {
     function Leave() {
         var user_status = $('input#user_status').val();
 
-        socket.emit('leave', { user_name: user_name, room: room_id, user_id:user_id, user_status: user_status});
+        socket.emit('leave', { user_name: user_name, room: room_id, user_id:global_user_id, user_status: user_status});
     }
 
     function kick(){
         status = $('input#room_status').val();
         if(status != 'GAME_FINISHED'){
-            kick_generic(user_id, user_name, room_id);
+            kick_generic(global_user_id, user_name, room_id);
         }
     }
 

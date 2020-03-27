@@ -352,6 +352,7 @@ def handle_room_events(room_messages, room_id, last_message):
     logged_users = {}
     room_status = None
     routing_timer_timestamp = None
+    timer_ended = False
     for item in room_messages:
         if item.message_type == JOIN_ROOM:
             logged_users[item.origin_id] = item.timestamp
@@ -360,6 +361,8 @@ def handle_room_events(room_messages, room_id, last_message):
                 del logged_users[item.origin_id]
         elif item.message_type == ROUTING_TIMER_STARTED:
             routing_timer_timestamp = item.timestamp
+        elif item.message_type == ROUTING_TIMER_ELAPSED:
+            timer_ended = True
         else:
             if item.origin_id in logged_users:
                 logged_users[item.origin_id] = item.timestamp
@@ -387,7 +390,7 @@ def handle_room_events(room_messages, room_id, last_message):
                 all_messages = PG.get_messages(room_id)
                 validate_finish_game(all_messages, room_id)
 
-    if routing_timer_timestamp:
+    if routing_timer_timestamp and not timer_ended:
         time_since_start = now - routing_timer_timestamp
         auto_ellapse = time_since_start.total_seconds() >= (campaign['start_threshold']*60 + 10)
         m = Message(origin_id=-1, origin_name="SYSTEM", message_type=ROUTING_TIMER_ELAPSED, room_id=room_id, user_status='SYSTEM')
