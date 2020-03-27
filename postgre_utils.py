@@ -142,7 +142,7 @@ class PostgreConnection:
 
         campaign_data = self.get_campaign(campaign_id)
 
-        before_start_time = datetime.utcnow() - timedelta(minutes=campaign_data['start_time'] - 1)
+        before_start_time = datetime.utcnow() - timedelta(minutes=(campaign_data['start_time'] + 2))
         before_1_hour = datetime.utcnow() - timedelta(hours=1)
 
         get_room_sql = """
