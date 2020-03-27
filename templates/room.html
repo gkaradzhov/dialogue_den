@@ -148,6 +148,8 @@ $(function() {
     var user_name = $('input#user_name').val();
     var user_id = $('input#user_id').val();
     var user_status = $('input#user_status').val();
+
+
     if (room_status == ROUTING_TIMER_STARTED || room_status == READY_TO_START){
         $.notify("The group phase of the game will start soon! Please submit your card selection. Once everyone does so, the game will start!",  {autoHide: false, className: 'info'});
         activityWatcher(wakeup, kick);
@@ -225,7 +227,6 @@ $(function() {
 
 
     socket.on( 'connect', function() {
-        user_name = $("#user_name").val();
         var user_status = $('input#user_status').val();
         socket.emit('join', { 'room': room_id, 'user_name': user_name, 'user_status': user_status});
         $('.logged_user').removeClass('wason-agreed');
@@ -233,8 +234,6 @@ $(function() {
 
     $('#leave_room').on('click', function(e){
         if (confirm('Are you sure you want to leave? Leaving the room will exclude you from participation.')) {
-            var user_name = $('input#user_name').val();
-            var user_id = $('input#user_id').val();
             var user_status = $('input#user_status').val();
             socket.emit('leave', { user_name: user_name, room: room_id, user_id:user_id, user_status: user_status});
             window.location.href = "/";
@@ -255,9 +254,9 @@ $(function() {
         e.preventDefault();
         if (confirm('Are you sure you want kick this user?.')) {
 
-            var user_id = $(this).val();
-            var user_name = $(this).attr('name');
-            kick_generic(user_id, user_name, room_id);
+            kick_user_id = $(this).val();
+            kick_user_name = $(this).attr('name');
+            kick_generic(kick_user_id, kick_user_name, room_id);
         }
     });
 
@@ -268,8 +267,6 @@ $(function() {
     }
 
     $('form#chat_form').on('submit', function(e) {
-        var user_name = $('input#user_name').val();
-        var user_id = $('input#user_id').val();
         var user_status = $('input#user_status').val();
         e.preventDefault();
         var message = $('input#message').val();
@@ -289,8 +286,6 @@ $(function() {
 
     var card_click = $('input:checkbox').on('change', function(e){
         var selection = get_card_selection();
-        var user_name = $('input#user_name').val();
-        var user_id = $('input#user_id').val();
         var user_status = $('input#user_status').val();
         socket.emit( 'response', {
             user_id: user_id,
@@ -307,10 +302,7 @@ $(function() {
 
     var agree_clicked = $('#btn-agree').on('click', function(e){
         var selection = get_card_selection();
-        var user_name = $('input#user_name').val();
-        var user_id = $('input#user_id').val();
-        var user_status = $('input#user_status').val();
-        var room_status = $('input#room_status').val();
+        room_status = $('input#room_status').val();
         socket.emit('response', {
             user_id: user_id,
             user_name: user_name,
@@ -332,8 +324,6 @@ $(function() {
         switch(msg.type) {
             case CHAT_MESSAGE:
                 if(typeof msg.user_name !== 'undefined' ) {
-                        var user_name = $('input#user_name').val();
-                        var user_id = $('input#user_id').val();
                         local_name = msg.user_name;
                         local_id = msg.user_id;
 
@@ -398,8 +388,6 @@ $(function() {
             case WASON_FINISHED:
                 $('.task button').prop('disabled', true);
                 $('.task input').prop('disabled', true);
-                var user_name = $('input#user_name').val();
-                var user_id = $('input#user_id').val();
                 var user_status = $('input#user_status').val()
                 $('.timer_holder').addClass('hidden');
                 $.notify("Game Finished! Thank you for playing! Please press the 'Submit HIT' button", {autoHide: false, className: 'success'});
@@ -425,8 +413,6 @@ $(function() {
                 var countDownDate = after_x_min.getTime();
 
                 var selection = get_card_selection();
-                var user_name = $('input#user_name').val();
-                var user_id = $('input#user_id').val();
                 var user_status = $('input#user_status').val()
                 var timer = setInterval(function(){start_timer(countDownDate, true, function(){
                     socket.emit('response', {
@@ -469,8 +455,6 @@ $(function() {
                 var timer = setInterval(function(){start_timer(countDownDate, true, function(){
                         $('#timer').text("Out of time");
                         var selection = get_card_selection();
-                        var user_name = $('input#user_name').val();
-                        var user_id = $('input#user_id').val();
                         var user_status = $('input#user_status').val()
                         socket.emit('response', {
                             user_id: user_id,
@@ -507,21 +491,14 @@ $(function() {
     }));
 
     function Leave() {
-        var user_name = $('input#user_name').val();
-        var user_id = $('input#user_id').val();
         var user_status = $('input#user_status').val();
 
         socket.emit('leave', { user_name: user_name, room: room_id, user_id:user_id, user_status: user_status});
     }
 
     function kick(){
-        console.log('kicking1')
-
         status = $('input#room_status').val();
         if(status != 'GAME_FINISHED'){
-            console.log('kicking2')
-            var user_name = $('input#user_name').val();
-            var user_id = $('input#user_id').val();
             kick_generic(user_id, user_name, room_id);
         }
     }
@@ -563,8 +540,5 @@ $(function() {
         prevKey = e.key.toUpperCase();
     });
 });
-
-
-
 </script>
 </html>
