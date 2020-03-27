@@ -229,7 +229,6 @@ $(function() {
     socket.on( 'connect', function() {
         var user_status = $('input#user_status').val();
         socket.emit('join', { 'room': room_id, 'user_name': user_name, 'user_status': user_status});
-        $('.logged_user').removeClass('wason-agreed');
     });
 
     $('#leave_room').on('click', function(e){
@@ -396,9 +395,7 @@ $(function() {
                 break;
             case WASON_AGREE:
                 target_user_id = msg.user_id;
-                if (msg.user_status == USR_PLAYING){
-                    $('#' + target_user_id).addClass('wason-agreed');
-                }
+                $('#' + target_user_id).addClass('wason-agreed');
                 break;
             case ROUTING_TIMER_STARTED:
                 $.notify("The group phase of the game will start soon! Please submit your card selection. Once everyone does so, the game will start!", {autoHide: false, className: 'info'});
@@ -432,6 +429,7 @@ $(function() {
                 $('input#room_status').val(READY_TO_START);
                 break;
             case FINISHED_ONBOARDING:
+                $('.logged_user').removeClass('wason-agreed');
                 $('input#user_status').val(USR_PLAYING);
                 $('#btn-agree').prop('disabled', false);
 
@@ -452,6 +450,7 @@ $(function() {
                 after_x_min.setMinutes (now.getMinutes() + date);
                 var countDownDate = after_x_min.getTime()
 
+                clearInterval(timer);
                 var timer = setInterval(function(){start_timer(countDownDate, true, function(){
                         $('#timer').text("Out of time");
                         var selection = get_card_selection();
