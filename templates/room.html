@@ -154,6 +154,10 @@ $(function() {
         sound.play()
 
         if (room_status == ROUTING_TIMER_STARTED){
+                var now = new Date();
+                var after_x_min = new Date(now);
+                after_x_min.setMinutes (now.getMinutes() + 1);
+                var countDownDate = after_x_min.getTime();
                 $('#game_start_timer').removeClass('hidden');
                 var timer = setInterval(function(){start_timer(countDownDate, true, function(){
                 socket.emit('response', {
