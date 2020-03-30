@@ -160,7 +160,7 @@ $(function() {
                 var start_time = $('input#start_time').val();
                 var now = new Date();
                 var after_x_min = new Date(now);
-                after_x_min.setMinutes(now.getMinutes() + start_time);
+                after_x_min.setMinutes(now.getMinutes() + parseInt(start_time));
                 var countDownDate = after_x_min.getTime();
                 $('#game_start_timer').removeClass('hidden');
                 var timer = setInterval(function(){start_timer(countDownDate, true, function(){
