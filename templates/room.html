@@ -23,6 +23,7 @@
 <input id="user_name" type="hidden" value="{{room_data.current_user}}"/>
 <input id="user_status" type="hidden" value="{{room_data.current_user_status}}"/>
 <input id="room_status" type="hidden" value="{{room_data.room_status}}"/>
+<input id="start_time" type="hidden" value="{{room_data.start_time}}"/>
 
 <div class="timer_holder">
     <div id="game_start_timer" class="hidden">The game will start in:</div>
@@ -156,10 +157,10 @@ $(function() {
 
         if (room_status == ROUTING_TIMER_STARTED){
                 var user_status = $('input#user_status').val();
-
+                var start_time = $('input#start_time').val();
                 var now = new Date();
                 var after_x_min = new Date(now);
-                after_x_min.setMinutes (now.getMinutes() + 1);
+                after_x_min.setMinutes(now.getMinutes() + start_time);
                 var countDownDate = after_x_min.getTime();
                 $('#game_start_timer').removeClass('hidden');
                 var timer = setInterval(function(){start_timer(countDownDate, true, function(){

@@ -273,7 +273,8 @@ def chatroom():
                                                    'messages': messages, 'existing_users': logged_users,
                                                    'current_user': current_user['user_name'],
                                                    'current_user_id': current_user['user_id'],
-                                                   'current_user_status': status, 'room_status': room.status, 'mturk_return_url': formated_return_url})
+                                                   'current_user_status': status, 'room_status': room.status,
+                                                   'mturk_return_url': formated_return_url, "start_time": campaign['start_time']})
 
 
 def create_broadcast_message(message):
