@@ -193,7 +193,7 @@ class PostgreConnection:
 
     def update_mturk_user_id(self, mturk_info_id, user_id):
         if mturk_info_id and mturk_info_id != '0':
-            self.__execute("UPDATE mturk_info SET user_id = %s WHERE id= %s", (user_id, mturk_info_id))
+            self.__execute("UPDATE mturk_info SET user_id = %s WHERE id= %s RETURNING ID", (user_id, mturk_info_id))
 
     def get_mturk_info(self, mturk_info_id):
         if mturk_info_id and mturk_info_id != '0':
