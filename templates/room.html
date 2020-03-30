@@ -147,7 +147,6 @@ $(function() {
     var sound = document.getElementById("audio");
     var user_name = $('input#user_name').val();
     var global_user_id = $('input#user_id').val();
-    var user_status = $('input#user_status').val();
 
 
     if (room_status == ROUTING_TIMER_STARTED || room_status == READY_TO_START){
@@ -156,6 +155,8 @@ $(function() {
         sound.play()
 
         if (room_status == ROUTING_TIMER_STARTED){
+                var user_status = $('input#user_status').val();
+
                 var now = new Date();
                 var after_x_min = new Date(now);
                 after_x_min.setMinutes (now.getMinutes() + 1);
@@ -302,6 +303,8 @@ $(function() {
     var agree_clicked = $('#btn-agree').on('click', function(e){
         var selection = get_card_selection();
         room_status = $('input#room_status').val();
+        var user_status = $('input#user_status').val();
+
         socket.emit('response', {
             user_id: global_user_id,
             user_name: user_name,
@@ -386,7 +389,6 @@ $(function() {
             case WASON_FINISHED:
                 $('.task button').prop('disabled', true);
                 $('.task input').prop('disabled', true);
-                var user_status = $('input#user_status').val()
                 $('.timer_holder').addClass('hidden');
                 $.notify("Game Finished! Thank you for playing! Please press the 'Submit HIT' button", {autoHide: false, className: 'success'});
                 $('input#room_status').val('GAME_FINISHED');
