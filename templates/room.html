@@ -162,18 +162,18 @@ $(function() {
                 var after_x_min = new Date(now);
                 after_x_min.setMinutes(now.getMinutes() + parseInt(start_time));
                 var countDownDate = after_x_min.getTime();
-<!--                $('#game_start_timer').removeClass('hidden');-->
-<!--                var timer = setInterval(function(){start_timer(countDownDate, false, function(){-->
-<!--                socket.emit('response', {-->
-<!--                            user_id: global_user_id,-->
-<!--                            user_name: user_name,-->
-<!--                            type: ROUTING_TIMER_ELAPSED,-->
-<!--                            room: room_id,-->
-<!--                            user_status: user_status,-->
-<!--                            message: ''-->
-<!--                        });-->
-<!--                    clearInterval(timer);-->
-<!--                })}, 1000);-->
+                $('#game_start_timer').removeClass('hidden');
+                var timer = setInterval(function(){start_timer(countDownDate, false, function(){
+                socket.emit('response', {
+                            user_id: global_user_id,
+                            user_name: user_name,
+                            type: ROUTING_TIMER_ELAPSED,
+                            room: room_id,
+                            user_status: user_status,
+                            message: ''
+                        });
+                    clearInterval(timer);
+                })}, 1000);
         }
     }
     else{
@@ -404,7 +404,7 @@ $(function() {
                 sound.play()
                 var date = msg.message;
 
-<!--                $('#game_start_timer').removeClass('hidden');-->
+                $('#game_start_timer').removeClass('hidden');
 
                 var now = new Date();
                 var after_x_min = new Date(now);
@@ -413,17 +413,17 @@ $(function() {
 
                 var selection = get_card_selection();
                 var user_status = $('input#user_status').val()
-<!--                var timer = setInterval(function(){start_timer(countDownDate, false, function(){-->
-<!--                    socket.emit('response', {-->
-<!--                            user_id: global_user_id,-->
-<!--                            user_name: user_name,-->
-<!--                            type: ROUTING_TIMER_ELAPSED,-->
-<!--                            room: room_id,-->
-<!--                            user_status: user_status,-->
-<!--                            message: selection-->
-<!--                        });-->
-<!--                    clearInterval(timer);-->
-<!--                })}, 1000);-->
+                var timer = setInterval(function(){start_timer(countDownDate, false, function(){
+                    socket.emit('response', {
+                            user_id: global_user_id,
+                            user_name: user_name,
+                            type: ROUTING_TIMER_ELAPSED,
+                            room: room_id,
+                            user_status: user_status,
+                            message: selection
+                        });
+                    clearInterval(timer);
+                })}, 1000);
 
                 activityWatcher(wakeup, kick);
                 break;
