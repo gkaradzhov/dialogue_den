@@ -298,6 +298,21 @@ def create_room():
         write_rooms_to_file(existing_rooms)
         return redirect('/rooms')
 
+@app.route('/compensation', methods=['GET', 'POST'])
+@talisman(
+    frame_options='ALLOW-FROM',
+    frame_options_allow_from='https://mturk.com',
+)
+def compensation_page():
+    assignment = request.args.get('assignmentId', None)
+    hit = request.args.get('hitId', None)
+    worker = request.args.get('workerId', None)
+    return_url = request.args.get('turkSubmitTo', None)
+    formated_return_url = '{}/mturk/externalSubmit?assignmentId={}&user_id={}'.format(return_url, assignment, worker)
+
+    return render_template("compensation.html", room_data={'mturk_return_url': formated_return_url})
+
+
 
 @socketio.on('join')
 def on_join(data):
