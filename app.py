@@ -128,7 +128,7 @@ def route_to_room():
 
     # Get Mturk data
     assignment = request.args.get('assignmentId', None)
-    campaign_id = request.args.get('campaign_id', None)
+    campaign_id = request.args.get('campaign', None)
     hit = request.args.get('hitId', None)
     worker = request.args.get('workerId', None)
     return_url = request.args.get('turkSubmitTo', None)
