@@ -125,73 +125,29 @@ def index():
     frame_options_allow_from='https://mturk.com',
 )
 def route_to_room():
-    if request.cookies.get('onboarding_status', None) == 'false':
-        return render_template('unsuccessful_onboarding.html')
-    if request.method == 'GET':
-        campaign_id = request.args.get('campaign', None)
 
-        # Get Mturk data
-        assignment = request.args.get('assignmentId', None)
-        hit = request.args.get('hitId', None)
-        worker = request.args.get('workerId', None)
-        return_url = request.args.get('turkSubmitTo', None)
+    # Get Mturk data
+    assignment = request.args.get('assignmentId', None)
+    campaign_id = request.args.get('campaign_id', None)
+    hit = request.args.get('hitId', None)
+    worker = request.args.get('workerId', None)
+    return_url = request.args.get('turkSubmitTo', None)
 
-        if assignment:
-            mturk_info_id = PG.add_initial_mturk_info(assignment, hit, worker, campaign_id, return_url)
-        else:
-            mturk_info_id = 0
-        ###
-        if assignment == 'ASSIGNMENT_ID_NOT_AVAILABLE':
-            preview_only = True
-        else:
-            preview_only = False
-            
-        campaign = PG.get_campaign(campaign_id)
-        if campaign:
-            return render_template('onboarding.html', data={'campaign_id': campaign['id'], 'mturk_info': mturk_info_id, 'preview_only': preview_only})
-        else:
-            return redirect('/')
+    if assignment:
+        mturk_info_id = PG.add_initial_mturk_info(assignment, hit, worker, campaign_id, return_url)
     else:
-        successful_onboarding = True
-        campaign_id = request.form.get('campaign_id')
-        mturk_info_id = request.form.get('mturk_info', None)
-        vowels = request.form.get('vowels')
-        if not verify_text(vowels, ['a', 'o', 'u', 'i', 'e']):
-            successful_onboarding = False
-        even = request.form.get('even')
-        if not verify_text(even, ['2', '4']):
-            successful_onboarding = False
-        vino = request.form.get('vino')
-        if not verify_text(vino, 'table'):
-            successful_onboarding = False
+        mturk_info_id = 0
+    ###
+    if assignment == 'ASSIGNMENT_ID_NOT_AVAILABLE':
+        # TODO: Render page for preview only
+        pass
 
-        if successful_onboarding:
-            active_room_id = PG.get_create_campaign_room(campaign_id)
+    active_room_id = PG.get_create_campaign_room(campaign_id)
 
-            resp = make_response(redirect(
-                url_for('chatroom', room_id=active_room_id, mturk_info=mturk_info_id, _scheme='https',
-                        _external=True)))
-            resp.set_cookie('onboarding_status', 'true')
-        else:
-            if mturk_info_id and mturk_info_id != 0:
-                mturk_info = PG.get_mturk_info(mturk_info_id)
-                if mturk_info:
-                    MTURK_MANAGEMENT.grant_qualification(mturk_info[2])
-            resp = make_response(render_template('unsuccessful_onboarding.html'))
-            resp.set_cookie('onboarding_status', 'false')
-
-        return resp
-
-
-def verify_text(suggested, gold, exact=False):
-    allowed = string.ascii_letters + string.digits
-    suggested_clean = [c.lower() for c in suggested if c in allowed]
-    suggested_clean = set(suggested_clean)
-    gold = set(gold)
-    if exact:
-        return suggested_clean == gold
-    else:
-        return suggested_clean.issubset(gold)
+    resp = make_response(redirect(
+        url_for('chatroom', room_id=active_room_id, mturk_info=mturk_info_id, _scheme='https',
+                _external=True)))
+    return resp
 
 
 @app.route('/rooms')
