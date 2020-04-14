@@ -26,7 +26,7 @@
 <input id="start_time" type="hidden" value="{{room_data.start_time}}"/>
 
 <div class="timer_holder">
-    <div id="game_start_timer" class="hidden">The game will start in:</div>
+    <div id="game_start_timer" class="hidden">The game will start soon, approximately in: </div>
     <div id="game_play_timer" class="hidden">Please complete the task in:</div>
     <div id="timer"></div>
 </div>
@@ -43,13 +43,10 @@
             <h3>Task Description:</h3>
                 <div id="detailed_instructions">
                     <ol>
-                        <li>First you will complete the task by yourself. When you are happy with your choice - press the "Submit Game"
-                            button.
-                        </li>
-                        <li>Once every participant completes the task by themselves, a chatbox will appear on the right of your screen. Please, discuss your solutions in the
-                            chat and possibly revise your selection. Note, that although many groups reach a unanimous decision, you can submit a different solution.
-                        </li>
-                        <li>Once the discussion starts, there is a timer set for 7 minutes, but you can take more time if needed.</li>
+                        <li>Read the instructions carefully. Finish the task by yourself.</li>
+                        <li>Participate in a group discussion (via the chat), collaborate with the other participants and try to find the best solution together. Give your best effort both in solving the task and in the group discussion.</li>
+                        <li>Submit the revised task solution again (you can submit the same answer, if you believe it's the correct one).</li>
+                        <li>Press the Complete HIT button.</li>
                     </ol>
                 </div>
             <div class="task_description">
@@ -163,7 +160,7 @@ $(function() {
                 after_x_min.setMinutes(now.getMinutes() + parseInt(start_time));
                 var countDownDate = after_x_min.getTime();
                 $('#game_start_timer').removeClass('hidden');
-                var timer = setInterval(function(){start_timer(countDownDate, false, function(){
+                var timer = setInterval(function(){start_timer(countDownDate, true, function(){
                 socket.emit('response', {
                             user_id: global_user_id,
                             user_name: user_name,
@@ -413,7 +410,7 @@ $(function() {
 
                 var selection = get_card_selection();
                 var user_status = $('input#user_status').val()
-                var timer = setInterval(function(){start_timer(countDownDate, false, function(){
+                var timer = setInterval(function(){start_timer(countDownDate, true, function(){
                     socket.emit('response', {
                             user_id: global_user_id,
                             user_name: user_name,
