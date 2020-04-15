@@ -47,6 +47,7 @@ function start_timer(count_down, visualise, end_text, callback) {
             $('#timer').text(end_text);
         }
         else{
+            console.log(distance)
             $('#timer').text(minutes + " minutes " + seconds + " seconds");
         }
     }
