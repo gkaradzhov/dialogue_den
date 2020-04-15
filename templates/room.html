@@ -411,7 +411,7 @@ $(function() {
 
                 var selection = get_card_selection();
                 var user_status = $('input#user_status').val()
-                var timer = setInterval(function(){start_timer(countDownDate, true, "Waiting for player" function(){
+                var timer = setInterval(function(){start_timer(countDownDate, true, "Waiting for player", function(){
                     socket.emit('response', {
                             user_id: global_user_id,
                             user_name: user_name,
