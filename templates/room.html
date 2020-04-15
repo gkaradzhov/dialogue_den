@@ -451,7 +451,7 @@ $(function() {
                 var countDownDate = after_x_min.getTime()
 
                 clearInterval(timer);
-                var timer = setInterval(function(){start_timer(countDownDate, true, "Out of time" function(){
+                var timer = setInterval(function(){start_timer(countDownDate, true, "Out of time", function(){
                         $('#timer').text("Out of time");
                         var selection = get_card_selection();
                         var user_status = $('input#user_status').val()
