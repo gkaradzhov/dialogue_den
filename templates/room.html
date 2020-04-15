@@ -160,17 +160,18 @@ $(function() {
                 after_x_min.setMinutes(now.getMinutes() + parseInt(start_time));
                 var countDownDate = after_x_min.getTime();
                 $('#game_start_timer').removeClass('hidden');
-                var timer = setInterval(function(){start_timer(countDownDate, true, function(){
-                socket.emit('response', {
-                            user_id: global_user_id,
-                            user_name: user_name,
-                            type: ROUTING_TIMER_ELAPSED,
-                            room: room_id,
-                            user_status: user_status,
-                            message: ''
-                        });
-                    clearInterval(timer);
-                })}, 1000);
+                var timer = setInterval(function(){start_timer(countDownDate, true, "Waiting for player",
+                 function(){
+                    socket.emit('response', {
+                                user_id: global_user_id,
+                                user_name: user_name,
+                                type: ROUTING_TIMER_ELAPSED,
+                                room: room_id,
+                                user_status: user_status,
+                                message: ''
+                            });
+                        clearInterval(timer);
+                    })}, 1000);
         }
     }
     else{
@@ -410,7 +411,7 @@ $(function() {
 
                 var selection = get_card_selection();
                 var user_status = $('input#user_status').val()
-                var timer = setInterval(function(){start_timer(countDownDate, true, function(){
+                var timer = setInterval(function(){start_timer(countDownDate, true, "Waiting for player" function(){
                     socket.emit('response', {
                             user_id: global_user_id,
                             user_name: user_name,
@@ -450,7 +451,7 @@ $(function() {
                 var countDownDate = after_x_min.getTime()
 
                 clearInterval(timer);
-                var timer = setInterval(function(){start_timer(countDownDate, true, function(){
+                var timer = setInterval(function(){start_timer(countDownDate, true, "Out of time" function(){
                         $('#timer').text("Out of time");
                         var selection = get_card_selection();
                         var user_status = $('input#user_status').val()

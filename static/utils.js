@@ -32,7 +32,7 @@ function boldMentions(str){
     return str;
 }
 
-function start_timer(count_down, visualise, callback) {
+function start_timer(count_down, visualise, end_text, callback) {
     var now = new Date().getTime();
     // Find the distance between now and the count down date
     var distance = count_down - now;
@@ -43,11 +43,15 @@ function start_timer(count_down, visualise, callback) {
     var seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
     if (visualise == true){
-        $('#timer').text(minutes + " minutes " + seconds + " seconds");
+        if (distance < 0){
+            $('#timer').text(end_text);
+        }
+        else{
+            $('#timer').text(minutes + " minutes " + seconds + " seconds");
+        }
     }
     // If the count down is finished, write some text
     if (distance < 0) {
-        console.log('distance');
         callback();
     }
 }
