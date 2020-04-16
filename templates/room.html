@@ -406,7 +406,7 @@ $(function() {
 
                 var now = new Date();
                 var after_x_min = new Date(now);
-                after_x_min.setMinutes (now.getMinutes() + date);
+                after_x_min.setMinutes(now.getMinutes() + parseInt(date));
                 var countDownDate = after_x_min.getTime();
 
                 var selection = get_card_selection();
