@@ -364,9 +364,10 @@ def handle_room_events(room_messages, room_id, last_message):
 
     if routing_timer_timestamp and not timer_ended:
         time_since_start = now - routing_timer_timestamp
-        auto_ellapse = time_since_start.total_seconds() >= (campaign['start_threshold']*60 + 10)
-        m = Message(origin_id=-1, origin_name="SYSTEM", message_type=ROUTING_TIMER_ELAPSED, room_id=room_id, user_status='SYSTEM')
-        create_broadcast_message(m)
+        auto_ellapse = time_since_start.total_seconds() >= (campaign['start_threshold'] * 60 + 10)
+        if auto_ellapse:
+            m = Message(origin_id=-1, origin_name="SYSTEM", message_type=ROUTING_TIMER_ELAPSED, room_id=room_id, user_status='SYSTEM')
+            create_broadcast_message(m)
     else:
         auto_ellapse = False
 
