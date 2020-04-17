@@ -139,8 +139,7 @@ def route_to_room():
         mturk_info_id = 0
     ###
     if assignment == 'ASSIGNMENT_ID_NOT_AVAILABLE':
-        # TODO: Render page for preview only
-        pass
+        return render_template("onboarding.html")
 
     active_room_id = PG.get_create_campaign_room(campaign_id)
 

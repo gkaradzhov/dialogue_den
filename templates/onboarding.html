@@ -14,46 +14,10 @@
 
     <title>Onboarding</title>
 
-
 </head>
 <body>
     <div class="container">
-        <h3>Task Description:</h3>
-        <div id="detailed_instructions">
-           In order for the assignment to be approved you have to:
-            <ol>
-                <li>Complete the short questionnaire bellow.</li>
-                <li>Finish the task by yourself.</li>
-                <li>Participate in a group discussion (chatting), collaborate with the other participants and try to find the best solution together. Give your best effort both in solving the task and in the group discussion.</li>
-                <li>Submit the revised task solution again (you can submit the same answer, if you believe it's the correct one).</li>
-                <li>Press the Complete HIT button.</li>
-            </ol>
-        </div>
-            <h1>Please answer the questions bellow</h1>
-    <form action="{{url_for('route_to_room')}}" method="post">
-        <input type="hidden" name="campaign_id" value="{{data.campaign_id}}">
-        <input type="hidden" name="mturk_info" value="{{data.mturk_info}}">
-
-        <div>Please enter at least 3 of the <b>vowels</b> in the English language (comma separated):</div>
-        <input type="text" name="vowels">
-        <hr/>
-        <div>Please enter <b>all even</b> numbers from 1-5 (comma separated):</div>
-        <input type="text" name="even">
-        <hr/>
-        <div>I spread the cloth on the table in order to protect it. <b>What am I protecting?</b></div>
-        <input id="table" type="radio" name="vino" value="table"> <label for="table"><b>The table</b></label> <br/>
-        <input id="cloth" type="radio" name="vino" value="cloth"> <label for="cloth"><b>The cloth</b></label> <br/>
-        {% if data.preview_only %}
-            <b>You have to accept the HIT in order to submit your solution</b>
-        {% else %}
-            <input type="submit" value="Submit">
-        {% endif %}
-
-
-    </form>
-
+        <img src="/static/example.png" alt="DelibotPreview">
     </div>
-
-
 </body>
 </html>
