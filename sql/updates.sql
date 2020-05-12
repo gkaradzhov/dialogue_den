@@ -10,3 +10,12 @@ redirect_url text
 
 ALTER TABLE ONLY public.mturk_info
     ADD CONSTRAINT mturk_info_pkey PRIMARY KEY (id);
+
+
+
+
+--- Update 12.06
+ALTER TABLE mturk_info
+ADD COLUMN qualification_granted bool DEFAULT false,
+ADD COLUMN bonus_status text,
+ADD COLUMN payment_status text;
