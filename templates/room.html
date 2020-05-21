@@ -45,7 +45,8 @@
                     <ol>
                         <li>Read the instructions carefully. Finish the task by yourself.</li>
                         <li>Participate in a group discussion (via the chat), collaborate with the other participants and try to find the best solution together. Give your best effort both in solving the task and in the group discussion.</li>
-                        <li>Submit the revised task solution again (you can submit the same answer, if you believe it's the correct one).</li>
+                        <li>You are expected to participate actively in the conversation for at least 5 minutes.</li>
+                        <li>Based on the discussion and arguments you had, submit the revised task solution again. You can submit the same answer, if you believe it's the correct one.</li>
                         <li>Press the Complete HIT button.</li>
                     </ol>
                 </div>
@@ -54,8 +55,8 @@
                 Each of the <b>4 cards below</b> has a letter on one side and a number on the other.
                 <b>Which card(s) do you need to turn to test the rule: <br/>
                 All cards with vowels on one side have an even number on the other.</b> <br/>
-                NB: Select <b>ONLY</b> the card(s) that you need to verify the rule.
-                To successfully finish the game you have to submit your final answer by pressing the <b>Submit</b>
+                NB: Select <b>ONLY</b> the card(s) required to verify the rule.
+                To successfully finish the game you have to submit your final answer by pressing the <b>Submit Game</b>
                 button.
             </div>
 
@@ -98,7 +99,7 @@
             <hr>
             {% if room_data.mturk_return_url%}
                 <form action="{{room_data.mturk_return_url}}" method="post">
-                    <b>Complete the HIT only after you've submitted the solo solution, participated in the chat and submitted your final solution.</b> <br>
+                    <b>Press the button ONLY after you've submitted the solo solution, participated in the chat and submitted your final solution.</b> <br>
                     <input type="submit" value="Complete HIT">
                 </form>
             {% endif %}
