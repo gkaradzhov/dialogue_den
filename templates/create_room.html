@@ -13,7 +13,7 @@
         <input type="text" name="room_name">
         <label for="campaign">Choose campaign:</label>
 
-<select name="campaing" id="campaign">
+<select name="campaign" id="campaign">
     {% for item in data.campaigns %}
         <option value={{item[0]}}>{{item[1]}}</option>
     {%endfor%}

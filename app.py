@@ -247,15 +247,10 @@ def create_room():
         return render_template("create_room.html", data={'campaigns': campaigns})
     else:
         camp = request.form.get('campaign', None)
-
         print(camp)
-        room = Room(room_name)
+        room = Room(room_name, campaign=camp)
 
         PG.create_room(room)
-
-        existing_rooms = read_rooms_from_file()
-        existing_rooms.append(room)
-        write_rooms_to_file(existing_rooms)
         return redirect('/rooms')
 
 @app.route('/compensation', methods=['GET', 'POST'])
