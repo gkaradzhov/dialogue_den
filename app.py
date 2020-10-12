@@ -242,8 +242,13 @@ def create_broadcast_message(message):
 def create_room():
     room_name = request.form.get('room_name', None)
     if room_name is None:
-        return render_template("create_room.html")
+        campaigns = PG.get_campaigns()
+
+        return render_template("create_room.html", data={'campaigns': campaigns})
     else:
+        camp = request.form.get('campaign', None)
+
+        print(camp)
         room = Room(room_name)
 
         PG.create_room(room)

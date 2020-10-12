@@ -11,6 +11,14 @@
 <div class="container">
     <form action="{{ url_for('create_room') }}" method="post">
         <input type="text" name="room_name">
+        <label for="campaign">Choose campaign:</label>
+
+<select name="campaing" id="campaign">
+    {% for item in data.campaigns %}
+        <option value={{item[0]}}>{{item[1}}</option>
+    {%endfor%}
+</select>
+
         <input type="submit">
     </form>
 </div>

@@ -137,7 +137,11 @@ class PostgreConnection:
         
         return {'id': campaign[0], 'start_threshold': campaign[1], 'start_time': campaign[2],
                 'close_threshold': campaign[3]}
-    
+
+    def get_campaigns(self):
+        campaigns = self.__execute("SELECT id, name FROM campaign")
+        return campaigns
+
     def get_create_campaign_room(self, campaign_id):
 
         campaign_data = self.get_campaign(campaign_id)
