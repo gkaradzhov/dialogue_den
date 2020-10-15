@@ -19,3 +19,12 @@ ALTER TABLE mturk_info
 ADD COLUMN qualification_granted bool DEFAULT false,
 ADD COLUMN bonus_status text,
 ADD COLUMN payment_status text;
+
+
+-- Update 15.10
+
+ALTER TABLE message
+ADD COLUMN origin_type text;
+
+ALTER TABLE campaign
+ADD COLUMN user_moderator_chance float DEFAULT 0;

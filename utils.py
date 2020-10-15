@@ -12,8 +12,8 @@ ANIMALS = {"Cat", "Guinea pig", "Alpaca", "Bat", "Beaver", "Bee", "Chipmunk", "D
 # COLOURS = {"Red", "Orange", "Purple", "Yellow", "Green", "Blue", "Pink", "Cyan", "Black", "White"}
 
 
-def generate_user(exclude_list, is_moderator=False):
-    if is_moderator:
+def generate_user(exclude_list, user_type):
+    if user_type == 'moderator':
         user_name = "Moderating Owl"
     else:
         exclude_animals = set([a for a in exclude_list])

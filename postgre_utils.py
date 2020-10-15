@@ -106,10 +106,10 @@ class PostgreConnection:
     
     def insert_message(self, message):
         self.__execute(
-            "INSERT INTO message (id, origin, origin_id, message_type, content, timestamp, room_id, user_status) "
-            "VALUES (%s, %s, %s, %s, %s, %s, %s, %s) RETURNING ID",
+            "INSERT INTO message (id, origin, origin_id, message_type, content, timestamp, room_id, user_status, user_type) "
+            "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING ID",
             (message.unique_id, message.origin, message.origin_id, message.message_type, str(message.content),
-             message.timestamp, message.room_id, message.user_status))
+             message.timestamp, message.room_id, message.user_status, message.user_type))
     
     def get_messages(self, room_id):
         db_messages = self.__execute(
@@ -128,7 +128,7 @@ class PostgreConnection:
     
     def get_campaign(self, campaign_id):
         campaign = self.__execute(
-            "SELECT id, start_threshold, start_time, close_threshold FROM campaign WHERE id=%s AND is_active=true",
+            "SELECT id, start_threshold, start_time, close_threshold, user_moderator_chance FROM campaign WHERE id=%s AND is_active=true",
             (campaign_id,))
         if len(campaign) > 0:
             campaign = campaign[0]
@@ -136,7 +136,7 @@ class PostgreConnection:
             return None
         
         return {'id': campaign[0], 'start_threshold': campaign[1], 'start_time': campaign[2],
-                'close_threshold': campaign[3]}
+                'close_threshold': campaign[3], 'user_moderator_chance': campaign[4]}
 
     def get_campaigns(self):
         campaigns = self.__execute("SELECT id, name FROM campaign")

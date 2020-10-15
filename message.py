@@ -26,7 +26,7 @@ class Room:
 
 
 class Message:
-    def __init__(self, origin_name, room_id, message_type, content='', origin_id=None, user_status='UKN', unique_id=None, timestamp=None):
+    def __init__(self, origin_name, room_id, message_type, content='', origin_id=None, user_status='UKN', unique_id=None, timestamp=None, user_type=None):
         self.origin = origin_name
         self.origin_id = origin_id
         self.message_type = message_type
@@ -41,15 +41,6 @@ class Message:
             self.unique_id = unique_id
         self.room_id = room_id
         self.user_status = user_status
-        
-        filename = os.path.join(DIALOGUES_RUNNING, room_id)
-        if os.path.exists(filename):
-            append_write = 'a'  # append if already exists
-        else:
-            append_write = 'w'  # make a new file if not
-        
-        with open(filename, append_write) as wf:
-            wf.writelines(self.to_json() + '\n')
     
     def to_json(self):
         output_dict = {

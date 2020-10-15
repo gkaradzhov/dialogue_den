@@ -6,6 +6,7 @@ import signal
 import string
 from datetime import timezone
 from os import path
+import random
 
 import flask_login
 import flask_socketio
@@ -182,7 +183,6 @@ def chatroom():
     mturk_info_id = request.args.get('mturk_info', None)
 
     is_moderator = request.args.get('moderator', False)
-    is_moderator = is_moderator == "True"
 
     room = PG.get_single_room(room_id)
     running_dialogue = PG.get_messages(room.room_id)
@@ -195,7 +195,18 @@ def chatroom():
         elif item.message_type == LEAVE_ROOM and (item.origin, item.origin_id) in logged_users:
             logged_users.remove((item.origin, item.origin_id))
 
-    current_user = generate_user([d[0] for d in logged_users], is_moderator)
+    user_type = 'participant'
+    if is_moderator == "True":
+        user_type = 'moderator'
+
+    campaign = PG.get_campaign(room.campaign)
+
+    if len(logged_users) == 0:
+        random_float = random.random()
+        if random_float < campaign['user_moderator_chance']:
+            user_type = 'human_delibot'
+
+    current_user = generate_user([d[0] for d in logged_users], user_type)
 
     formated_return_url = None
     if mturk_info_id:
@@ -209,13 +220,11 @@ def chatroom():
     else:
         status = USR_ONBOARDING
     m = Message(origin_name=current_user['user_name'], message_type=JOIN_ROOM, room_id=room_id,
-                origin_id=current_user['user_id'], user_status=status)
+                origin_id=current_user['user_id'], user_status=status, user_type=user_type)
 
     create_broadcast_message(m)
 
     wason_initial = [d.content for d in running_dialogue if d.message_type == WASON_INITIAL][0]
-
-    campaign = PG.get_campaign(room.campaign)
 
     handle_routing(running_dialogue, logged_users, campaign['start_threshold'], campaign['start_time'],
                    campaign['close_threshold'], room.room_id)
@@ -228,6 +237,7 @@ def chatroom():
                                                    'messages': messages, 'existing_users': logged_users,
                                                    'current_user': current_user['user_name'],
                                                    'current_user_id': current_user['user_id'],
+                                                   'current_user_type': user_type,
                                                    'current_user_status': status, 'room_status': room.status,
                                                    'mturk_return_url': formated_return_url, "start_time": campaign['start_time']})
 
