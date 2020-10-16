@@ -41,6 +41,7 @@ class Message:
             self.unique_id = unique_id
         self.room_id = room_id
         self.user_status = user_status
+        self.user_type = user_type
     
     def to_json(self):
         output_dict = {
@@ -51,6 +52,7 @@ class Message:
             'timestamp': str(self.timestamp),
             'room_id': self.room_id,
             'message_id': self.unique_id,
-            'user_status': self.user_status
+            'user_status': self.user_status,
+            'user_type': self.user_type
         }
         return json.dumps(output_dict)
