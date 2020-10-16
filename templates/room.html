@@ -24,6 +24,7 @@
 <input id="user_status" type="hidden" value="{{room_data.current_user_status}}"/>
 <input id="room_status" type="hidden" value="{{room_data.room_status}}"/>
 <input id="start_time" type="hidden" value="{{room_data.start_time}}"/>
+<input id="user_type" type="hidden" value="{{room_data.current_user_type}}">
 
 <div class="timer_holder">
     <div id="game_start_timer" class="hidden">The game will start soon, approximately in: </div>
@@ -41,16 +42,43 @@
     <div class="col-6">
         <div class="task">
             <h3>Task Description:</h3>
-                <div id="detailed_instructions">
-                    <ol>
-                        <li>Read the instructions carefully. Finish the task by yourself.</li>
-                        <li>Participate in a group discussion (via the chat), collaborate with the other participants and try to find the best solution together. Give your best effort both in solving the task and in the group discussion.</li>
-                        <li>You are expected to participate actively in the conversation for at least 5 minutes.</li>
-                        <li>Based on the discussion and arguments you had, submit the revised task solution again. You can submit the same answer, if you believe it's the correct one.</li>
-                        <li>Press the Complete HIT button.</li>
-                        <li>Do not refresh the page at any time. Do not press the Complete HIT button unless you are done.</li>
-                    </ol>
-                </div>
+                {% if room_data.current_user_type == 'human_delibot'%}
+                    <div id="detailed_instructions">
+                        <ol>
+                            <li>Read the instructions carefully.</li>
+                            <li>You have been picked at random to work as a moderator in this discussion.
+                                During the discussion please ask questions to encourage the other participants to explain their
+                                arguments. you can also ask them what they think the solution is,
+                                and ask questions about how the discussion is going.
+                            </li>
+                            <li>You should NOT propose a solution to the task, nor should you advocate for one.
+                                Your task is to help group with their discussion by facilitating good decision making processes.</li>
+                            <li>Although you can see the same task the rest of the participants are seeing, you are not required to complete it.</li>
+                            <li>The rest of the participants will first complete the task by themselves, once they are ready a chatbox will appear. Use that chatbox to communicate with the group.</li>
+                            <li>Finally, we ask you to mark each message before sending it. Possible ways to mark a message are:
+                                <ol>
+                                    <li><b>Reasoning</b>: Question about reasons (e.g. “Why do you think the answer is X?” or “What does that mean?”)</li>
+                                    <li><b>Solution</b>: Question about solutions (e.g.”Are we going for this answer then?”)</li>
+                                    <li><b>Moderation</b>: Question about the discussion (e.g. “What does person A think?”, “Should we vote on it?”)</li>
+                                    <li><b>None</b>: If you asked a question, that is not a part of any of the previous categories.</li>
+                                </ol>
+
+                            </li>
+                        </ol>
+                    </div>
+                {% else %}
+                    <div id="detailed_instructions">
+                        <ol>
+                            <li>Read the instructions carefully. Finish the task by yourself.</li>
+                            <li>Participate in a group discussion (via the chat), collaborate with the other participants and try to find the best solution together. Give your best effort both in solving the task and in the group discussion.</li>
+                            <li>You are expected to participate actively in the conversation for at least 5 minutes.</li>
+                            <li>Based on the discussion and arguments you had, submit the revised task solution again. You can submit the same answer, if you believe it's the correct one.</li>
+                            <li>Press the Complete HIT button.</li>
+                            <li>Do not refresh the page at any time. Do not press the Complete HIT button unless you are done.</li>
+                        </ol>
+                    </div>
+            {% endif %}
+
             <div class="task_description">
                 <h3>Task:</h3>
                 Each of the <b>4 cards below</b> has a letter on one side and a number on the other.
@@ -121,6 +149,14 @@
         </div>
         <form id="chat_form" class="sumbission" action="" method="POST">
             <input type="text" id="message" placeholder="Type a message"/>
+            {% if room_data.current_user_type == 'human_delibot'%}
+            <select name="cars" id="cars">
+              <option value="reasoning">Reasoning</option>
+              <option value="solution">Solution</option>
+              <option value="moderation">Moderation</option>
+              <option value="none" selected="selected">None</option>
+            </select>
+            {%endif%}
             <input class="btn btn-primary" type="submit"/>
             <div class="note">TIP: You can @mention the other participants.</div>
         </form>
@@ -147,6 +183,7 @@ $(function() {
     var sound = document.getElementById("audio");
     var user_name = $('input#user_name').val();
     var global_user_id = $('input#user_id').val();
+    var current_user_type = $('#user_type').val();
 
 
     if (room_status == ROUTING_TIMER_STARTED || room_status == READY_TO_START){
@@ -170,6 +207,7 @@ $(function() {
                                 type: ROUTING_TIMER_ELAPSED,
                                 room: room_id,
                                 user_status: user_status,
+                                user_type: current_user_type,
                                 message: ''
                             });
                         clearInterval(timer);
@@ -230,13 +268,13 @@ $(function() {
 
     socket.on( 'connect', function() {
         var user_status = $('input#user_status').val();
-        socket.emit('join', { 'room': room_id, 'user_name': user_name, 'user_status': user_status});
+        socket.emit('join', { 'room': room_id, 'user_name': user_name, 'user_status': user_status, user_type: current_user_type});
     });
 
     $('#leave_room').on('click', function(e){
         if (confirm('Are you sure you want to leave? Leaving the room will exclude you from participation.')) {
             var user_status = $('input#user_status').val();
-            socket.emit('leave', { user_name: user_name, room: room_id, user_id:global_user_id, user_status: user_status});
+            socket.emit('leave', { user_name: user_name, room: room_id, user_id:global_user_id, user_status: user_status, user_type: current_user_type});
             window.location.href = "/";
         }
     });
@@ -278,8 +316,23 @@ $(function() {
                 type: CHAT_MESSAGE,
                 message: message,
                 room: room_id,
+                user_type: current_user_type,
                 user_status: user_status
           });
+
+        if (user_type == 'human_delibot'){
+            var annotation = $('input#delibot_annotation').val();
+            if (annotation!=""){
+            socket.emit( 'response', {
+                user_id: global_user_id,
+                user_name: user_name,
+                type: 'USER_ANNOTATION',
+                message: annotation,
+                room: room_id,
+                user_type: current_user_type,
+                user_status: user_status
+          });
+        }
         }
         $('input#message').val('').focus();
       });
@@ -294,7 +347,8 @@ $(function() {
             type: WASON_GAME,
             message: selection,
             user_status: user_status,
-            room: room_id
+            room: room_id,
+            user_type: current_user_type
         });
 
         $('#btn-agree').prop('disabled', false);
@@ -312,6 +366,7 @@ $(function() {
             type: WASON_AGREE,
             message: selection,
             room: room_id,
+            user_type: current_user_type,
             user_status: user_status
         });
 

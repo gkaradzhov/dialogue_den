@@ -113,14 +113,14 @@ class PostgreConnection:
     
     def get_messages(self, room_id):
         db_messages = self.__execute(
-            "SELECT id, origin, origin_id, message_type, content, timestamp, room_id, user_status "
+            "SELECT id, origin, origin_id, message_type, content, timestamp, room_id, user_status, user_type "
             " FROM message"
             " WHERE room_id = %s"
             " ORDER BY timestamp", (room_id,))
         messages = []
         for r in db_messages:
             messages.append(Message(unique_id=r[0], origin_name=r[1], origin_id=r[2], message_type=r[3], content=r[4],
-                                    timestamp=r[5], room_id=r[6], user_status=r[7]))
+                                    timestamp=r[5], room_id=r[6], user_status=r[7], user_type=r[8]))
         return messages
     
     def mark_room_done(self, room_id):

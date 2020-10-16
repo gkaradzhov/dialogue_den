@@ -292,9 +292,11 @@ def on_leave(data):
     user_id = data['user_id']
     room = data['room']
     status = data['user_status']
+    type = data['user_type']
+
     leave_room(room)
 
-    m = Message(origin_name=username, message_type=LEAVE_ROOM, room_id=room, origin_id=user_id, user_status=status)
+    m = Message(origin_name=username, message_type=LEAVE_ROOM, room_id=room, origin_id=user_id, user_status=status, user_type=type)
     create_broadcast_message(m)
 
     all_messages = PG.get_messages(room)
@@ -307,7 +309,7 @@ def check_finished(room_history, usr_status, room_status):
         return False
     logged_users = {}
     for item in room_history:
-        if item.user_status == USR_MODERATING:
+        if item.user_status == USR_MODERATING or item.user_type == 'human_delibot':
             continue
         if usr_status == USR_ONBOARDING and item.message_type == FINISHED_ONBOARDING:
             # No need to check, already finished onboarding
@@ -335,6 +337,8 @@ def handle_room_events(room_messages, room_id, last_message):
     routing_timer_timestamp = None
     timer_ended = False
     for item in room_messages:
+        if item.user_status == USR_MODERATING or item.user_type == 'human_delibot':
+            continue
         if item.message_type == JOIN_ROOM:
             logged_users[item.origin_id] = item.timestamp
         elif item.message_type == LEAVE_ROOM:
@@ -390,7 +394,7 @@ def handle_response(json, methods=('GET', 'POST')):
     print('received my event: ' + str(json))
     room_id = json['room']
     m = Message(origin_id=json['user_id'], origin_name=json['user_name'], message_type=json['type'], room_id=room_id,
-                content=json['message'], user_status=json['user_status'])
+                content=json['message'], user_status=json['user_status'], user_type=json['user_type'])
 
     create_broadcast_message(m)
     all_messages = PG.get_messages(room_id)
