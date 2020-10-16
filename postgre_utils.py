@@ -106,14 +106,14 @@ class PostgreConnection:
     
     def insert_message(self, message):
         self.__execute(
-            "INSERT INTO message (id, origin, origin_id, message_type, content, timestamp, room_id, user_status, user_type) "
+            "INSERT INTO message (id, origin, origin_id, message_type, content, timestamp, room_id, user_status, origin_type) "
             "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING ID",
             (message.unique_id, message.origin, message.origin_id, message.message_type, str(message.content),
              message.timestamp, message.room_id, message.user_status, message.user_type))
     
     def get_messages(self, room_id):
         db_messages = self.__execute(
-            "SELECT id, origin, origin_id, message_type, content, timestamp, room_id, user_status, user_type "
+            "SELECT id, origin, origin_id, message_type, content, timestamp, room_id, user_status, origin_type "
             " FROM message"
             " WHERE room_id = %s"
             " ORDER BY timestamp", (room_id,))
