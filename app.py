@@ -292,7 +292,7 @@ def on_leave(data):
     user_id = data['user_id']
     room = data['room']
     status = data['user_status']
-    type = data['user_type']
+    type = data.get('user_type', None)
 
     leave_room(room)
 
@@ -394,7 +394,7 @@ def handle_response(json, methods=('GET', 'POST')):
     print('received my event: ' + str(json))
     room_id = json['room']
     m = Message(origin_id=json['user_id'], origin_name=json['user_name'], message_type=json['type'], room_id=room_id,
-                content=json['message'], user_status=json['user_status'], user_type=json['user_type'])
+                content=json['message'], user_status=json['user_status'], user_type=json.get('user_type', None))
 
     create_broadcast_message(m)
     all_messages = PG.get_messages(room_id)
