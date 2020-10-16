@@ -150,7 +150,7 @@
         <form id="chat_form" class="sumbission" action="" method="POST">
             <input type="text" id="message" placeholder="Type a message"/>
             {% if room_data.current_user_type == 'human_delibot'%}
-            <select name="cars" id="cars">
+            <select name="delibot_annotation" id="delibot_annotation">
               <option value="reasoning">Reasoning</option>
               <option value="solution">Solution</option>
               <option value="moderation">Moderation</option>
@@ -281,12 +281,12 @@ $(function() {
 
     $('#group_start').on('click', function(e){
       $('#group_start').prop('disabled', true);
-      socket.emit('response', { user_name: 'SYSTEM_MODERATOR', room: room_id, user_id: -1, user_status: USR_MODERATING, type: "MODERATION", message: "GROUP_PHASE_STARTED"});
+      socket.emit('response', { user_name: 'SYSTEM_MODERATOR', room: room_id, user_id: -1, user_status: USR_MODERATING, type: "MODERATION", message: "GROUP_PHASE_STARTED", user_type: current_user_type});
     });
 
     $('#group_ended').on('click', function(e){
       $('#group_ended').prop('disabled', true);
-      socket.emit('response', { user_name: 'SYSTEM_MODERATOR', room: room_id, user_id: -1, user_status: USR_MODERATING, type: "MODERATION", message: "GROUP_PHASE_ENDED"});
+      socket.emit('response', { user_name: 'SYSTEM_MODERATOR', room: room_id, user_id: -1, user_status: USR_MODERATING, type: "MODERATION", message: "GROUP_PHASE_ENDED", user_type: current_user_type});
     });
 
     $('.kick').on('click', function(e){
@@ -406,7 +406,7 @@ $(function() {
                         e.preventDefault();
                         var user_id = $(this).val();
                         var user_name = $(this).attr('name')
-                        socket.emit('leave', { user_name: user_name, room: room_id, user_id: user_id, user_status: 'KICKED'});
+                        socket.emit('leave', { user_name: user_name, room: room_id, user_id: user_id, user_status: 'KICKED', user_type: current_user_type});
 
                         $('#'+user_id).remove();
                         logged_users = logged_users.filter(function(el) { return el.label != "@"+user_name; });
@@ -478,7 +478,8 @@ $(function() {
                             type: ROUTING_TIMER_ELAPSED,
                             room: room_id,
                             user_status: user_status,
-                            message: selection
+                            message: selection,
+                            user_type: current_user_type
                         });
                     clearInterval(timer);
                 })}, 1000);
@@ -521,7 +522,8 @@ $(function() {
                             type: 'OUT_OF_TIME',
                             message: selection,
                             room: room_id,
-                            user_status: user_status
+                            user_status: user_status,
+                            user_type: current_user_type
                         })
                         clearInterval(timer);
                         ;})}, 1000);
@@ -552,7 +554,7 @@ $(function() {
     function Leave() {
         var user_status = $('input#user_status').val();
 
-        socket.emit('leave', { user_name: user_name, room: room_id, user_id:global_user_id, user_status: user_status});
+        socket.emit('leave', { user_name: user_name, room: room_id, user_id:global_user_id, user_status: user_status, user_type: current_user_type});
     }
 
     function kick(){
