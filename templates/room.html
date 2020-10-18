@@ -323,8 +323,7 @@ $(function() {
 
         if (current_user_type == 'human_delibot'){
             var annotation = $('input#delibot_annotation').val();
-            if (annotation!=""){
-                socket.emit( 'response', {
+            var send_object = {
                     user_id: global_user_id,
                     user_name: user_name,
                     type: 'USER_ANNOTATION',
@@ -332,7 +331,10 @@ $(function() {
                     room: room_id,
                     user_type: current_user_type,
                     user_status: user_status
-              });
+              }
+            console.log(send_object)
+            if (annotation != ""){
+                socket.emit( 'response', send_object);
             }
         }
 
