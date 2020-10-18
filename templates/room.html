@@ -321,7 +321,7 @@ $(function() {
           });
         }
 
-        if (user_type == 'human_delibot'){
+        if (current_user_type == 'human_delibot'){
             var annotation = $('input#delibot_annotation').val();
             if (annotation!=""){
                 socket.emit( 'response', {
