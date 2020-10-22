@@ -78,12 +78,15 @@
             {% endif %}
 
             {% if room_data.current_user_type == 'human_delibot'%}
-                {% set class='hidden' %}
+                {% set human_delibot_hide='hidden' %}
+                {% set human_delibot_disable='disabled' %}
+
             {% else %}
-                {% set class='' %}
+                {% set human_delibot_hide='' %}
+                {% set human_delibot_disable='' %}
             {% endif %}
 
-            <div class="task_description {{class}}">
+            <div class="task_description {{human_delibot_hide}}">
                 <h3>Task:</h3>
                 Each of the <b>4 cards below</b> has a letter on one side and a number on the other.
                 <b>Which card(s) do you need to turn to test the rule: <br/>
@@ -99,14 +102,14 @@
                 <div class='card_container'>
                     <div class='card'>{{card['value']}}</div>
                     {% if card['checked'] %}
-                    <input type="checkbox" checked id='{{card["value"]}}' value={{card["value"]}}>
+                    <input type="checkbox" {{human_delibot_disable}} checked id='{{card["value"]}}' value={{card["value"]}}>
                     {% else %}
-                    <input type="checkbox" id='{{card["value"]}}' value={{card["value"]}}>
+                    <input type="checkbox" {{human_delibot_disable}} id='{{card["value"]}}' value={{card["value"]}}>
                     {% endif %}
                 </div>
                 {% endfor %}
             </div>
-            <div class="game_buttons">
+            <div class="game_buttons {{human_delibot_hide}}">
                 <button type="button" id="btn-agree" class="btn btn-success btn-lg">Submit Game</button>
             </div>
         </div>
@@ -509,6 +512,7 @@ $(function() {
                 clearInterval(timer);
                 $('#chat_container').removeClass('hidden');
                 $('#game_play_timer').removeClass('hidden');
+                $('.task_description').removeClass('hidden');
                 $('#game_start_timer').addClass('hidden');
 
                 var date = msg.message;
