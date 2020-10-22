@@ -78,10 +78,11 @@
             {% endif %}
 
             {% if room_data.current_user_type == 'human_delibot'%}
-                class='hidden'
+                set class='hidden'
             {% else %}
-                class=''
+                set class=''
             {% endif %}
+
             <div class="task_description {{class}}">
                 <h3>Task:</h3>
                 Each of the <b>4 cards below</b> has a letter on one side and a number on the other.
