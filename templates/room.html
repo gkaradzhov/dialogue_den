@@ -79,7 +79,11 @@
                     </div>
             {% endif %}
 
-            <div class="task_description">
+            {{class=''}}
+            {% if room_data.current_user_type == 'human_delibot'%}
+                class='hidden'
+            {%endif%}
+            <div class="task_description {{class}}">
                 <h3>Task:</h3>
                 Each of the <b>4 cards below</b> has a letter on one side and a number on the other.
                 <b>Which card(s) do you need to turn to test the rule: <br/>
