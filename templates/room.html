@@ -78,9 +78,9 @@
             {% endif %}
 
             {% if room_data.current_user_type == 'human_delibot'%}
-                set class='hidden'
+                {% set class='hidden' %}
             {% else %}
-                set class=''
+                {% set class='' %}
             {% endif %}
 
             <div class="task_description {{class}}">
