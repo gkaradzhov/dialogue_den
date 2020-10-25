@@ -163,6 +163,8 @@
               <option value="moderation">Moderation</option>
               <option value="none">None</option>
             </select>
+            {%else%}
+            <input type="hidden" id="delibot_annotation" value="no_annotation"/>
             {%endif%}
             <input type="text" id="message" placeholder="Type a message"/>
             <input id="msg_submit" class="btn btn-primary" type="submit"/>
@@ -327,12 +329,14 @@ $(function() {
         var user_status = $('input#user_status').val();
         e.preventDefault();
         var message = $('input#message').val();
+        var annotation = $('#delibot_annotation').val();
+
         if (message!=""){
             socket.emit( 'response', {
                 user_id: global_user_id,
                 user_name: user_name,
                 type: CHAT_MESSAGE,
-                message: message,
+                message: {'message': message, 'annotation': annotation},
                 room: room_id,
                 user_type: current_user_type,
                 user_status: user_status
@@ -343,21 +347,6 @@ $(function() {
 
             $('#message').prop('disabled', true);
             $('#msg_submit').prop('disabled', true)
-
-            var annotation = $('#delibot_annotation').val();
-            var send_object = {
-                    user_id: global_user_id,
-                    user_name: user_name,
-                    type: 'USER_ANNOTATION',
-                    message: {'m': message, 'ann': annotation},
-                    room: room_id,
-                    user_type: current_user_type,
-                    user_status: user_status
-              }
-            console.log(send_object)
-            if (annotation != ""){
-                socket.emit( 'response', send_object);
-            }
             $('#delibot_annotation').val('def');
         }
 
@@ -412,8 +401,8 @@ $(function() {
                 if(typeof msg.user_name !== 'undefined' ) {
                         local_name = msg.user_name;
                         local_id = msg.user_id;
-
-                        processed_message = boldMentions(msg.message);
+                        message_obj = JSON.parse(msg.message)
+                        processed_message = boldMentions(message_obj.message);
                         if (local_id == global_user_id){
                             $( 'div.chatbox' ).append('<div class="message msg-mine"><b>' + local_name +': </b> ' + processed_message +'</div>' );
                         }else{
