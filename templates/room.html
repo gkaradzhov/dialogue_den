@@ -155,16 +155,17 @@
             {%endfor%}
         </div>
         <form id="chat_form" class="sumbission" action="" method="POST">
-            <input type="text" id="message" placeholder="Type a message"/>
             {% if room_data.current_user_type == 'human_delibot'%}
             <select name="delibot_annotation" id="delibot_annotation">
+                <option disabled selected value="def"> -- select an option -- </option>
               <option value="reasoning">Reasoning</option>
               <option value="solution">Solution</option>
               <option value="moderation">Moderation</option>
-              <option value="none" selected="selected">None</option>
+              <option value="none">None</option>
             </select>
             {%endif%}
-            <input class="btn btn-primary" type="submit"/>
+            <input type="text" id="message" placeholder="Type a message"/>
+            <input id="msg_submit" class="btn btn-primary" type="submit"/>
             <div class="note">TIP: You can @mention the other participants.</div>
         </form>
     </div>
@@ -192,6 +193,11 @@ $(function() {
     var global_user_id = $('input#user_id').val();
     var current_user_type = $('#user_type').val();
 
+
+    if (current_user_type == 'human_delibot'){
+        $('#message').prop('disabled', true);
+        $('#msg_submit').prop('disabled', true)
+    }
 
     if (room_status == ROUTING_TIMER_STARTED || room_status == READY_TO_START){
         $.notify("The group phase of the game will start soon! Please submit your card selection. Once everyone does so, the game will start!",  {autoHide: false, className: 'info'});
@@ -312,6 +318,11 @@ $(function() {
         $('#chat_container').removeClass('hidden');
     }
 
+    $('#delibot_annotation').change(function(){
+        $('#message').prop('disabled', false);
+        $('#msg_submit').prop('disabled', false)
+    });
+
     $('form#chat_form').on('submit', function(e) {
         var user_status = $('input#user_status').val();
         e.preventDefault();
@@ -329,6 +340,10 @@ $(function() {
         }
 
         if (current_user_type == 'human_delibot'){
+
+            $('#message').prop('disabled', true);
+            $('#msg_submit').prop('disabled', true)
+
             var annotation = $('#delibot_annotation').val();
             var send_object = {
                     user_id: global_user_id,
@@ -343,6 +358,7 @@ $(function() {
             if (annotation != ""){
                 socket.emit( 'response', send_object);
             }
+            $('#delibot_annotation').val('def');
         }
 
         $('input#message').val('').focus();
