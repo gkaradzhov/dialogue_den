@@ -145,7 +145,7 @@ def route_to_room():
         return render_template("onboarding.html")
 
     if wait_room == 'True':
-        return render_template('waiting', st=start_time, assignment_id=assignment, hit_id=hit, worker_id=worker,
+        return render_template('waiting_room', st=start_time, assignment_id=assignment, hit_id=hit, worker_id=worker,
                                turk_submit=return_url)
 
     active_room_id = PG.get_create_campaign_room(campaign_id)
