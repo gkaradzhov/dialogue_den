@@ -401,8 +401,7 @@ $(function() {
                 if(typeof msg.user_name !== 'undefined' ) {
                         local_name = msg.user_name;
                         local_id = msg.user_id;
-                        message_obj = JSON.parse(msg.message)
-                        processed_message = boldMentions(message_obj.message);
+                        processed_message = boldMentions(msg.message.message);
                         if (local_id == global_user_id){
                             $( 'div.chatbox' ).append('<div class="message msg-mine"><b>' + local_name +': </b> ' + processed_message +'</div>' );
                         }else{
