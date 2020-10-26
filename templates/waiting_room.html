@@ -52,14 +52,14 @@
         console.log(d);
         var check_allow = false;
 
-        $('.consent_check').on('change', function({
+        $('.consent_check').change(function(){
             if ($('.consent_check:checked').length == $('.consent_check').length){
                 console.log('all checked');
             }
             else{
                 console.log('not all checked');
             }
-        }));
+        });
 
     });
 
