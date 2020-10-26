@@ -36,7 +36,7 @@
     <input type="checkbox" id="check4" name="check4" class="consent_check"> <label for="check4"> By continuing to the take part in this task you indicate your consent to participating in the research</label><br>
 
 
-    <button type="button" id="btn-agree" class="btn btn-success disabled btn-lg">I want to participate!</button>
+    <button type="button" id="btn-agree" disabled class="btn btn-success btn-lg">I want to participate!</button>
 
     </div>
 </body>
@@ -48,17 +48,39 @@
     $(function() {
         var start_time = $('input#ssttmm').val();
 
-        var d = new Date(start_time);
+        var start_date = new Date(start_time);
 
-        $('#btn-agree').text('I want to participate! (available at ' + d + ' )')
+        $('#btn-agree').text('I want to participate! (available at ' + start_date + ' )')
         var check_allow = false;
+        var timer_allow = false;
+
+        var now = new Date();
+        if (start_date < now){
+            timer_allow = true;
+            if (check_allow == true){
+                $('#btn-agree').prop('disabled', false);
+                $('#btn-agree').text('I want to participate!')
+
+            }
+        }
+
+        var timer = setInterval(function(){start_timer(start_date, true, "Waiting for player",
+                 function(){
+                        timer_allow = true
+                        if (check_allow == true){
+                            $('#btn-agree').prop('disabled', false);
+                            $('#btn-agree').text('I want to participate!')
+                        }
+                        clearInterval(timer);
+                    })}, 1000);
 
         $('.consent_check').change(function(){
             if ($('.consent_check:checked').length == $('.consent_check').length){
-                console.log('all checked');
-            }
-            else{
-                console.log('not all checked');
+                check_allow = true
+                if (timer_allow == true){
+                    $('#btn-agree').prop('disabled', false);
+                    $('#btn-agree').text('I want to participate!')
+                }
             }
         });
 
