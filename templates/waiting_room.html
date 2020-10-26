@@ -16,7 +16,38 @@
 
 </head>
 <body>
+    <input id="ssttmm" type="hidden" value="{{data.ssttmm}}"/>
+    <input id="assignment_id" type="hidden" value="{{data.assignment_id}}"/>
+    <input id="hit_id" type="hidden" value="{{data.hit_id}}"/>
+    <input id="worker_id" type="hidden" value="{{data.worker_id}}"/>
+    <input id="turk_submit" type="hidden" value="{{data.turk_submit}}"/>
+
     <div class="container">
+    You are about to take part in a group chat with other students about a logic problem. The problem is interesting because many people get the answer wrong at first.
+    As well as being an exercise which will enhance your understanding of the Cognitive Psychology course, today's experiment is an active research project led by Tom Stafford and researchers at the University of Cambridge. The research has been officially reviewed and approved by the Department. Please read the <a href="https://drive.google.com/file/d/1QRd1L6adv6BSn_6xcfK6BrvRIyH6Ad-N/view">full information sheet</a> and indicate your consent below.
+        Please note, we will store, share and analyse the transcripts of the online discussions about the task. Because of this you should not discuss identifying or confidential details (such as phone numbers, your name or location). No identifying information is collected by us and your participation is anonymous.
+    <br>
+    <input type="checkbox" id="check1" name="check1"> <label for="check1"> I have read the information sheet</label><br>
+    <input type="checkbox" id="check2" name="check1"> <label for="check2"> I understand that text I enter as part of this task being stored and shared as part of the research data for this project</label><br>
+    <input type="checkbox" id="check3" name="check1"> <label for="check3"> I am aware that my participation is voluntary</label><br>
+    <input type="checkbox" id="check4" name="check1"> <label for="check4"> By continuing to the take part in this task you indicate your consent to participating in the research</label><br>
+
+
+    <button type="button" id="btn-agree" class="btn btn-success disabled btn-lg">I want to participate! (available in 1 week)</button>
+
     </div>
 </body>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script type="text/javascript">
+    $(function() {
+        var start_time = $('input#ssttmm').val();
+
+        var d = new Date(start_time);
+
+    });
+
+</script>
 </html>

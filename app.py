@@ -2,18 +2,16 @@ import datetime
 import hashlib
 import json
 import os
+import random
 import signal
-import string
 from datetime import timezone
 from os import path
-import random
 
 import flask_login
 import flask_socketio
 from flask import Flask, request, render_template, redirect, make_response, url_for
 from flask_socketio import join_room, leave_room
 from flask_socketio import send
-from postgre_utils import PostgreConnection
 from flask_talisman import Talisman
 
 from constants import JOIN_ROOM, CHAT_MESSAGE, LEAVE_ROOM, WASON_INITIAL, WASON_AGREE, WASON_GAME, WASON_FINISHED, \
@@ -21,7 +19,8 @@ from constants import JOIN_ROOM, CHAT_MESSAGE, LEAVE_ROOM, WASON_INITIAL, WASON_
     ROUTING_TIMER_ELAPSED, ROOM_READY_TO_START
 from data_persistency_utils import read_rooms_from_file, write_rooms_to_file
 from message import Room, Message
-from sys_config import DIALOGUES_STABLE, ROOM_PATH
+from postgre_utils import PostgreConnection
+from sys_config import DIALOGUES_STABLE
 from utils import generate_user, MTurkManagement
 
 login_manager = flask_login.LoginManager()
@@ -145,8 +144,11 @@ def route_to_room():
         return render_template("onboarding.html")
 
     if wait_room == 'True':
-        return render_template('waiting_room', st=start_time, assignment_id=assignment, hit_id=hit, worker_id=worker,
-                               turk_submit=return_url)
+        return render_template('waiting_room', data={'ssttmm': start_time,
+                                                     'assignment_id': assignment,
+                                                     'hit_id': hit,
+                                                     'worker_id': worker,
+                               'turk_submit': return_url})
 
     active_room_id = PG.get_create_campaign_room(campaign_id)
 
