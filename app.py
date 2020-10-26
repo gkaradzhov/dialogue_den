@@ -144,7 +144,7 @@ def route_to_room():
         return render_template("onboarding.html")
 
     if wait_room == 'True':
-        return render_template('waiting_room', data={'ssttmm': start_time,
+        return render_template('waiting_room.html', data={'ssttmm': start_time,
                                                      'assignment_id': assignment,
                                                      'hit_id': hit,
                                                      'worker_id': worker,
