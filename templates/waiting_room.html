@@ -41,13 +41,16 @@
     </div>
 </body>
 
-<script type="text/javascript" src="/static/utils.js"></script>
-<script type="text/javascript" src="/static/notify.min.js"></script>
 
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+
+<script type="text/javascript" src="/static/utils.js"></script>
+<script type="text/javascript" src="/static/notify.min.js"></script>
+
+
 <script type="text/javascript">
     $(function() {
         var start_time = $('input#ssttmm').val();
@@ -90,6 +93,10 @@
                     $('#btn-agree').prop('disabled', false);
                     $('#btn-agree').text('I want to participate!')
                 }
+            }
+            else{
+                check_allow = false
+                $('#btn-agree').prop('disabled', true);
             }
         });
 
