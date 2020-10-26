@@ -77,7 +77,16 @@
                     </div>
             {% endif %}
 
-            <div class="task_description">
+            {% if room_data.current_user_type == 'human_delibot'%}
+                {% set human_delibot_hide='hidden' %}
+                {% set human_delibot_disable='disabled' %}
+
+            {% else %}
+                {% set human_delibot_hide='' %}
+                {% set human_delibot_disable='' %}
+            {% endif %}
+
+            <div class="task_description {{human_delibot_hide}}">
                 <h3>Task:</h3>
                 Each of the <b>4 cards below</b> has a letter on one side and a number on the other.
                 <b>Which card(s) do you need to turn to test the rule: <br/>
@@ -93,14 +102,14 @@
                 <div class='card_container'>
                     <div class='card'>{{card['value']}}</div>
                     {% if card['checked'] %}
-                    <input type="checkbox" checked id='{{card["value"]}}' value={{card["value"]}}>
+                    <input type="checkbox" {{human_delibot_disable}} checked id='{{card["value"]}}' value={{card["value"]}}>
                     {% else %}
-                    <input type="checkbox" id='{{card["value"]}}' value={{card["value"]}}>
+                    <input type="checkbox" {{human_delibot_disable}} id='{{card["value"]}}' value={{card["value"]}}>
                     {% endif %}
                 </div>
                 {% endfor %}
             </div>
-            <div class="game_buttons">
+            <div class="game_buttons {{human_delibot_hide}}">
                 <button type="button" id="btn-agree" class="btn btn-success btn-lg">Submit Game</button>
             </div>
         </div>
@@ -146,16 +155,19 @@
             {%endfor%}
         </div>
         <form id="chat_form" class="sumbission" action="" method="POST">
-            <input type="text" id="message" placeholder="Type a message"/>
             {% if room_data.current_user_type == 'human_delibot'%}
             <select name="delibot_annotation" id="delibot_annotation">
+                <option disabled selected value="def"> -- select an option -- </option>
               <option value="reasoning">Reasoning</option>
               <option value="solution">Solution</option>
               <option value="moderation">Moderation</option>
-              <option value="none" selected="selected">None</option>
+              <option value="none">None</option>
             </select>
+            {%else%}
+            <input type="hidden" id="delibot_annotation" value="no_annotation"/>
             {%endif%}
-            <input class="btn btn-primary" type="submit"/>
+            <input type="text" id="message" placeholder="Type a message"/>
+            <input id="msg_submit" class="btn btn-primary" type="submit"/>
             <div class="note">TIP: You can @mention the other participants.</div>
         </form>
     </div>
@@ -183,6 +195,11 @@ $(function() {
     var global_user_id = $('input#user_id').val();
     var current_user_type = $('#user_type').val();
 
+
+    if (current_user_type == 'human_delibot'){
+        $('#message').prop('disabled', true);
+        $('#msg_submit').prop('disabled', true)
+    }
 
     if (room_status == ROUTING_TIMER_STARTED || room_status == READY_TO_START){
         $.notify("The group phase of the game will start soon! Please submit your card selection. Once everyone does so, the game will start!",  {autoHide: false, className: 'info'});
@@ -303,16 +320,23 @@ $(function() {
         $('#chat_container').removeClass('hidden');
     }
 
+    $('#delibot_annotation').change(function(){
+        $('#message').prop('disabled', false);
+        $('#msg_submit').prop('disabled', false)
+    });
+
     $('form#chat_form').on('submit', function(e) {
         var user_status = $('input#user_status').val();
         e.preventDefault();
         var message = $('input#message').val();
+        var annotation = $('#delibot_annotation').val();
+
         if (message!=""){
             socket.emit( 'response', {
                 user_id: global_user_id,
                 user_name: user_name,
                 type: CHAT_MESSAGE,
-                message: message,
+                message: {'message': message, 'annotation': annotation},
                 room: room_id,
                 user_type: current_user_type,
                 user_status: user_status
@@ -320,20 +344,10 @@ $(function() {
         }
 
         if (current_user_type == 'human_delibot'){
-            var annotation = $('#delibot_annotation').val();
-            var send_object = {
-                    user_id: global_user_id,
-                    user_name: user_name,
-                    type: 'USER_ANNOTATION',
-                    message: {'m': message, 'ann': annotation},
-                    room: room_id,
-                    user_type: current_user_type,
-                    user_status: user_status
-              }
-            console.log(send_object)
-            if (annotation != ""){
-                socket.emit( 'response', send_object);
-            }
+
+            $('#message').prop('disabled', true);
+            $('#msg_submit').prop('disabled', true)
+            $('#delibot_annotation').val('def');
         }
 
         $('input#message').val('').focus();
@@ -387,8 +401,8 @@ $(function() {
                 if(typeof msg.user_name !== 'undefined' ) {
                         local_name = msg.user_name;
                         local_id = msg.user_id;
-
-                        processed_message = boldMentions(msg.message);
+                        message_obj = JSON.parse(msg.message)
+                        processed_message = boldMentions(message_obj.message);
                         if (local_id == global_user_id){
                             $( 'div.chatbox' ).append('<div class="message msg-mine"><b>' + local_name +': </b> ' + processed_message +'</div>' );
                         }else{
@@ -503,6 +517,7 @@ $(function() {
                 clearInterval(timer);
                 $('#chat_container').removeClass('hidden');
                 $('#game_play_timer').removeClass('hidden');
+                $('.task_description').removeClass('hidden');
                 $('#game_start_timer').addClass('hidden');
 
                 var date = msg.message;

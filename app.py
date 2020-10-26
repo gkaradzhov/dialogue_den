@@ -113,7 +113,6 @@ def trigger_finish(room_data):
     write_rooms_to_file(existing_rooms)
 
 
-
 # A welcome message to test our server
 @app.route('/')
 def index():
@@ -126,6 +125,9 @@ def index():
     frame_options_allow_from='https://mturk.com',
 )
 def route_to_room():
+    # Route room options
+    wait_room = request.args.get("hw", None)  # HW = has waiting room
+    start_time = request.args.get('ssttmm', None)
 
     # Get Mturk data
     assignment = request.args.get('assignmentId', None)
@@ -141,6 +143,10 @@ def route_to_room():
     ###
     if assignment == 'ASSIGNMENT_ID_NOT_AVAILABLE':
         return render_template("onboarding.html")
+
+    if wait_room == 'True':
+        return render_template('waiting_room', st=start_time, assignment_id=assignment, hit_id=hit, worker_id=worker,
+                               turk_submit=return_url)
 
     active_room_id = PG.get_create_campaign_room(campaign_id)
 
@@ -213,7 +219,9 @@ def chatroom():
         PG.update_mturk_user_id(mturk_info_id, current_user['user_id'])
         mturk_info = PG.get_mturk_info(mturk_info_id)
         if mturk_info:
-            formated_return_url = '{}/mturk/externalSubmit?assignmentId={}&user_id={}'.format(mturk_info[1], mturk_info[0], current_user['user_id'])
+            formated_return_url = '{}/mturk/externalSubmit?assignmentId={}&user_id={}'.format(mturk_info[1],
+                                                                                              mturk_info[0],
+                                                                                              current_user['user_id'])
 
     if is_moderator:
         status = USR_MODERATING
@@ -231,7 +239,6 @@ def chatroom():
 
     # Have to get the room again, in case the status changed
     room = PG.get_single_room(room_id)
-    
 
     return render_template("room.html", room_data={'id': room_id, 'name': room.name, 'game': json.loads(wason_initial),
                                                    'messages': messages, 'existing_users': logged_users,
@@ -239,7 +246,8 @@ def chatroom():
                                                    'current_user_id': current_user['user_id'],
                                                    'current_user_type': user_type,
                                                    'current_user_status': status, 'room_status': room.status,
-                                                   'mturk_return_url': formated_return_url, "start_time": campaign['start_time']})
+                                                   'mturk_return_url': formated_return_url,
+                                                   "start_time": campaign['start_time']})
 
 
 def create_broadcast_message(message):
@@ -263,6 +271,7 @@ def create_room():
         PG.create_room(room)
         return redirect('/rooms')
 
+
 @app.route('/compensation', methods=['GET', 'POST'])
 @talisman(
     frame_options='ALLOW-FROM',
@@ -276,7 +285,6 @@ def compensation_page():
     formated_return_url = '{}/mturk/externalSubmit?assignmentId={}&user_id={}'.format(return_url, assignment, worker)
 
     return render_template("compensation.html", room_data={'mturk_return_url': formated_return_url})
-
 
 
 @socketio.on('join')
@@ -296,7 +304,8 @@ def on_leave(data):
 
     leave_room(room)
 
-    m = Message(origin_name=username, message_type=LEAVE_ROOM, room_id=room, origin_id=user_id, user_status=status, user_type=type)
+    m = Message(origin_name=username, message_type=LEAVE_ROOM, room_id=room, origin_id=user_id, user_status=status,
+                user_type=type)
     create_broadcast_message(m)
 
     all_messages = PG.get_messages(room)
@@ -330,7 +339,6 @@ def check_finished(room_history, usr_status, room_status):
 def handle_room_events(room_messages, room_id, last_message):
     room = PG.get_single_room(room_id)
     campaign = PG.get_campaign(room.campaign)
-
 
     logged_users = {}
     room_status = None
@@ -379,7 +387,8 @@ def handle_room_events(room_messages, room_id, last_message):
         time_since_start = now - routing_timer_timestamp
         auto_ellapse = time_since_start.total_seconds() >= (campaign['start_threshold'] * 60 + 10)
         if auto_ellapse:
-            m = Message(origin_id=-1, origin_name="SYSTEM", message_type=ROUTING_TIMER_ELAPSED, room_id=room_id, user_status='SYSTEM')
+            m = Message(origin_id=-1, origin_name="SYSTEM", message_type=ROUTING_TIMER_ELAPSED, room_id=room_id,
+                        user_status='SYSTEM')
             create_broadcast_message(m)
     else:
         auto_ellapse = False
