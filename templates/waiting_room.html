@@ -49,6 +49,18 @@
         var start_time = $('input#ssttmm').val();
 
         var d = new Date(start_time);
+        console.log(d);
+        var check_allow = false;
+
+        $('checkbox').on('change', function({
+            var checked = $('.abc:checked').length == $('.abc').length
+            if (checked == true){
+                console.log('all checked');
+            }
+            else{
+                console.log('not all checked');
+            }
+        }));
 
     });
 
