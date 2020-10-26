@@ -36,7 +36,7 @@
     <input type="checkbox" id="check4" name="check4" class="consent_check"> <label for="check4"> By continuing to the take part in this task you indicate your consent to participating in the research</label><br>
 
 
-    <button type="button" id="btn-agree" class="btn btn-success disabled btn-lg">I want to participate! (available in 1 week)</button>
+    <button type="button" id="btn-agree" class="btn btn-success disabled btn-lg">I want to participate!</button>
 
     </div>
 </body>
@@ -49,7 +49,8 @@
         var start_time = $('input#ssttmm').val();
 
         var d = new Date(start_time);
-        console.log(d);
+
+        $('#btn-agree').text('I want to participate! (available at ' + d + ' )')
         var check_allow = false;
 
         $('.consent_check').change(function(){
