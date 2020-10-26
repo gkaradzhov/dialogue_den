@@ -41,6 +41,10 @@
     </div>
 </body>
 
+<script type="text/javascript" src="/static/utils.js"></script>
+<script type="text/javascript" src="/static/notify.min.js"></script>
+
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
@@ -63,8 +67,9 @@
 
             }
         }
+        else{
 
-        var timer = setInterval(function(){start_timer(start_date, true, "Waiting for player",
+         var timer = setInterval(function(){start_timer(start_date, false, "",
                  function(){
                         timer_allow = true
                         if (check_allow == true){
@@ -73,6 +78,10 @@
                         }
                         clearInterval(timer);
                     })}, 1000);
+
+        }
+
+
 
         $('.consent_check').change(function(){
             if ($('.consent_check:checked').length == $('.consent_check').length){
