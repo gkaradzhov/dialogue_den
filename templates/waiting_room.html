@@ -31,9 +31,9 @@
 
 
     <input type="checkbox" id="check1" name="check1"> <label for="check1"> I have read the information sheet</label><br>
-    <input type="checkbox" id="check2" name="check1"> <label for="check2"> I understand that text I enter as part of this task being stored and shared as part of the research data for this project</label><br>
-    <input type="checkbox" id="check3" name="check1"> <label for="check3"> I am aware that my participation is voluntary</label><br>
-    <input type="checkbox" id="check4" name="check1"> <label for="check4"> By continuing to the take part in this task you indicate your consent to participating in the research</label><br>
+    <input type="checkbox" id="check2" name="check2"> <label for="check2"> I understand that text I enter as part of this task being stored and shared as part of the research data for this project</label><br>
+    <input type="checkbox" id="check3" name="check3"> <label for="check3"> I am aware that my participation is voluntary</label><br>
+    <input type="checkbox" id="check4" name="check4"> <label for="check4"> By continuing to the take part in this task you indicate your consent to participating in the research</label><br>
 
 
     <button type="button" id="btn-agree" class="btn btn-success disabled btn-lg">I want to participate! (available in 1 week)</button>
@@ -53,7 +53,7 @@
         var check_allow = false;
 
         $('checkbox').on('change', function({
-            var checked = $('.abc:checked').length == $('.abc').length
+            var checked = $('checkbox:checked').length == $('checkbox').length
             if (checked == true){
                 console.log('all checked');
             }
