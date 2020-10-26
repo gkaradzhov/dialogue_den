@@ -127,6 +127,9 @@ def route_to_room():
     # Route room options
     wait_room = request.args.get("hw", None)  # HW = has waiting room
     start_time = request.args.get('ssttmm', None)
+    
+    if start_time is not None:
+        date_time_obj = datetime.datetime.strptime(start_time, '%Y-%m-%dT%H:%M:%SZ')
 
     # Get Mturk data
     assignment = request.args.get('assignmentId', None)
@@ -149,6 +152,7 @@ def route_to_room():
                                                      'hit_id': hit,
                                                      'worker_id': worker,
                                'turk_submit': return_url})
+
 
     active_room_id = PG.get_create_campaign_room(campaign_id)
 
