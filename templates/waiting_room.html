@@ -21,6 +21,7 @@
     <input id="hit_id" type="hidden" value="{{data.hit_id}}"/>
     <input id="worker_id" type="hidden" value="{{data.worker_id}}"/>
     <input id="turk_submit" type="hidden" value="{{data.turk_submit}}"/>
+    <input id="campaign_id" type="hidden" value="{{data.campaign_id}}">
 
     <div class="container">
 
@@ -53,6 +54,22 @@
 
 <script type="text/javascript">
     $(function() {
+
+        var campaign = $('input#campaign_id').val();
+        var assignment = $('input#assignment_id').val();
+        var hit_id = $('input#hit_id').val();
+        var worker_id = $('input#worker_id').val();
+        var turk_submit = $('input#turk_submit').val();
+
+        $('#btn-agree').click(function(){
+            window.location.href="https://dialogueden.herokuapp.com/route?campaign=" + campaign
+            + "&assignmentId=" + assignment
+            + "&hitId=" + hit_id
+            + "&workerId=" + worker_id
+            + "&turkSubmitTo=" + turk_submit;
+        });
+
+
         var start_time = $('input#ssttmm').val();
 
         var start_date = new Date(start_time);
@@ -85,7 +102,6 @@
         }
 
 
-
         $('.consent_check').change(function(){
             if ($('.consent_check:checked').length == $('.consent_check').length){
                 check_allow = true
@@ -99,7 +115,6 @@
                 $('#btn-agree').prop('disabled', true);
             }
         });
-
     });
 
 </script>

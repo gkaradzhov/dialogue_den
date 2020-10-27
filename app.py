@@ -151,7 +151,8 @@ def route_to_room():
                                                      'assignment_id': assignment,
                                                      'hit_id': hit,
                                                      'worker_id': worker,
-                               'turk_submit': return_url})
+                                                    'turk_submit': return_url,
+                                                    'campaign_id': campaign_id})
 
 
     active_room_id = PG.get_create_campaign_room(campaign_id)
