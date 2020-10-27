@@ -135,7 +135,7 @@ def route_to_room():
     worker = request.args.get('workerId', None)
     return_url = request.args.get('turkSubmitTo', None)
 
-    if assignment != 0:
+    if assignment != '0' and assignment != 0:
         mturk_info_id = PG.add_initial_mturk_info(assignment, hit, worker, campaign_id, return_url)
     else:
         mturk_info_id = 0
