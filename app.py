@@ -145,12 +145,11 @@ def route_to_room():
 
     if wait_room == 'True':
         return render_template('waiting_room.html', data={'ssttmm': start_time,
-                                                     'assignment_id': assignment,
-                                                     'hit_id': hit,
-                                                     'worker_id': worker,
-                                                    'turk_submit': return_url,
-                                                    'campaign_id': campaign_id})
-
+                                                          'assignment_id': assignment,
+                                                          'hit_id': hit,
+                                                          'worker_id': worker,
+                                                          'turk_submit': return_url,
+                                                          'campaign_id': campaign_id})
 
     active_room_id = PG.get_create_campaign_room(campaign_id)
 
@@ -431,7 +430,15 @@ def validate_finish_game(all_messages, room_id):
         m = Message(origin_id=SYSTEM_ID, origin_name=SYSTEM_USER, message_type=WASON_FINISHED, room_id=room_id)
         create_broadcast_message(m)
         all_messages.append(m)
-        trigger_finish(all_messages)
+
+        outro_content = "Thank you for your participation! Please fill " \
+                        "<a href='https://sheffieldpsychology.eu.qualtrics.com/jfe/form/SV_0ibJOwF7AiNXFfT?roomid={0}'>this questionnaire</a>".format(
+            room_id)
+        outro_message = Message(origin_id=SYSTEM_ID, origin_name=SYSTEM_USER, message_type=CHAT_MESSAGE,
+                                room_id=room_id, content=outro_content)
+
+        create_broadcast_message(outro_message)
+        all_messages.append(m)
         PG.set_room_status(room_id, 'FINISHED_GAME')
 
 
