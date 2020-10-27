@@ -435,7 +435,7 @@ def validate_finish_game(all_messages, room_id):
                         "<a href='https://sheffieldpsychology.eu.qualtrics.com/jfe/form/SV_0ibJOwF7AiNXFfT?roomid={0}'>this questionnaire</a>".format(
             room_id)
         outro_message = Message(origin_id=SYSTEM_ID, origin_name=SYSTEM_USER, message_type=CHAT_MESSAGE,
-                                room_id=room_id, content=outro_content)
+                                room_id=room_id, content={'annotation': 'no_annotation', 'message': outro_content})
 
         create_broadcast_message(outro_message)
         all_messages.append(m)
