@@ -127,18 +127,15 @@ def route_to_room():
     # Route room options
     wait_room = request.args.get("hw", None)  # HW = has waiting room
     start_time = request.args.get('ssttmm', None)
-    
-    if start_time is not None:
-        date_time_obj = datetime.datetime.strptime(start_time, '%Y-%m-%dT%H:%M:%SZ')
 
     # Get Mturk data
-    assignment = request.args.get('assignmentId', None)
+    assignment = request.args.get('assignmentId', 0)
     campaign_id = request.args.get('campaign', None)
     hit = request.args.get('hitId', None)
     worker = request.args.get('workerId', None)
     return_url = request.args.get('turkSubmitTo', None)
 
-    if assignment:
+    if assignment != 0:
         mturk_info_id = PG.add_initial_mturk_info(assignment, hit, worker, campaign_id, return_url)
     else:
         mturk_info_id = 0
