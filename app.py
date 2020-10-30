@@ -426,7 +426,8 @@ def validate_finish_game(all_messages, room_id):
         PG.set_room_status(room_id, 'FINISHED_ONBOARDING')
 
     finished_game = check_finished(all_messages, USR_PLAYING, room.status)
-    if finished_game:
+
+    if finished_game and room.status != "FINISHED_GAME":
         m = Message(origin_id=SYSTEM_ID, origin_name=SYSTEM_USER, message_type=WASON_FINISHED, room_id=room_id)
         create_broadcast_message(m)
         all_messages.append(m)
