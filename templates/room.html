@@ -203,7 +203,7 @@ $(function() {
     }
 
     if (room_status == ROUTING_TIMER_STARTED || room_status == READY_TO_START){
-        $.notify("The group phase of the game will start soon! Please submit your card selection. Once everyone does so, the game will start!",  {autoHide: false, className: 'info'});
+        $.notify("The group phase of the game will start soon! Please submit your card selection. Once everyone does so, the game will start! (click to close)",  {autoHide: false, className: 'info'});
         activityWatcher(wakeup, kick);
         sound.play()
 
@@ -231,7 +231,7 @@ $(function() {
         }
     }
     else{
-        $.notify("Welcome! Please read the instructions carefully. We are currently recruiting more people to join the room, once there are at least 3 users, the game will start.", {autoHide: false, className: 'info'});
+        $.notify("Welcome! Please read the instructions carefully. We are currently recruiting more people to join the room, once there are at least 3 users, the game will start. (click to close)", {autoHide: false, className: 'info'});
     }
 
     $('div.chatbox').scrollTop($('div.chatbox')[0].scrollHeight);
@@ -389,7 +389,7 @@ $(function() {
         });
 
         if (user_status == USR_ONBOARDING){
-            $.notify("Thank you for submitting your solution. The game will start soon! Please wait for the other participants to submit their solo selections.", {autoHide: false, className: 'info'});
+            $.notify("Thank you for submitting your solution. The game will start soon! Please wait for the other participants to submit their solo selections. (click to close)", {autoHide: false, className: 'info'});
         }
         $('#btn-agree').prop('disabled', true);
 
@@ -463,7 +463,7 @@ $(function() {
                 $('.task button').prop('disabled', true);
                 $('.task input').prop('disabled', true);
                 $('.timer_holder').addClass('hidden');
-                $.notify("Game Finished! Thank you for playing! Please press the 'Complete HIT' button", {autoHide: false, className: 'success'});
+                $.notify("Game Finished! Thank you for playing! (click to close)", {autoHide: false, className: 'success'});
                 $('input#room_status').val('GAME_FINISHED');
                 $(window).scrollTop(0);
                 break;
@@ -472,7 +472,7 @@ $(function() {
                 $('#' + target_user_id).addClass('wason-agreed');
                 break;
             case ROUTING_TIMER_STARTED:
-                $.notify("The group phase of the game will start soon! Please submit your card selection. Once everyone does so, the game will start!", {autoHide: false, className: 'info'});
+                $.notify("The group phase of the game will start soon! Please submit your card selection. Once everyone does so, the game will start! (click to close)", {autoHide: false, className: 'info'});
                 sound.play()
                 var date = msg.message;
 
@@ -512,7 +512,7 @@ $(function() {
 
                 if (room_status != ROOM_PLAYING){
                     sound.play()
-                    $.notify('Now you have to collaborate with the other participants in this conversation to solve the task together.',  {autoHide: false, className: 'info'});
+                    $.notify('Now you have to collaborate with the other participants in this conversation to solve the task together. (click to close)',  {autoHide: false, className: 'info'});
                 }
                 clearInterval(timer);
                 $('#chat_container').removeClass('hidden');
@@ -583,7 +583,7 @@ $(function() {
         status = $('input#room_status').val();
         if(status != 'GAME_FINISHED'){
             sound.play();
-            $.notify("You have been inactive for a while. Please be mindful, that after a prolonged period of inactivity you will be excluded from the room.", {autoHide: false, className: 'error'});
+            $.notify("You have been inactive for a while. Please be mindful, that after a prolonged period of inactivity you will be excluded from the room. (click to close)", {autoHide: false, className: 'error'});
         }
     }
 
