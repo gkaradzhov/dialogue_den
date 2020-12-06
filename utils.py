@@ -5,8 +5,9 @@ import uuid
 
 import boto3
 
-ANIMALS = {"Cat", "Guinea pig", "Alpaca", "Bat", "Beaver", "Bee", "Chipmunk", "Dolphin", "Duck", "Falcon", "Kiwi",
-           "Lobster", "Ox", "Leopard", "Zebra", "Llama", "Narwhal", 'Lion', 'Tiger', "Hedgehog", "Giraffe"}
+ANIMALS = {"Cat", "Guinea pig", "Alpaca", "Bat", "Beaver", "Bee", "Chipmunk", "Dolphin", "Duck", "Falcon",
+           "Kiwi", "Lobster", "Ox", "Leopard", "Zebra", "Llama", "Narwhal", 'Lion', 'Tiger', "Hedgehog",
+           "Giraffe", 'Puffin', 'Unicorn', 'Koala', 'Raven', 'Emu', 'Butterfly', 'Hamster', 'Panda'}
 
 
 # COLOURS = {"Red", "Orange", "Purple", "Yellow", "Green", "Blue", "Pink", "Cyan", "Black", "White"}
