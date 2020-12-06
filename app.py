@@ -217,6 +217,14 @@ def chatroom():
 
     current_user = generate_user([d[0] for d in logged_users], user_type)
 
+    if is_moderator:
+        status = USR_MODERATING
+    else:
+        status = USR_ONBOARDING
+    m = Message(origin_name=current_user['user_name'], message_type=JOIN_ROOM, room_id=room_id,
+                origin_id=current_user['user_id'], user_status=status, user_type=user_type)
+    create_broadcast_message(m)
+
     formated_return_url = None
     if mturk_info_id:
         PG.update_mturk_user_id(mturk_info_id, current_user['user_id'])
@@ -226,14 +234,6 @@ def chatroom():
                                                                                               mturk_info[0],
                                                                                               current_user['user_id'])
 
-    if is_moderator:
-        status = USR_MODERATING
-    else:
-        status = USR_ONBOARDING
-    m = Message(origin_name=current_user['user_name'], message_type=JOIN_ROOM, room_id=room_id,
-                origin_id=current_user['user_id'], user_status=status, user_type=user_type)
-
-    create_broadcast_message(m)
 
     wason_initial = [d.content for d in running_dialogue if d.message_type == WASON_INITIAL][0]
 
