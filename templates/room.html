@@ -68,11 +68,12 @@
                 {% else %}
                     <div id="detailed_instructions">
                         <ol>
-                            <li>Read the instructions carefully. Finish the task by yourself.</li>
+                            <li>Read the instructions carefully. Finish the task by yourself by selecting the appropriate cards and pressing the Submit button.</li>
                             <li>Participate in a group discussion (via the chat), collaborate with the other participants and try to find the best solution together. Give your best effort both in solving the task and in the group discussion.</li>
+                            <li>Every time you change your mind about the solution, please update it by selecting the new cards and pressing the Submit button.</li>
+                            <li>You can submit the same answer, if you believe it's the correct one.</li>
                             <li>You are expected to participate actively in the conversation for at least 5 minutes.</li>
-                            <li>Based on the discussion and arguments you had, submit the revised task solution again. You can submit the same answer, if you believe it's the correct one.</li>
-                            <li>Press the Complete HIT button.</li>
+<!--                            <li>Press the Complete HIT button.</li>-->
                             <li>Do not refresh the page at any time. Do not press the Complete HIT button unless you are done.</li>
                         </ol>
                     </div>
@@ -469,7 +470,7 @@ $(function() {
                 break;
             case WASON_AGREE:
                 target_user_id = msg.user_id;
-                $('#' + target_user_id).addClass('wason-agreed');
+                //$('#' + target_user_id).addClass('wason-agreed');
                 break;
             case ROUTING_TIMER_STARTED:
                 $.notify("The group phase of the game will start soon! Please submit your card selection. Once everyone does so, the game will start! (click to close)", {autoHide: false, className: 'info'});
