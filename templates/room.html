@@ -25,6 +25,7 @@
 <input id="room_status" type="hidden" value="{{room_data.room_status}}"/>
 <input id="start_time" type="hidden" value="{{room_data.start_time}}"/>
 <input id="user_type" type="hidden" value="{{room_data.current_user_type}}">
+<input id="mturk_url" type="hidden" value="{{room_data.mturk_url}}">
 
 <div class="timer_holder">
     <div id="game_start_timer" class="hidden">The game will start soon, approximately in: </div>
@@ -113,6 +114,7 @@
             </div>
             <div class="game_buttons {{human_delibot_hide}}">
                 <button type="button" id="btn-agree" class="btn btn-success btn-lg">Submit Game</button>
+                <button type="button" id="final_submit" class="btn btn-success btn-lg">Final Decision and Submit HIT</button>
             </div>
         </div>
         <hr/>
@@ -137,7 +139,7 @@
             <hr>
             {% if room_data.mturk_return_url%}
                 <form action="{{room_data.mturk_return_url}}" method="post">
-                    <b>Press the button ONLY after you've submitted the solo solution, participated in the chat and submitted your final solution.</b> <br>
+                    <b>.</b> <br>
                     <input type="submit" value="Complete HIT">
                 </form>
             {% endif %}
@@ -293,6 +295,23 @@ $(function() {
             var user_status = $('input#user_status').val();
             socket.emit('leave', { user_name: user_name, room: room_id, user_id:global_user_id, user_status: user_status, user_type: current_user_type});
             window.location.href = "/";
+        }
+    });
+
+   $('#final_submit').on('click', function(e){
+        if (confirm('Are you sure you want to Submit HIT? Press the button ONLY after you've submitted the solo solution, participated in the chat and submitted your final solution.')) {
+            var mturk_url = $('#mturk_url').val();
+            if (mturk_url) != ''{
+                $.ajax({
+                  type: "POST",
+                  url: mturk_url,
+                });
+            }
+            $.post(mturk_url, function() {
+                socket.emit('finish', { user_name: user_name, room: room_id, user_id:global_user_id, user_status: user_status, user_type: current_user_type});
+                window.location.href = "/";
+
+            });
         }
     });
 

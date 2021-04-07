@@ -249,7 +249,8 @@ def chatroom():
                                                    'current_user_id': current_user['user_id'],
                                                    'current_user_type': user_type,
                                                    'current_user_status': status, 'room_status': room.status,
-                                                   'mturk_return_url': formated_return_url,
+                                                   # 'mturk_return_url': formated_return_url,
+                                                   'mturk_return_url': 'test_post',
                                                    "start_time": campaign['start_time']})
 
 
@@ -428,19 +429,20 @@ def validate_finish_game(all_messages, room_id):
     finished_game = check_finished(all_messages, USR_PLAYING, room.status)
 
     if finished_game and room.status != "FINISHED_GAME":
-        m = Message(origin_id=SYSTEM_ID, origin_name=SYSTEM_USER, message_type=WASON_FINISHED, room_id=room_id)
-        create_broadcast_message(m)
-        all_messages.append(m)
-
-        outro_content = "Thank you for your participation! Please fill " \
-                        "<a target='_blank' href='https://sheffieldpsychology.eu.qualtrics.com/jfe/form/SV_0ibJOwF7AiNXFfT?roomid={0}'>this questionnaire</a>".format(
-            room_id)
-        outro_message = Message(origin_id=SYSTEM_ID, origin_name=SYSTEM_USER, message_type=CHAT_MESSAGE,
-                                room_id=room_id, content={'annotation': 'no_annotation', 'message': outro_content})
-
-        create_broadcast_message(outro_message)
-        all_messages.append(m)
-        PG.set_room_status(room_id, 'FINISHED_GAME')
+        pass
+        # m = Message(origin_id=SYSTEM_ID, origin_name=SYSTEM_USER, message_type=WASON_FINISHED, room_id=room_id)
+        # create_broadcast_message(m)
+        # all_messages.append(m)
+        #
+        # outro_content = "Thank you for your participation! Please fill " \
+        #                 "<a target='_blank' href='https://sheffieldpsychology.eu.qualtrics.com/jfe/form/SV_0ibJOwF7AiNXFfT?roomid={0}'>this questionnaire</a>".format(
+        #     room_id)
+        # outro_message = Message(origin_id=SYSTEM_ID, origin_name=SYSTEM_USER, message_type=CHAT_MESSAGE,
+        #                         room_id=room_id, content={'annotation': 'no_annotation', 'message': outro_content})
+        #
+        # create_broadcast_message(outro_message)
+        # all_messages.append(m)
+        # PG.set_room_status(room_id, 'FINISHED_GAME')
 
 
 def handle_signals():
