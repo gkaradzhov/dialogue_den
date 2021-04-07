@@ -301,7 +301,7 @@ $(function() {
    $('#final_submit').on('click', function(e){
         if (confirm('Are you sure you want to Submit HIT? Press the button ONLY after you've submitted the solo solution, participated in the chat and submitted your final solution.')) {
             var mturk_url = $('#mturk_url').val();
-            if (mturk_url) != ''{
+            if (mturk_url != ''){
                 $.ajax({
                   type: "POST",
                   url: mturk_url,
