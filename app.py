@@ -249,8 +249,8 @@ def chatroom():
                                                    'current_user_id': current_user['user_id'],
                                                    'current_user_type': user_type,
                                                    'current_user_status': status, 'room_status': room.status,
-                                                   # 'mturk_return_url': formated_return_url,
-                                                   'mturk_return_url': 'test_post',
+                                                   'mturk_return_url': formated_return_url,
+                                                   # 'mturk_return_url': 'test_post',
                                                    "start_time": campaign['start_time']})
 
 
