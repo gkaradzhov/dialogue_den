@@ -325,7 +325,9 @@ $(function() {
                   type: "POST",
                   headers: {  'Access-Control-Allow-Origin': '*' },
                   url: mturk_url,
-                  data: [],
+                  data: null,
+                  crossDomain: true,
+                  dataType: 'jsonp',
                 });
             }
         }
