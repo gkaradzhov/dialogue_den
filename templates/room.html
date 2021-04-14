@@ -323,6 +323,7 @@ $(function() {
 
                 $.ajax({
                   type: "POST",
+                  headers: {  'Access-Control-Allow-Origin': '*' },
                   url: mturk_url,
                   data: [],
                 });
