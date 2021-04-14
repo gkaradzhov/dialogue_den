@@ -136,13 +136,11 @@
 
         <div>
             <br/>
-<!--            <hr>-->
-<!--            {% if room_data.mturk_return_url%}-->
-<!--                <form action="{{room_data.mturk_return_url}}" method="post">-->
-<!--                    <b>.</b> <br>-->
-<!--                    <input type="submit" value="Complete HIT">-->
-<!--                </form>-->
-<!--            {% endif %}-->
+            <hr>
+            {% if room_data.mturk_return_url%}
+                <form id="mturk" action="{{room_data.mturk_return_url}}" method="post">
+                </form>
+            {% endif %}
             <hr>
             <b>Disclaimer:</b>
             Please remember that these transcripts may be used in future research, and therefore you have the right to
@@ -319,16 +317,17 @@ $(function() {
 
             console.log(mturk_url);
             if (mturk_url != ''){
-                $.ajax({
-                  type: "POST",
-                  headers: {  'Access-Control-Allow-Origin': '*' },
-                  url: mturk_url,
-                  data: {},
-                  crossDomain: true,
-                  dataType: "json",
+                $('#mturk').submit();
+<!--                $.ajax({-->
+<!--                  type: "POST",-->
+<!--                  headers: {  'Access-Control-Allow-Origin': '*' },-->
+<!--                  url: mturk_url,-->
+<!--                  data: {},-->
+<!--                  crossDomain: true,-->
+<!--                  dataType: "json",-->
 
-                    contentType: "application/json; charset=utf-8"
-                });
+<!--                    contentType: "application/json; charset=utf-8"-->
+<!--                });-->
             }
         }
     });
