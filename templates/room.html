@@ -319,15 +319,15 @@ $(function() {
 
             console.log(mturk_url);
             if (mturk_url != ''){
-                console.log('IN');
-
                 $.ajax({
                   type: "POST",
                   headers: {  'Access-Control-Allow-Origin': '*' },
                   url: mturk_url,
-                  data: null,
+                  data: {},
                   crossDomain: true,
+                  dataType: "json",
 
+                    contentType: "application/json; charset=utf-8"
                 });
             }
         }
