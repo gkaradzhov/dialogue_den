@@ -316,8 +316,12 @@ $(function() {
                 user_status: user_status
             });
 
+
+            console.log(mturk_url);
             if (mturk_url != ''){
-                $.post(mturk_url, function() {
+                console.log('IN');
+                $.post(mturk_url, function(e) {
+                    console.log(e);
                     socket.emit('finish', { user_name: user_name, room: room_id, user_id:global_user_id, user_status: user_status, user_type: current_user_type});
                 });
             }
