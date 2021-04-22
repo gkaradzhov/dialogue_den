@@ -164,6 +164,10 @@ def route_to_room():
     return resp
 
 @app.route('/unsuccessful_onboarding')
+@talisman(
+    frame_options='ALLOW-FROM',
+    frame_options_allow_from='https://mturk.com',
+)
 def unsuccessful_onboarding():
     return render_template('unsuccessful_onboarding.html')
 
