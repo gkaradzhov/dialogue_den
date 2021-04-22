@@ -211,11 +211,16 @@ class PostgreConnection:
 
     def check_for_user(self, mturk_info_id):
         if mturk_info_id and mturk_info_id != '0':
-            has_user = self.__execute("SELECT worker_id FROM mturk_info WHERE id=%s AND user_id IS NOT NULL",
-                                        (mturk_info_id,))
-            print(has_user)
-            if has_user:
-                return True
+            worker_id = self.__execute("SELECT worker_id FROM mturk_info WHERE id=%s", (mturk_info_id,))
+            print("WId", str(worker_id))
+            if worker_id:
+                has_user = self.__execute("SELECT worker_id FROM mturk_info WHERE worker_id=%s AND user_id IS NOT NULL",
+                                            (worker_id,))
+                print("Has Us Internal", str(has_user))
+                if has_user:
+                    return True
+                else:
+                    return False
             else:
                 return False
         else:

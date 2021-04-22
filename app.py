@@ -213,7 +213,7 @@ def chatroom():
     mturk_info_id = request.args.get('mturk_info', None)
 
     has_user = PG.check_for_user(mturk_info_id=mturk_info_id)
-    print(has_user)
+    print("Has user chat room", str(has_user))
     if has_user:
         return render_template('unsuccessful_onboarding.html')
 
