@@ -164,7 +164,6 @@ def route_to_room():
     return resp
 
 @app.route('/unsuccessful_onboarding')
-@flask_login.login_required
 def unsuccessful_onboarding():
     return render_template('unsuccessful_onboarding.html')
 
