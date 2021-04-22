@@ -127,6 +127,7 @@
         var turk_submit = $('input#turk_submit').val();
 
         $('#btn-agree').click(function(){
+            $('#btn-agree').prop('disabled', true);
             var isChecked_table = $('#table').prop('checked');
             var isChecked_odd = $('#odd').prop('checked');
             var isChecked_con = $('#con').prop('checked');
