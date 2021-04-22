@@ -213,7 +213,7 @@ class PostgreConnection:
         if mturk_info_id and mturk_info_id != '0':
             has_user = self.__execute("SELECT worker_id FROM mturk_info WHERE id=%s AND user_id IS NOT NULL",
                                         (mturk_info_id,))
-
+            print(has_user)
             if has_user:
                 return True
             else:

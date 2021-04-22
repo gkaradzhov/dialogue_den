@@ -127,7 +127,7 @@ def index():
     frame_options_allow_from='https://mturk.com',
 )
 def route_to_room():
-    sl = random.randint(0, 3) + random.random()
+    sl = random.randint(0, 2) + random.random()
     sleep(sl)
 
     # Route room options
@@ -207,13 +207,13 @@ def handle_routing(messages, logged_users, start_threshold, start_time, close_th
     frame_options_allow_from='https://mturk.com',
 )
 def chatroom():
-    sl = random.randint(0, 3) + random.random()
+    sl = random.randint(0, 2) + random.random()
     sleep(sl)
     room_id = request.args.get('room_id')
     mturk_info_id = request.args.get('mturk_info', None)
 
     has_user = PG.check_for_user(mturk_info_id=mturk_info_id)
-
+    print(has_user)
     if has_user:
         return render_template('unsuccessful_onboarding.html')
 
