@@ -204,6 +204,11 @@ def chatroom():
     room_id = request.args.get('room_id')
     mturk_info_id = request.args.get('mturk_info', None)
 
+    has_user = PG.check_for_user(mturk_info_id=mturk_info_id)
+
+    if has_user:
+        return render_template('unsuccessful_onboarding.html')
+
     is_moderator = request.args.get('moderator', False)
 
     room = PG.get_single_room(room_id)

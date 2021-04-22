@@ -209,6 +209,18 @@ class PostgreConnection:
         else:
             return None
 
+    def check_for_user(self, mturk_info_id):
+        if mturk_info_id and mturk_info_id != '0':
+            has_user = self.__execute("SELECT worker_id FROM mturk_info WHERE id=%s AND user_id IS NOT NULL",
+                                        (mturk_info_id,))
+
+            if has_user:
+                return True
+            else:
+                return False
+        else:
+            return False
+
 # pg = PostgreConnection('creds.json', True)
 
 
