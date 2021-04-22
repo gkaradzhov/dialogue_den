@@ -215,7 +215,7 @@ class PostgreConnection:
             print("WId", str(worker_id))
             if worker_id:
                 has_user = self.__execute("SELECT worker_id FROM mturk_info WHERE worker_id=%s AND user_id IS NOT NULL",
-                                            (worker_id,))
+                                            (worker_id[0],))
                 print("Has Us Internal", str(has_user))
                 if has_user:
                     return True
