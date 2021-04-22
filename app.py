@@ -22,6 +22,9 @@ from message import Room, Message
 from postgre_utils import PostgreConnection
 from sys_config import DIALOGUES_STABLE
 from utils import generate_user, MTurkManagement
+from time import sleep
+import random
+
 
 login_manager = flask_login.LoginManager()
 
@@ -124,6 +127,9 @@ def index():
     frame_options_allow_from='https://mturk.com',
 )
 def route_to_room():
+    sl = random.randint(0, 3) + random.random()
+    sleep(sl)
+
     # Route room options
     wait_room = request.args.get("hw", None)  # HW = has waiting room
     start_time = request.args.get('ssttmm', None)
@@ -201,6 +207,8 @@ def handle_routing(messages, logged_users, start_threshold, start_time, close_th
     frame_options_allow_from='https://mturk.com',
 )
 def chatroom():
+    sl = random.randint(0, 3) + random.random()
+    sleep(sl)
     room_id = request.args.get('room_id')
     mturk_info_id = request.args.get('mturk_info', None)
 
