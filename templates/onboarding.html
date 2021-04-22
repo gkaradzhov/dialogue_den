@@ -7,17 +7,124 @@
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
 
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" nonce="a9d09b55f2b66e00f4d27f8b453003e6">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          nonce="a9d09b55f2b66e00f4d27f8b453003e6">
     <link rel="stylesheet" type="text/css" href="/static/style.css" nonce="a9d09b55f2b66e00f4d27f8b453003e6"/>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" nonce="a9d09b55f2b66e00f4d27f8b453003e6"
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css"
+          nonce="a9d09b55f2b66e00f4d27f8b453003e6"
           crossorigin="anonymous">
 
-    <title>Onboarding</title>
+    <title>Quick Check</title>
 
 </head>
 <body>
+<input id="assignment_id" type="hidden" value="{{data.assignment_id}}"/>
+<input id="hit_id" type="hidden" value="{{data.hit_id}}"/>
+<input id="worker_id" type="hidden" value="{{data.worker_id}}"/>
+<input id="turk_submit" type="hidden" value="{{data.turk_submit}}"/>
+<input id="campaign_id" type="hidden" value="{{data.campaign_id}}">
+
+
+<div class="vertical-center">
     <div class="container">
-        <img src="/static/example.png" alt="DelibotPreview">
+         <div class="justify-content-center"> Before you participate in the HIT you should complete a quick test.
+        </div>
+
+        <div class="justify-content-center" id="reading">
+            <b>I spread the cloth on the table in order to protect it. What am I protecting?</b>
+            <input
+                class="form-check-input"
+                type="radio"
+                name="cloth"
+                id="cloth"
+              />
+              <label class="form-check-label" for="cloth">The Cloth</label>
+            <input
+                class="form-check-input"
+                type="radio"
+                name="table"
+                id="table"
+              />
+              <label class="form-check-label" for="table">The Table </label>
+        </div>
+
+        <div class="justify-content-center" id="odds">
+            <b>Which line contains ONLY odd numbers</b>
+            <input
+                class="form-check-input"
+                type="radio"
+                name="odd"
+                id="odd"
+              />
+              <label class="form-check-label" for="odd">3, 5, 7</label>
+            <input
+                class="form-check-input"
+                type="radio"
+                name="odd_NOT"
+                id="odd_NOT"
+              />
+              <label class="form-check-label" for="odd_NOT">2, 1, 3, 4 </label>
+        </div>
+
+        <div class="justify-content-center" id="consonants">
+            <b>Which line contains ONLY consonants</b>
+            <input
+                class="form-check-input"
+                type="radio"
+                name="con_not"
+                id="con_not"
+              />
+              <label class="form-check-label" for="con_not">a,b,c,d</label>
+            <input
+                class="form-check-input"
+                type="radio"
+                name="con"
+                id="con"
+              />
+              <label class="form-check-label" for="odd_NOT">f, g, h, j</label>
+        </div>
+
+        <button type="button" id="btn-agree" class="btn btn-success btn-lg">Continue</button>
+
     </div>
+
+</div>
+
 </body>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+
+<script type="text/javascript" src="/static/utils.js"></script>
+<script type="text/javascript" src="/static/notify.min.js"></script>
+
+
+<script type="text/javascript">
+    $(function() {
+
+        var campaign = $('input#campaign_id').val();
+        var assignment = $('input#assignment_id').val();
+        var hit_id = $('input#hit_id').val();
+        var worker_id = $('input#worker_id').val();
+        var turk_submit = $('input#turk_submit').val();
+
+        $('#btn-agree').click(function(){
+            var isChecked_table = $('#table').prop('checked');
+            var isChecked_odd = $('#odd').prop('checked');
+            var isChecked_con = $('#con').prop('checked');
+
+            if (isChecked_table == true && isChecked_odd == true && isChecked_con == true){
+                window.location.href="https://dialogueden.herokuapp.com/route?campaign=" + campaign
+                    + "&assignmentId=" + assignment
+                    + "&hitId=" + hit_id
+                    + "&workerId=" + worker_id
+                    + "&turkSubmitTo=" + turk_submit;
+            }else{
+                window.location.href="https://dialogueden.herokuapp.com/unsuccessful_onboarding";
+
+            }
+        });
+</script>
 </html>

@@ -141,11 +141,16 @@ def route_to_room():
         mturk_info_id = 0
     ###
     if assignment == 'ASSIGNMENT_ID_NOT_AVAILABLE':
-        return render_template("onboarding.html")
+        return render_template("preview.html")
 
     if wait_room == 'True':
-        return render_template('waiting_room.html', data={'ssttmm': start_time,
-                                                          'assignment_id': assignment,
+        # return render_template('waiting_room.html', data={'ssttmm': start_time,
+        #                                                   'assignment_id': assignment,
+        #                                                   'hit_id': hit,
+        #                                                   'worker_id': worker,
+        #                                                   'turk_submit': return_url,
+        #                                                   'campaign_id': campaign_id})
+        return render_template('onboarding.html', data={ 'assignment_id': assignment,
                                                           'hit_id': hit,
                                                           'worker_id': worker,
                                                           'turk_submit': return_url,
@@ -157,6 +162,11 @@ def route_to_room():
         url_for('chatroom', room_id=active_room_id, mturk_info=mturk_info_id, _scheme='https',
                 _external=True)))
     return resp
+
+@app.route('/unsuccessful_onboarding')
+@flask_login.login_required
+def unsuccessful_onboarding():
+    return render_template('unsuccessful_onboarding.html')
 
 
 @app.route('/rooms')
