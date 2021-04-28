@@ -403,7 +403,7 @@ def handle_room_events(room_messages, room_id, last_message):
 
     for user, last_active in logged_users.items():
         difference = now - last_active
-        user_activity[user] = difference.total_seconds() <= 220
+        user_activity[user] = difference.total_seconds() <= 545
 
     if routing_threshold is not None and routing_threshold is True:
         for user, activity in user_activity.items():
