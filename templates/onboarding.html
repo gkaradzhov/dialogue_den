@@ -100,7 +100,19 @@
         </div>
         <br/>
         <hr/>
-        <button type="button" id="btn-agree" class="btn btn-success btn-lg">Continue</button>
+        <ol>
+            <li>You and your peers are going to be presented a logical task</li>
+            <li>Solve the task by yourself. After doing so, wait for the rest of your group to solve the task as well.
+            This may take a few minutes (often less than 1 minute, but sometimes 3-5 minutes).</li>
+            <li>After everyone submits the task, a chat box will appear. You are expected to discuss the solution of the task.
+                Give your best effort in solving the task, discussing your arguments and solutions with the group. In the past, groups that collaborate well typically are better in solving the task.
+                *If you solve the task correctly you will get a bonus* </li>
+            <li> If the chatbox did not appear for more than 10 minutes after you solve the task by yourslef, you may submit the HIT. Submitting before that will result in rejection.</li>
+        </ol>
+          <input type="checkbox" id="check1" name="check1" class="consent_check"> <label for="check1">
+        I understand that my HIT will be rejected if I fail to follow the above instructions </label><br>
+
+        <button type="button" id="btn-agree" disabled class="btn btn-success btn-lg">Continue</button>
 
     </div>
 
@@ -125,6 +137,18 @@
         var hit_id = $('input#hit_id').val();
         var worker_id = $('input#worker_id').val();
         var turk_submit = $('input#turk_submit').val();
+        var check_allow = false
+        $('.consent_check').change(function(){
+            if ($('.consent_check:checked').length == $('.consent_check').length){
+                check_allow = true
+                $('#btn-agree').prop('disabled', false);
+            }
+            else{
+                check_allow = false
+                $('#btn-agree').prop('disabled', true);
+            }
+        });
+
 
         $('#btn-agree').click(function(){
             $('#btn-agree').prop('disabled', true);
