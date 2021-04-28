@@ -371,6 +371,7 @@ def handle_room_events(room_messages, room_id, last_message):
     campaign = PG.get_campaign(room.campaign)
 
     logged_users = {}
+    submitted_users = {}
     room_status = None
     routing_timer_timestamp = None
     timer_ended = False
@@ -388,6 +389,10 @@ def handle_room_events(room_messages, room_id, last_message):
         elif item.message_type == ROUTING_TIMER_ELAPSED:
             timer_ended = True
             timer_ended_timestamp = item.timestamp
+        elif item.message_type == WASON_AGREE:
+            submitted_users[item.origin_id] = True
+            if item.origin_id in logged_users:
+                logged_users[item.origin_id] = item.timestamp
         else:
             if item.origin_id in logged_users:
                 logged_users[item.origin_id] = item.timestamp
@@ -402,8 +407,12 @@ def handle_room_events(room_messages, room_id, last_message):
         routing_threshold = None
 
     for user, last_active in logged_users.items():
-        difference = now - last_active
-        user_activity[user] = difference.total_seconds() <= 545
+        if user in submitted_users:
+            difference = now - last_active
+            user_activity[user] = difference.total_seconds() <= 545
+        else:
+            difference = now - last_active
+            user_activity[user] = difference.total_seconds() <= 120
 
     if routing_threshold is not None and routing_threshold is True:
         for user, activity in user_activity.items():
