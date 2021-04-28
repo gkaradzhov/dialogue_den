@@ -374,6 +374,7 @@ def handle_room_events(room_messages, room_id, last_message):
     room_status = None
     routing_timer_timestamp = None
     timer_ended = False
+    timer_ended_timestamp = None
     for item in room_messages:
         if item.user_status == USR_MODERATING or item.user_type == 'human_delibot':
             continue
@@ -386,6 +387,7 @@ def handle_room_events(room_messages, room_id, last_message):
             routing_timer_timestamp = item.timestamp
         elif item.message_type == ROUTING_TIMER_ELAPSED:
             timer_ended = True
+            timer_ended_timestamp = item.timestamp
         else:
             if item.origin_id in logged_users:
                 logged_users[item.origin_id] = item.timestamp
@@ -401,7 +403,7 @@ def handle_room_events(room_messages, room_id, last_message):
 
     for user, last_active in logged_users.items():
         difference = now - last_active
-        user_activity[user] = difference.total_seconds() <= 545
+        user_activity[user] = difference.total_seconds() <= 220
 
     if routing_threshold is not None and routing_threshold is True:
         for user, activity in user_activity.items():
