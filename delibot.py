@@ -36,7 +36,7 @@ class GPT2SequenceClassifierModel(nn.Module):
             self,
             max_seq_length: int = 280,
             embedding_func=sum_all_tokens,
-            combine_sentence_tokens=True, tokenizer='microsoft/DialoGPT-large', model='microsoft/DialoGPT-large'
+            combine_sentence_tokens=True, tokenizer='microsoft/DialoGPT-small', model='microsoft/DialoGPT-small'
     ):
         super(GPT2SequenceClassifierModel, self).__init__()
         # self.hidden_size = hidden_size
@@ -167,7 +167,7 @@ def get_similarity_best(item, collection, key, embedder):
 
 if __name__ == "__main__":
 
-    tokenizer = AutoTokenizer.from_pretrained("microsoft/DialoGPT-large")
+    tokenizer = AutoTokenizer.from_pretrained("microsoft/DialoGPT-small")
     # model = AutoModelForCausalLM.from_pretrained("microsoft/DialoGPT-large")
     #
     tokenizer.add_special_tokens({'additional_special_tokens': ["<CARD>", '<MENTION>']})
