@@ -290,6 +290,11 @@ def delibot():
     s = speak_similarity('Moderation', ['Hey how are you', 'I am well thanks'], cards=['A', 'A', '3'],
                          users=['Dolphin'], all_utterances=processed, processor=dialogue)
 
+    room_id = json['room']
+    m = Message(origin_id=json['user_id'], origin_name=json['user_name'], message_type=json['type'], room_id=room_id,
+                content=json['message'], user_status=json['user_status'], user_type=json.get('user_type', None))
+
+    create_broadcast_message(m)
     return s
 
 
