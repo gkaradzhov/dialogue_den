@@ -287,6 +287,10 @@ def chatroom():
     frame_options_allow_from='https://mturk.com',
 )
 def delibot():
+    room_id = request.args.get('room_id', None)
+    delitype = request.args.get('delitype', None)
+
+
     s = speak_similarity('Moderation', ['Hey how are you', 'I am well thanks'], cards=['A', 'A', '3'],
                          users=['Dolphin'], all_utterances=processed, processor=dialogue)
 
