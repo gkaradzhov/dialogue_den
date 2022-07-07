@@ -123,6 +123,10 @@
                 <b> <i>(you)</i> {{room_data.current_user}}</b>
                 <button id="leave_room" class="btn btn-danger btn-sm float-right pull-right">Leave room</button>
             </div>
+            <button id="deli_moderation" class="btn btn-info btn-sm float-right pull-right">Deli Moderation</button>
+            <button id="deli_reasoning" class="btn btn-info btn-sm float-right pull-right">Deli Reasoning</button>
+            <button id="deli_solution" class="btn btn-info btn-sm float-right pull-right">Deli Solution</button>
+
             {% for item in room_data.existing_users %}
             <div class="logged_user" id="{{item[1]}}">
                 <b>{{item[0]}}</b>
@@ -422,6 +426,11 @@ $(function() {
         $('#btn-agree').prop('disabled', true);
 
     });
+
+    $('#deli_moderation').on('click', function(e){
+
+    });
+
     socket.on('response', function(message_str) {
         msg =  JSON.parse(message_str);
         console.log(msg);
