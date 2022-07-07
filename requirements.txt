@@ -28,7 +28,6 @@ psycopg2-binary==2.8.4
 talisman==0.1.0
 flask-talisman==0.7.0
 transformers==4.15.0
-torch==1.8.1
 tokenizers==0.10.3
 stop-words==2018.7.23
 spacy==2.3.2
