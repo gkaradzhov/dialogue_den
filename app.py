@@ -18,7 +18,6 @@ from constants import JOIN_ROOM, CHAT_MESSAGE, LEAVE_ROOM, WASON_INITIAL, WASON_
     USR_ONBOARDING, USR_PLAYING, FINISHED_ONBOARDING, USR_MODERATING, ROUTING_TIMER_STARTED, SYSTEM_USER, SYSTEM_ID, \
     ROUTING_TIMER_ELAPSED, ROOM_READY_TO_START
 from data_persistency_utils import read_rooms_from_file, write_rooms_to_file
-from delibot import speak_similarity
 from message import Room, Message
 from postgre_utils import PostgreConnection
 from sys_config import DIALOGUES_STABLE
@@ -291,8 +290,8 @@ def delibot():
     delitype = request.args.get('delitype', None)
 
 
-    s = speak_similarity('Moderation', ['Hey how are you', 'I am well thanks'], cards=['A', 'A', '3'],
-                         users=['Dolphin'], all_utterances=processed, processor=dialogue)
+    # s = speak_similarity('Moderation', ['Hey how are you', 'I am well thanks'], cards=['A', 'A', '3'],
+    #                      users=['Dolphin'], all_utterances=processed, processor=dialogue)
 
     room_id = json['room']
     m = Message(origin_id=json['user_id'], origin_name=json['user_name'], message_type=json['type'], room_id=room_id,
