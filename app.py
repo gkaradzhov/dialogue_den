@@ -510,61 +510,6 @@ def handle_signals():
 
 
 if __name__ == '__main__':
-    signal.signal(signal.SIGTERM, handle_signals)
-
-    tokenizer = AutoTokenizer.from_pretrained("microsoft/DialoGPT-large")
-    # model = AutoModelForCausalLM.from_pretrained("microsoft/DialoGPT-large")
-    #
-    tokenizer.add_special_tokens({'additional_special_tokens': ["<CARD>", '<MENTION>']})
-    # model.resize_token_embeddings(len(tokenizer))
-
-    dialogue = GPT2SequenceClassifierModel()
-    annotations = read_3_lvl_annotation_file('data/annotated_data.tsv')
-    raw_data = read_wason_dump('data/all/')
-
-    nlp = spacy.load('en_core_web_sm')
-
-    for item in annotations:
-        raw = [r for r in raw_data if r.identifier == item.identifier][0]
-        item.raw_db_conversation = raw.raw_db_conversation
-
-
-    for item in annotations:
-        item.preprocess_everything(nlp)
-        messages = merge_with_solution_raw(item, False)
-        item.wason_messages = messages
-        item.clean_special_tokens()
-
-    probing = defaultdict(lambda: [])
-    for conversation in annotations:
-        current_conversation = []
-        for message in conversation.wason_messages:
-            if 'type' in message.annotation and message.annotation['type'] == 'Probing':
-                probing[message.annotation['target']].append(
-                    {'previous': tokenizer.eos_token.join(current_conversation[-2:]), 'probing': message.clean_text})
-            current_conversation.append(message.clean_text)
-
-
-    counter = 0
-    processed = defaultdict(lambda: [])
-    for key, item in probing.items():
-        print(key)
-        for example in item:
-            counter += 1
-            print(counter)
-            tokenised_dialogue = dialogue.tokenize_and_predict([example['previous']])[0]
-            example['previous_embedding_dialogue'] = tokenised_dialogue.reshape(1, -1)
-            processed[key].append(example)
-            if counter == 10:
-                break
-        if counter == 10:
-            break
-
-
-
-    print(s)
-
-
     try:
         socketio.run(host='localhost', port=8898, app=app)
     finally:

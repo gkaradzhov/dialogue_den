@@ -25,12 +25,4 @@ Werkzeug==2.1.2
 psycopg2-binary==2.8.4
 talisman==0.1.0
 flask-talisman==0.7.0
-transformers==4.15.0
-stop-words==2018.7.23
-spacy==3.3.1
-sklearn==0.0
-sentence-transformers==2.1.0
-sentencepiece==0.1.96
-pandas==1.4.3
-nltk==3.5
 
