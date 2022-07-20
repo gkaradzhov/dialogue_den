@@ -510,6 +510,7 @@ def handle_signals():
 
 
 if __name__ == '__main__':
+    app.run()
     try:
         socketio.run(host='localhost', port=8898, app=app)
     finally:
