@@ -312,10 +312,9 @@ def delibot():
 
     m = Message(origin_id=990, origin_name='DEliBot', message_type='CHAT_MESSAGE', room_id=room_id,
                 content={'message': x.text}, user_status=USR_PLAYING, user_type='DELIBOT_SIMILARITY')
-    time.sleep(5)
     create_broadcast_message(m)
 
-    time.sleep(5)
+    time.sleep(15)
     return ('', 200)
 
 def create_broadcast_message(message):
