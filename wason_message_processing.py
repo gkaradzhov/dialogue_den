@@ -413,7 +413,7 @@ def get_context_solutions_users(postgre_messages, nlp):
     users = []
     for m in messages_reversed:
         users.append(m.origin)
-        if m.annotation['sol_tracker'] is not None:
+        if 'sol_tracker' in m.annotation and m.annotation['sol_tracker'] is not None:
             cards.extend(list(m.annotation['sol_tracker']))
 
     print(context)
