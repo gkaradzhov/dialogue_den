@@ -405,10 +405,8 @@ def get_context_solutions_users(postgre_messages, nlp):
     wason_conversation.wason_messages = messages
     wason_conversation.clean_special_tokens()
 
-    initial = wason_conversation.get_initial_cards()
-    print(initial)
     messages_reversed = wason_conversation.wason_messages[::-1]
-    context = [m.content for m in messages_reversed[:2]]
+    context = [m.content['message'] for m in messages_reversed[:2]]
     cards = []
     users = []
     for m in messages_reversed:
@@ -416,7 +414,4 @@ def get_context_solutions_users(postgre_messages, nlp):
         if 'sol_tracker' in m.annotation and m.annotation['sol_tracker'] is not None:
             cards.extend(list(m.annotation['sol_tracker']))
 
-    print(context)
-    print(cards)
-    print(users)
-    return wason_conversation, None, None
+    return context, cards, users

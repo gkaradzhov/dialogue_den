@@ -301,21 +301,18 @@ def delibot():
     print(normalised_delitype)
     url = 'http://delibot.cl.cam.ac.uk/delibot'
     myobj = {"delitype": normalised_delitype,
-             "context": ["hey", "maybe turning A"],
-             "cards": ["A", "3", "4"], "users": ["Narwhal"]}
+             "context": context,
+             "cards": solution, "users": users}
 
 
     x = requests.post(url, json=myobj)
 
     print(x.text)
-    # s = speak_similarity('Moderation', ['Hey how are you', 'I am well thanks'], cards=['A', 'A', '3'],
-    #                      users=['Dolphin'], all_utterances=processed, processor=dialogue)
 
-    # room_id = json['room']
-    # m = Message(origin_id=json['user_id'], origin_name=json['user_name'], message_type=json['type'], room_id=room_id,
-    #             content=json['message'], user_status=json['user_status'], user_type=json.get('user_type', None))
-    #
-    # create_broadcast_message(m)
+    m = Message(origin_id=990, origin_name='DEliBot', message_type='CHAT_MESSAGE', room_id=room_id,
+                content=x.text, user_status=USR_PLAYING, user_type='DELIBOT_SIMILARITY')
+
+    create_broadcast_message(m)
     # return s
     return ('', 200)
 
