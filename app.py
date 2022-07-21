@@ -310,7 +310,7 @@ def delibot():
     print(x.text)
 
     m = Message(origin_id=990, origin_name='DEliBot', message_type='CHAT_MESSAGE', room_id=room_id,
-                content=x.text, user_status=USR_PLAYING, user_type='DELIBOT_SIMILARITY')
+                content={'message': x.text}, user_status=USR_PLAYING, user_type='DELIBOT_SIMILARITY')
 
     create_broadcast_message(m)
     # return s
