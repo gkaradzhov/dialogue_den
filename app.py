@@ -9,6 +9,7 @@ from os import path
 import requests
 import flask_login
 import flask_socketio
+import spacy as spacy
 from flask import Flask, request, render_template, redirect, make_response, url_for
 from flask_socketio import join_room, leave_room
 from flask_socketio import send
@@ -25,6 +26,7 @@ from utils import generate_user, MTurkManagement
 from time import sleep
 import random
 
+from wason_message_processing import get_context_solutions_users
 
 login_manager = flask_login.LoginManager()
 
@@ -37,6 +39,8 @@ app.config.update(dict(
 
 talisman = Talisman(app, content_security_policy=None)
 socketio = flask_socketio.SocketIO(app, cors_allowed_origins='*', async_mode='eventlet')
+
+nlp = spacy.load('en_core_web_sm')
 
 login_manager.init_app(app)
 
@@ -290,6 +294,9 @@ def delibot():
     room_id = request.args.get('room_id', None)
     delitype = request.args.get('delitype', None)
 
+    messages = PG.get_messages(room_id)
+
+    context, solution, users = get_context_solutions_users(messages, nlp)
     normalised_delitype = delitype.split('_')[1]
     print(normalised_delitype)
     url = 'http://delibot.cl.cam.ac.uk/delibot'
@@ -310,7 +317,7 @@ def delibot():
     #
     # create_broadcast_message(m)
     # return s
-    return None
+    return ('', 200)
 
 def create_broadcast_message(message):
     PG.insert_message(message)
