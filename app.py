@@ -289,14 +289,18 @@ def chatroom():
 def delibot():
     room_id = request.args.get('room_id', None)
     delitype = request.args.get('delitype', None)
-    print(delitype)
+
+    normalised_delitype = delitype.split('_')[1]
+    print(normalised_delitype)
     url = 'http://delibot.cl.cam.ac.uk/delibot'
-    myobj = {"delitype": "Moderation", "context": ["hey", "maybe turning A"], "cards": ["A", "3", "4"], "users": ["Narwhal"]}
+    myobj = {"delitype": normalised_delitype,
+             "context": ["hey", "maybe turning A"],
+             "cards": ["A", "3", "4"], "users": ["Narwhal"]}
 
 
     x = requests.post(url, json=myobj)
 
-    print(x)
+    print(x.text)
     # s = speak_similarity('Moderation', ['Hey how are you', 'I am well thanks'], cards=['A', 'A', '3'],
     #                      users=['Dolphin'], all_utterances=processed, processor=dialogue)
 
@@ -306,7 +310,7 @@ def delibot():
     #
     # create_broadcast_message(m)
     # return s
-    return True
+    return None
 
 def create_broadcast_message(message):
     PG.insert_message(message)
