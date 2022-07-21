@@ -396,7 +396,8 @@ def get_context_solutions_users(postgre_messages, nlp):
         wason_conversation.raw_db_conversation.append({'message_type': pm.message_type,
                                      'content': pm.content,
                                      'user_name': pm.origin,
-                                     'message_id': pm.unique_id})
+                                     'message_id': pm.unique_id,
+                                    'user_status': pm.user_status})
 
     wason_conversation.wason_messages_from_raw()
     wason_conversation.preprocess_everything(nlp)
