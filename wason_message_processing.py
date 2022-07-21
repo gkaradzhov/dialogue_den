@@ -1,10 +1,5 @@
 from nltk.tokenize import TweetTokenizer
-import pandas as pd
-import os
-import traceback
 import copy
-import csv
-import ast
 import string
 
 
