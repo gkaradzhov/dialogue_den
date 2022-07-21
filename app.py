@@ -6,7 +6,7 @@ import random
 import signal
 from datetime import timezone
 from os import path
-
+import requests
 import flask_login
 import flask_socketio
 from flask import Flask, request, render_template, redirect, make_response, url_for
@@ -40,8 +40,8 @@ socketio = flask_socketio.SocketIO(app, cors_allowed_origins='*', async_mode='ev
 
 login_manager.init_app(app)
 
-PG = PostgreConnection('local_cred.json')
-MTURK_MANAGEMENT = MTurkManagement('local_cred.json')
+PG = PostgreConnection('localadasdda_cred.json')
+MTURK_MANAGEMENT = MTurkManagement('local_creddadasasd.json')
 admin_pass = os.environ.get('ADMIN')
 salt = os.environ.get('SALT')
 
@@ -203,6 +203,7 @@ def handle_routing(messages, logged_users, start_threshold, start_time, close_th
 
 @app.route('/room')
 @talisman(
+
     frame_options='ALLOW-FROM',
     frame_options_allow_from='https://mturk.com',
 )
@@ -281,25 +282,31 @@ def chatroom():
 
 
 @app.route('/delibot')
-@talisman(
-    frame_options='ALLOW-FROM',
-    frame_options_allow_from='https://mturk.com',
-)
+# @talisman(
+#     frame_options='ALLOW-FROM',
+#     frame_options_allow_from='https://mturk.com',
+# )
 def delibot():
     room_id = request.args.get('room_id', None)
     delitype = request.args.get('delitype', None)
+    print(delitype)
+    url = 'http://delibot.cl.cam.ac.uk/delibot'
+    myobj = {"delitype": "Moderation", "context": ["hey", "maybe turning A"], "cards": ["A", "3", "4"], "users": ["Narwhal"]}
 
 
+    x = requests.post(url, json=myobj)
+
+    print(x)
     # s = speak_similarity('Moderation', ['Hey how are you', 'I am well thanks'], cards=['A', 'A', '3'],
     #                      users=['Dolphin'], all_utterances=processed, processor=dialogue)
 
-    room_id = json['room']
-    m = Message(origin_id=json['user_id'], origin_name=json['user_name'], message_type=json['type'], room_id=room_id,
-                content=json['message'], user_status=json['user_status'], user_type=json.get('user_type', None))
-
-    create_broadcast_message(m)
-    return s
-
+    # room_id = json['room']
+    # m = Message(origin_id=json['user_id'], origin_name=json['user_name'], message_type=json['type'], room_id=room_id,
+    #             content=json['message'], user_status=json['user_status'], user_type=json.get('user_type', None))
+    #
+    # create_broadcast_message(m)
+    # return s
+    return True
 
 def create_broadcast_message(message):
     PG.insert_message(message)
