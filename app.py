@@ -312,13 +312,18 @@ def delibot():
     m = Message(origin_id=990, origin_name='DEliBot', message_type='CHAT_MESSAGE', room_id=room_id,
                 content={'message': x.text}, user_status=USR_PLAYING, user_type='DELIBOT_SIMILARITY')
 
+
     create_broadcast_message(m)
-    # return s
     return ('', 200)
 
 def create_broadcast_message(message):
+    print('BEFORE DB INSERT')
     PG.insert_message(message)
+    print('AFTER DB INSERT/ BEFORE EMIT')
+
+    print(message.to_json())
     socketio.emit('response', message.to_json(), room=message.room_id)
+    print('AFTER EMIT')
 
 
 @app.route('/create_room', methods=('GET', 'POST'))
