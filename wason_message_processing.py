@@ -1,3 +1,5 @@
+import ast
+
 from nltk.tokenize import TweetTokenizer
 import copy
 import string
@@ -388,6 +390,9 @@ def get_context_solutions_users(postgre_messages, nlp):
     print(postgre_messages)
     wason_conversation = WasonConversation(postgre_messages[0].room_id)
     for pm in postgre_messages:
+        if pm.message_type in ['WASON_INITIAL', 'WASON_GAME', 'WASON_SUBMIT']:
+            pm.content = pm.content.replace('false', 'False').replace('true', 'True')
+            pm.content = ast.literal_eval(pm.content)
         wason_conversation.raw_db_conversation.append({'message_type': pm.message_type,
                                      'content': pm.content,
                                      'user_name': pm.origin,
