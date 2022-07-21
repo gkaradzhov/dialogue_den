@@ -406,7 +406,7 @@ def get_context_solutions_users(postgre_messages, nlp):
     wason_conversation.clean_special_tokens()
 
     messages_reversed = wason_conversation.wason_messages[::-1]
-    context = [m.content['message'] for m in messages_reversed[:2]]
+    context = [m.clean_text for m in messages_reversed[:2]]
     cards = []
     users = []
     for m in messages_reversed:
