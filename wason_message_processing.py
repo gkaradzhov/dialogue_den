@@ -388,7 +388,7 @@ def get_context_solutions_users(postgre_messages, nlp):
     print(postgre_messages)
     wason_conversation = WasonConversation(postgre_messages[0].room_id)
     for pm in postgre_messages:
-        wason_conversation.raw_db_conversation.append({'type': pm.message_type,
+        wason_conversation.raw_db_conversation.append({'message_type': pm.message_type,
                                      'content': pm.content,
                                      'user_name': pm.origin,
                                      'message_id': pm.unique_id})
@@ -399,5 +399,5 @@ def get_context_solutions_users(postgre_messages, nlp):
     wason_conversation.wason_messages = messages
     wason_conversation.clean_special_tokens()
 
-    print(wason_conversation.wason_messages[2].annotation)
+    print([a.annotation for a in wason_conversation.wason_messages])
     return wason_conversation, None, None
