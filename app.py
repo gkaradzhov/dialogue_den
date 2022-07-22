@@ -286,14 +286,10 @@ def chatroom():
                                                    "start_time": campaign['start_time']})
 
 
-@app.route('/delibot')
-# @talisman(
-#     frame_options='ALLOW-FROM',
-#     frame_options_allow_from='https://mturk.com',
-# )
-def delibot():
-    room_id = request.args.get('room_id', None)
-    delitype = request.args.get('delitype', None)
+@socketio.on('delibot')
+def delibot(json):
+    room_id = json.get('room_id', None)
+    delitype = json.get('delitype', None)
 
     messages = PG.get_messages(room_id)
 
@@ -305,7 +301,6 @@ def delibot():
              "context": context,
              "cards": solution, "users": users}
 
-
     x = requests.post(url, json=myobj)
 
     print(x.text)
@@ -314,17 +309,12 @@ def delibot():
                 content={'message': x.text}, user_status=USR_PLAYING, user_type='DELIBOT_SIMILARITY')
     create_broadcast_message(m)
 
-    time.sleep(15)
-    return ('', 200)
 
 def create_broadcast_message(message):
-    print('BEFORE DB INSERT')
-    PG.insert_message(message)
-    print('AFTER DB INSERT/ BEFORE EMIT')
 
-    print(message.to_json())
+    PG.insert_message(message)
     socketio.emit('response', message.to_json(), room=message.room_id)
-    print('AFTER EMIT')
+
 
 
 @app.route('/create_room', methods=('GET', 'POST'))

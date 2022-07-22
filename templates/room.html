@@ -429,10 +429,7 @@ $(function() {
 
     $('.DELIBOT').on('click', function(e){
         id_type = e.target.id
-
-        $.ajax({
-          url: '/delibot?delitype='+id_type+'&room_id='+room_id,
-        });
+        socket.emit('delibot', { room_id: room_id, delitype: id_type});
     });
 
     socket.on('response', function(message_str) {
