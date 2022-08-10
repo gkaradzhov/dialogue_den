@@ -298,8 +298,10 @@ def delibot(json):
     print(normalised_delitype)
     url = 'http://delibot.cl.cam.ac.uk/delibot'
     myobj = {"delitype": normalised_delitype,
-             "context": context,
-             "cards": solution, "users": users}
+             "context": context[-2:],
+             "cards": solution,
+             "users": users,
+             "skip": context}
 
     x = requests.post(url, json=myobj)
 

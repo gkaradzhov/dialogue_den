@@ -30,9 +30,13 @@ class WasonConversation:
 
     def preprocess_everything(self, tagger):
         for item in self.wason_messages:
-            doc = tagger(item.content)
+            content = item.content
+            for raw in self.raw_db_conversation:
+                if item.identifier == raw['message_id']:
+                    content = raw['content']
+            doc = tagger(content)
             item.content_pos = [a.pos_ for a in doc]
-            item.content_tokenised = self.tknzr.tokenize(item.content)
+            item.content_tokenised = self.tknzr.tokenize(content)
 
     def clean_special_tokens(self):
         initial_cards = self.get_initial_cards()
@@ -387,7 +391,6 @@ def merge_with_solution_raw(conversation_external, supervised=False):
 
 
 def get_context_solutions_users(postgre_messages, nlp):
-    print(postgre_messages)
     wason_conversation = WasonConversation(postgre_messages[0].room_id)
     for pm in postgre_messages:
         if pm.message_type in ['WASON_INITIAL', 'WASON_GAME', 'WASON_SUBMIT']:
@@ -405,11 +408,12 @@ def get_context_solutions_users(postgre_messages, nlp):
     wason_conversation.wason_messages = messages
     wason_conversation.clean_special_tokens()
 
-
-    context = [m.clean_text for m in wason_conversation.wason_messages[-2:]]
+    context = []
     cards = []
     users = []
     for m in wason_conversation.wason_messages:
+        if m.origin.lower() != 'delibot':
+            context.append(m.clean_text)
         if m.origin != 'SYSTEM':
             users.append(m.origin)
         if 'sol_tracker' in m.annotation and m.annotation['sol_tracker'] is not None:
