@@ -412,8 +412,6 @@ def get_context_solutions_users(postgre_messages, nlp):
     cards = []
     users = []
     for m in wason_conversation.wason_messages:
-        if m.origin.lower() != 'delibot':
-            context.append(m.clean_text)
         if m.origin != 'SYSTEM':
             users.append(m.origin)
         if 'sol_tracker' in m.annotation and m.annotation['sol_tracker'] is not None:
