@@ -303,6 +303,8 @@ def delibot(json):
              "users": users,
              "skip": context}
 
+    print(myobj)
+
     x = requests.post(url, json=myobj)
 
     print(x.text)
