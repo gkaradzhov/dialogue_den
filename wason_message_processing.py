@@ -394,6 +394,7 @@ def merge_with_solution_raw(conversation_external, supervised=False):
 def get_context_solutions_users(postgre_messages, nlp):
     wason_conversation = WasonConversation(postgre_messages[0].room_id)
     for pm in postgre_messages:
+        print(pm.content)
         if pm.message_type in ['WASON_INITIAL', 'WASON_GAME', 'WASON_SUBMIT']:
             pm.content = pm.content.replace('false', 'False').replace('true', 'True')
         wason_conversation.raw_db_conversation.append({'message_type': pm.message_type,
