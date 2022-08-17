@@ -30,10 +30,10 @@ class WasonConversation:
 
     def preprocess_everything(self, tagger):
         for item in self.wason_messages:
-            content = item.content
+            content = item.content['message']
             for raw in self.raw_db_conversation:
                 if item.identifier == raw['message_id']:
-                    content = raw['content']
+                    content = raw['content']['message']
             doc = tagger(content)
             item.content_pos = [a.pos_ for a in doc]
             item.content_tokenised = self.tknzr.tokenize(content)
