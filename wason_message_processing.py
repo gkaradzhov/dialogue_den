@@ -396,7 +396,6 @@ def get_context_solutions_users(postgre_messages, nlp):
     for pm in postgre_messages:
         if pm.message_type in ['WASON_INITIAL', 'WASON_GAME', 'WASON_SUBMIT']:
             pm.content = pm.content.replace('false', 'False').replace('true', 'True')
-            pm.content = ast.literal_eval(pm.content)
         wason_conversation.raw_db_conversation.append({'message_type': pm.message_type,
                                      'content': ast.literal_eval(pm.content),
                                      'user_name': pm.origin,
