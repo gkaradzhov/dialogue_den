@@ -398,7 +398,7 @@ def get_context_solutions_users(postgre_messages, nlp):
             pm.content = pm.content.replace('false', 'False').replace('true', 'True')
             pm.content = ast.literal_eval(pm.content)
         wason_conversation.raw_db_conversation.append({'message_type': pm.message_type,
-                                     'content': pm.content,
+                                     'content': ast.literal_eval(pm.content),
                                      'user_name': pm.origin,
                                      'message_id': pm.unique_id,
                                     'user_status': pm.user_status})
