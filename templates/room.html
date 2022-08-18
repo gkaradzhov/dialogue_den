@@ -191,7 +191,7 @@
 <script type="text/javascript">
 $(function() {
 
-    var socket = io.connect('http://' + document.domain + ':' + location.port, { transports: ['websocket'] });
+    var socket = io.connect('http://' + document.domain + ':' + location.port);
     var room_id = $('input#chat_id').val();
     var timer = null;
     var room_status = $('#room_status').val();
