@@ -183,7 +183,7 @@
 
 </body>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.1/socket.io.js" integrity="sha512-9mpsATI0KClwt+xVZfbcf2lJ8IFBAwsubJ6mI3rtULwyM3fBmQFzj0It4tGqxLOGQwGfJdk/G+fANnxfq9/cew==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 
 <script type="text/javascript" src="/static/utils.js"></script>
@@ -192,7 +192,8 @@
 <script type="text/javascript">
 $(function() {
 
-    var socket = io.connect('http://' + document.domain + ':' + location.port, { transports: ['websocket'] });
+    var socket = io.connect('http://' + document.domain + ':' + location.port, {forceNew: true,
+   transports: ["polling"] });
     var room_id = $('input#chat_id').val();
     var timer = null;
     var room_status = $('#room_status').val();
