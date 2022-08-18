@@ -190,7 +190,8 @@
 <script type="text/javascript">
 $(function() {
 
-    var socket = io.connect('https://' + document.domain + ':' + location.port);
+    var socket = io.connect('https://' + document.domain + ':' + location.port, {autoConnect: true});
+
     var room_id = $('input#chat_id').val();
     var timer = null;
     var room_status = $('#room_status').val();
