@@ -397,6 +397,8 @@ def get_context_solutions_users(postgre_messages, nlp):
         if pm.message_type in ['WASON_INITIAL', 'WASON_GAME', 'WASON_SUBMIT']:
             pm.content = pm.content.replace('false', 'False').replace('true', 'True')
 
+        if pm.message_type in ['JOIN_ROOM', 'ROUTING_TIMER_ELAPSED']:
+            continue
         print(pm.message_type)
         print(pm.content)
         wason_conversation.raw_db_conversation.append({'message_type': pm.message_type,
