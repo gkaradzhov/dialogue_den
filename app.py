@@ -476,7 +476,7 @@ def handle_room_events(room_messages, room_id, last_message):
 
 
 @socketio.on('response')
-def handle_response(json, methods=('GET', 'POST')):
+def handle_response(json):
     print('received my event: ' + str(json))
     room_id = json['room']
     m = Message(origin_id=json['user_id'], origin_name=json['user_name'], message_type=json['type'], room_id=room_id,
