@@ -13,7 +13,7 @@ gunicorn==20.1.0
 gevent-websocket==0.10.1
 greenlet==1.1.2
 itsdangerous==2.1.2
-Jinja2==2.10.3
+Jinja2==3.1.2
 jmespath==0.9.4
 MarkupSafe==1.1.1
 monotonic==1.5
