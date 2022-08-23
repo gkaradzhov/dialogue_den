@@ -356,6 +356,7 @@ def compensation_page():
 
 @socketio.on('join')
 def on_join(data):
+    print("redirected to JOIN")
     room = data['room']
     join_room(room)
     send(data['user_name'] + ' has entered the room.', room=room)
@@ -478,7 +479,7 @@ def handle_room_events(room_messages, room_id, last_message):
 
 @socketio.on('response')
 def handle_response(json):
-    print('aaaaAAAAAAaaaaaaaaa=====================')
+    print('redirected to response')
     print('received my event: ' + str(json))
     room_id = json['room']
     m = Message(origin_id=json['user_id'], origin_name=json['user_name'], message_type=json['type'], room_id=room_id,
