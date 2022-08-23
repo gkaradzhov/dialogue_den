@@ -39,7 +39,7 @@ app.config.update(dict(
 ))
 
 talisman = Talisman(app, content_security_policy=None)
-socketio = flask_socketio.SocketIO(app, cors_allowed_origins='*', async_mode='eventlet', logger=True, engineio_logger=True)
+socketio = flask_socketio.SocketIO(app, cors_allowed_origins='*', logger=True, engineio_logger=True)
 
 nlp = spacy.load('en_core_web_sm')
 
