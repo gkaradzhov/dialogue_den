@@ -26,8 +26,6 @@ from sys_config import DIALOGUES_STABLE
 from utils import generate_user, MTurkManagement
 from time import sleep
 import random
-from engineio.async_drivers import gevent
-from engineio.async_drivers import gevent_uwsgi
 
 from wason_message_processing import get_context_solutions_users
 
@@ -41,7 +39,8 @@ app.config.update(dict(
 ))
 
 talisman = Talisman(app, content_security_policy=None)
-socketio = flask_socketio.SocketIO(app, cors_allowed_origins='*', async_mode='gevent_uwsgi', logger=True, engineio_logger=True)
+socketio = flask_socketio.SocketIO(app, cors_allowed_origins='*', async_mode='eventlet', logger=True, engineio_logger=True)
+
 
 nlp = spacy.load('en_core_web_sm')
 
