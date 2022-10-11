@@ -416,7 +416,7 @@ def get_context_solutions_users(postgre_messages, nlp):
     context = []
     cards = []
     users = []
-    tracker = []
+    tracker = [0]
     for m in wason_conversation.wason_messages:
 
         if m.origin != 'SYSTEM':
@@ -425,5 +425,7 @@ def get_context_solutions_users(postgre_messages, nlp):
         if 'sol_tracker' in m.annotation and m.annotation['sol_tracker'] is not None:
             cards.extend(list(m.annotation['sol_tracker']))
             tracker.append(m.annotation['performance_change'])
+        else:
+            tracker.append(tracker[-1])
 
     return context, cards, users, tracker
