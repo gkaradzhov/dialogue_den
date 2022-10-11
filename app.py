@@ -287,7 +287,7 @@ def chatroom():
                                                    "start_time": campaign['start_time']})
 
 
-@app.route('/room')
+@app.route('/delibot')
 @talisman(
 
     frame_options='ALLOW-FROM',
