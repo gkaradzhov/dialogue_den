@@ -287,6 +287,85 @@ def chatroom():
                                                    "start_time": campaign['start_time']})
 
 
+@app.route('/room')
+@talisman(
+
+    frame_options='ALLOW-FROM',
+    frame_options_allow_from='https://mturk.com',
+)
+def delibot():
+    sl = random.randint(0, 2) + random.random()
+    sleep(sl)
+    room_id = request.args.get('room_id')
+    mturk_info_id = request.args.get('mturk_info', None)
+
+    has_user = PG.check_for_user(mturk_info_id=mturk_info_id)
+    print("Has user chat room", str(has_user))
+    if has_user:
+        return render_template('unsuccessful_onboarding.html')
+
+    is_moderator = request.args.get('moderator', False)
+
+    room = PG.get_single_room(room_id)
+    running_dialogue = PG.get_messages(room.room_id)
+    messages = [d for d in running_dialogue if d.message_type == CHAT_MESSAGE]
+
+    logged_users = set()
+    for item in running_dialogue:
+        if item.message_type == JOIN_ROOM:
+            logged_users.add((item.origin, item.origin_id))
+        elif item.message_type == LEAVE_ROOM and (item.origin, item.origin_id) in logged_users:
+            logged_users.remove((item.origin, item.origin_id))
+
+    user_type = 'participant'
+    if is_moderator == "True":
+        user_type = 'moderator'
+
+    campaign = PG.get_campaign(room.campaign)
+
+    if len(logged_users) == 0:
+        random_float = random.random()
+        if random_float < campaign['user_moderator_chance']:
+            user_type = 'human_delibot'
+
+    current_user = generate_user([d[0] for d in logged_users], user_type)
+
+    if is_moderator:
+        status = USR_MODERATING
+    else:
+        status = USR_ONBOARDING
+    m = Message(origin_name=current_user['user_name'], message_type=JOIN_ROOM, room_id=room_id,
+                origin_id=current_user['user_id'], user_status=status, user_type=user_type)
+    create_broadcast_message(m)
+
+    formated_return_url = None
+    if mturk_info_id:
+        PG.update_mturk_user_id(mturk_info_id, current_user['user_id'])
+        mturk_info = PG.get_mturk_info(mturk_info_id)
+        if mturk_info:
+            formated_return_url = '{}/mturk/externalSubmit?assignmentId={}&user_id={}'.format(mturk_info[1],
+                                                                                              mturk_info[0],
+                                                                                              current_user['user_id'])
+
+
+    wason_initial = [d.content for d in running_dialogue if d.message_type == WASON_INITIAL][0]
+
+    handle_routing(running_dialogue, logged_users, campaign['start_threshold'], campaign['start_time'],
+                   campaign['close_threshold'], room.room_id)
+
+    # Have to get the room again, in case the status changed
+    room = PG.get_single_room(room_id)
+
+    return render_template("delibot.html", room_data={'id': room_id, 'name': room.name, 'game': json.loads(wason_initial),
+                                                   'messages': messages, 'existing_users': logged_users,
+                                                   'current_user': current_user['user_name'],
+                                                   'current_user_id': current_user['user_id'],
+                                                   'current_user_type': user_type,
+                                                   'current_user_status': status, 'room_status': room.status,
+                                                   'mturk_return_url': formated_return_url,
+                                                   # 'mturk_return_url': 'test_post',
+                                                   "start_time": campaign['start_time']})
+
 @socketio.on('delibot')
 def delibot(json):
     room_id = json.get('room_id', None)
@@ -294,7 +373,7 @@ def delibot(json):
 
     messages = PG.get_messages(room_id)
 
-    context, solution, users = get_context_solutions_users(messages, nlp)
+    context, solution, users, tracker = get_context_solutions_users(messages, nlp)
     normalised_delitype = delitype.split('_')[1]
     print(normalised_delitype)
     url = 'http://delibot.cl.cam.ac.uk/delibot'
@@ -491,6 +570,40 @@ def handle_response(json):
     handle_room_events(all_messages, room_id, m)
 
     validate_finish_game(all_messages, room_id)
+
+@socketio.on('deliresponse')
+def handle_response(json):
+    print('redirected to response')
+    print('received my event: ' + str(json))
+    room_id = json['room']
+    m = Message(origin_id=json['user_id'], origin_name=json['user_name'], message_type=json['type'], room_id=room_id,
+                content=json['message'], user_status=json['user_status'], user_type=json.get('user_type', None))
+
+    create_broadcast_message(m)
+    all_messages = PG.get_messages(room_id)
+
+    handle_room_events(all_messages, room_id, m)
+
+    validate_finish_game(all_messages, room_id)
+
+    context, solution, users, tracker = get_context_solutions_users(all_messages, nlp)
+
+    print("Tracker: ", str(tracker))
+    if 'delibot' not in set(users[-5:]) and len(set(tracker[-5:])) == 1:
+        url = 'http://delibot.cl.cam.ac.uk/delibot2'
+        myobj = {
+                 "context": context[-2:],
+                 "cards": solution,
+                 "users": users,
+                 "skip": context}
+
+        print(myobj)
+        x = requests.post(url, json=myobj)
+        print(x.text)
+
+        m = Message(origin_id=990, origin_name='DEliBot', message_type='CHAT_MESSAGE', room_id=room_id,
+                    content={'message': x.text}, user_status=USR_PLAYING, user_type='DELIBOT_SIMILARITY')
+        create_broadcast_message(m)
 
 
 def validate_finish_game(all_messages, room_id):

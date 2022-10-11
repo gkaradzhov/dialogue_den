@@ -43,7 +43,30 @@
     <div class="col-6">
         <div class="task">
             <h3>Task Description:</h3>
+                {% if room_data.current_user_type == 'human_delibot'%}
+                    <div id="detailed_instructions">
+                        <ol>
+                            <li>Read the instructions carefully.</li>
+                            <li>You have been picked at random to work as a moderator in this discussion.
+                            </li>
+                            <li>The rest of the group will complete a card selection task, where they have to choose from the presented cards below. First, they will complete the task by themselves, and after that a chatbox will appear on the right of the screen, where all of you should engage in discussion of what the correct answer is.</li>
+                            <li>During the discussion please ask questions to encourage the other participants to explain the reasoning behind their proposed solutions. You can also ask them what they think the solution is, and ask questions about how the discussion is going.
+</li>
+                            <li>You are not required to complete the task - your main goal is to facilitate the discussion and help the decision making processes.
+</li>
+                            <li>Finally, we ask you to mark each message before sending it according to its focal point. You can do this using the dropdown on the left of your message box. Possible ways to mark a message are:
 
+                                <ol>
+                                    <li><b>Reasoning</b>:  Question about the reasons behind a certain solution (e.g. “Why do you think the answer is X?” or “What does that mean?”</li>
+                                    <li><b>Solution without reasoning</b>: Question about solutions, that does not involve any questioning about <i>why</i> a specific solution is selected (e.g.”Are we going for this answer then?”)</li>
+                                    <li><b>Moderation</b>: Question about the discussion (e.g. “What does person A think?”, “Should we vote on it?”)</li>
+                                    <li><b>None</b>: If you send a message  that does not belong to  of any of the previous categories.</li>
+                                </ol>
+
+                            </li>
+                        </ol>
+                    </div>
+                {% else %}
                     <div id="detailed_instructions">
                         <ol>
                             <li>Read the instructions carefully. Finish the task by yourself by selecting the appropriate cards and pressing the "Submit Initial" button. Wait for the rest of the participants to complete the task (this may take a few minutes, but typically less than 3).</li>
@@ -56,6 +79,16 @@
                             <li>Do not refresh the page at any time. Do not press the "Final Decision and Submit HIT" button unless you are done.</li>
                         </ol>
                     </div>
+            {% endif %}
+
+            {% if room_data.current_user_type == 'human_delibot'%}
+                {% set human_delibot_hide='hidden' %}
+                {% set human_delibot_disable='disabled' %}
+
+            {% else %}
+                {% set human_delibot_hide='' %}
+                {% set human_delibot_disable='' %}
+            {% endif %}
 
             <div class="task_description {{human_delibot_hide}}">
                 <h3>Task:</h3>
@@ -71,9 +104,9 @@
                 <div class='card_container'>
                     <div class='card'>{{card['value']}}</div>
                     {% if card['checked'] %}
-                    <input type="checkbox" checked id='{{card["value"]}}' value={{card["value"]}}>
+                    <input type="checkbox" {{human_delibot_disable}} checked id='{{card["value"]}}' value={{card["value"]}}>
                     {% else %}
-                    <input type="checkbox" id='{{card["value"]}}' value={{card["value"]}}>
+                    <input type="checkbox" {{human_delibot_disable}} id='{{card["value"]}}' value={{card["value"]}}>
                     {% endif %}
                 </div>
                 {% endfor %}
@@ -90,6 +123,10 @@
                 <b> <i>(you)</i> {{room_data.current_user}}</b>
                 <button id="leave_room" class="btn btn-danger btn-sm float-right pull-right">Leave room</button>
             </div>
+            <button id="deli_Moderation" class="btn btn-info btn-sm float-right pull-right DELIBOT">Deli Moderation</button>
+            <button id="deli_Reasoning" class="btn btn-info btn-sm float-right pull-right DELIBOT">Deli Reasoning</button>
+            <button id="deli_Solution" class="btn btn-info btn-sm float-right pull-right DELIBOT">Deli Solution</button>
+
             {% for item in room_data.existing_users %}
             <div class="logged_user" id="{{item[1]}}">
                 <b>{{item[0]}}</b>
@@ -123,8 +160,17 @@
             {%endfor%}
         </div>
         <form id="chat_form" class="sumbission" action="" method="POST">
+            {% if room_data.current_user_type == 'human_delibot'%}
+            <select name="delibot_annotation" id="delibot_annotation">
+                <option disabled selected value="def"> -- select an option -- </option>
+              <option value="reasoning">Reasoning</option>
+              <option value="solution">Solution (w/o reasons)</option>
+              <option value="moderation">Moderation</option>
+              <option value="none">None</option>
+            </select>
+            {%else%}
             <input type="hidden" id="delibot_annotation" value="no_annotation"/>
-
+            {%endif%}
             <input type="text" id="message" placeholder="Type a message"/>
             <input id="msg_submit" class="btn btn-primary" type="submit"/>
             <div class="note">TIP: Please revise your solution every time your change your mind (use the "Revise Solution" button).</div>
@@ -137,16 +183,16 @@
 
 </body>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-
+<link href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" rel="Stylesheet">
+<script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js" ></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.0/socket.io.js" integrity="sha512-/xb5+PNOA079FJkngKI2jvID5lyiqdHXaUUcfmzE0X0BdpkgzIWHC59LOG90a2jDcOyRsd1luOr24UCCAG8NNw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script type="text/javascript" src="/static/utils.js"></script>
 <script type="text/javascript" src="/static/notify.min.js"></script>
 
 <script type="text/javascript">
 $(function() {
+    var socket = io.connect('https://' + document.domain, {autoConnect: true,  transports: ["websocket", "polling"], upgrade: true});
 
-    var socket = io.connect('http://' + document.domain + ':' + location.port, { transports: ['websocket'] });
     var room_id = $('input#chat_id').val();
     var timer = null;
     var room_status = $('#room_status').val();
@@ -158,13 +204,13 @@ $(function() {
 
     if (current_user_type == 'human_delibot'){
         $('#message').prop('disabled', true);
-        $('#msg_submit').prop('disabled', true)
+        $('#msg_submit').prop('disabled', true);
     }
 
     if (room_status == ROUTING_TIMER_STARTED || room_status == READY_TO_START){
         $.notify("The group phase of the game will start soon! Please submit your card selection. Once everyone does so, the game will start! (click to close)",  {autoHide: false, className: 'info'});
         activityWatcher(wakeup, kick);
-        sound.play()
+        sound.play();
 
         if (room_status == ROUTING_TIMER_STARTED){
                 var user_status = $('input#user_status').val();
@@ -199,7 +245,7 @@ $(function() {
         {'label': "@all",'id':'1'},
     ];
     {% for user in room_data.existing_users%}
-        logged_users.push({'label': "@" + "{{user[0]}}", 'id': "{{user[1]}}"})
+        logged_users.push({'label': "@" + "{{user[0]}}", 'id': "{{user[1]}}"});
     {%endfor%}
 
 
@@ -316,7 +362,7 @@ $(function() {
         var annotation = $('#delibot_annotation').val();
 
         if (message!=""){
-            socket.emit( 'response', {
+            socket.emit( 'deliresponse', {
                 user_id: global_user_id,
                 user_name: user_name,
                 type: CHAT_MESSAGE,
@@ -380,6 +426,12 @@ $(function() {
         $('#btn-agree').prop('disabled', true);
 
     });
+
+    $('.DELIBOT').on('click', function(e){
+        id_type = e.target.id
+        socket.emit('delibot', { room_id: room_id, delitype: id_type});
+    });
+
     socket.on('response', function(message_str) {
         msg =  JSON.parse(message_str);
         console.log(msg);
