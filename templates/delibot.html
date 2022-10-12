@@ -182,7 +182,7 @@
 <script type="text/javascript">
 $(function() {
     var socket = null;
-    var socket = io.connect('https://' + document.domain, {autoConnect: true,  transports: ["polling"], upgrade: false, 'forceNew': true, 'sync disconnect on unload' : true});
+    var socket = io.connect('https://' + document.domain, {autoConnect: true,  transports: ["polling"], upgrade: true, 'forceNew': true, 'sync disconnect on unload' : true});
 
     var room_id = $('input#chat_id').val();
     var timer = null;
@@ -293,7 +293,7 @@ $(function() {
       });
 
       socket.on("connect_error", function(err){
-          console.log('connect_error due to ${err.message}');
+          console.log('connect_error due to ' +  err);
         });
 
       socket.on('response', function(message_str) {
