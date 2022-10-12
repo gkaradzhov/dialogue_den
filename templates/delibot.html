@@ -191,7 +191,6 @@
 
 <script type="text/javascript">
 $(function() {
-    socket.off();
     var socket = null;
     var socket = io.connect('https://' + document.domain, {autoConnect: true,  transports: ["websocket", "polling"], upgrade: true, 'forceNew': true});
 
