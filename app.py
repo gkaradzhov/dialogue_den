@@ -591,7 +591,7 @@ def handle_response(json):
     print("Tracker: ", str(tracker))
     print("Users: ", str(users))
 
-    if 'delibot' not in set(users[-5:]) and len(set(tracker[-5:])) == 1 and len(tracker) >= 5:
+    if 'delibot' not in set(users[-3:]) and len(tracker) >= 4:
         url = 'http://delibot.cl.cam.ac.uk/delibot2'
         myobj = {
                  "context": context[-2:],
