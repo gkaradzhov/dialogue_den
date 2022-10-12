@@ -330,18 +330,13 @@ $(function() {
             var user_status = $('input#user_status').val();
             socket.emit('join', { 'room': room_id, 'user_name': user_name, 'user_status': user_status, user_type: current_user_type});
             resolve(socket.id); // x8WIv7-mJelg7on_ALbx
-
+        });
         socket.on('disconnect', function () {
             console.log("LOG: just disconnected: " + socket.id)
             reject(socket.id); // undefined
 
         });
-
-
     });
-
-
-
 
 
 
