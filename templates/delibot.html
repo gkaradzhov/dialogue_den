@@ -291,6 +291,16 @@ $(function() {
         console.log('connecting');
         var user_status = $('input#user_status').val();
         socket.emit('join', { 'room': room_id, 'user_name': user_name, 'user_status': user_status, user_type: current_user_type});
+          socket.on('disconnect', function () {
+        console.log("LOG: just disconnected: " + socket.id)
+      })
+
+      // use the ack function argument to send a response back
+      socket.on('isConnected', function(id, ackFn) {
+          let otherSocket = io.sockets.connected[id];
+          ackFn(!!otherSocket && otherSocket.connected);
+      });
+
     });
 
     $('#leave_room').on('click', function(e){
