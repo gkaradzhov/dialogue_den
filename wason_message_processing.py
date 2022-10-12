@@ -422,10 +422,12 @@ def get_context_solutions_users(postgre_messages, nlp):
         if m.origin != 'SYSTEM':
             users.append(m.origin.lower())
             context.append(m.clean_text)
+            if 'sol_tracker' in m.annotation and m.annotation['sol_tracker'] is not None:
+                tracker.append(m.annotation['performance_change'])
+            else:
+                tracker.append(tracker[-1])
+
         if 'sol_tracker' in m.annotation and m.annotation['sol_tracker'] is not None:
             cards.extend(list(m.annotation['sol_tracker']))
-            tracker.append(m.annotation['performance_change'])
-        else:
-            tracker.append(tracker[-1])
 
     return context, cards, users, tracker
