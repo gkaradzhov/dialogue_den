@@ -191,7 +191,7 @@
 
 <script type="text/javascript">
 $(function() {
-    var socket = io.connect('https://' + document.domain, {autoConnect: true,  transports: ["websocket", "polling"], upgrade: true});
+    var socket = io.connect('https://' + document.domain, {autoConnect: true,  transports: ["websocket", "polling"], upgrade: true}, reconnectionDelay:50);
 
     var room_id = $('input#chat_id').val();
     var timer = null;
@@ -248,6 +248,10 @@ $(function() {
         logged_users.push({'label': "@" + "{{user[0]}}", 'id': "{{user[1]}}"});
     {%endfor%}
 
+    socket.on("connect_error", (err) => {
+        socket.connect();
+    });
+
 
 
     var autocomplete_options = {
@@ -301,7 +305,150 @@ $(function() {
           ackFn(!!otherSocket && otherSocket.connected);
       });
 
-      socket.on('response', function(message_str) {
+    });
+
+
+    $('#leave_room').on('click', function(e){
+        if (confirm('Are you sure you want to leave? Leaving the room will exclude you from participation.')) {
+            var user_status = $('input#user_status').val();
+            socket.emit('leave', { user_name: user_name, room: room_id, user_id:global_user_id, user_status: user_status, user_type: current_user_type});
+            window.location.href = "/";
+        }
+    });
+
+   $('#final_submit').on('click', function(e){
+        if (confirm("Are you sure you want to Submit HIT? Press the button ONLY after you've submitted the solo solution, participated in the chat and submitted your final solution.")) {
+
+            var mturk_url = $('#mturk_url').val();
+            var selection = get_card_selection();
+            var room_status = $('input#room_status').val();
+            var user_status = $('input#user_status').val();
+
+            socket.emit('response', {
+                user_id: global_user_id,
+                user_name: user_name,
+                type: WASON_AGREE,
+                message: selection,
+                room: room_id,
+                user_type: current_user_type,
+                user_status: user_status
+            });
+
+            if (mturk_url != ''){
+                $('#mturk').submit();
+            }
+        }
+    });
+
+    $('#group_start').on('click', function(e){
+      $('#group_start').prop('disabled', true);
+      socket.emit('response', { user_name: 'SYSTEM_MODERATOR', room: room_id, user_id: -1, user_status: USR_MODERATING, type: "MODERATION", message: "GROUP_PHASE_STARTED", user_type: current_user_type});
+    });
+
+    $('#group_ended').on('click', function(e){
+      $('#group_ended').prop('disabled', true);
+      socket.emit('response', { user_name: 'SYSTEM_MODERATOR', room: room_id, user_id: -1, user_status: USR_MODERATING, type: "MODERATION", message: "GROUP_PHASE_ENDED", user_type: current_user_type});
+    });
+
+    $('.kick').on('click', function(e){
+        e.preventDefault();
+        if (confirm('Are you sure you want kick this user?.')) {
+
+            kick_user_id = $(this).val();
+            kick_user_name = $(this).attr('name');
+            kick_generic(kick_user_id, kick_user_name, room_id, true);
+        }
+    });
+
+    var user_status = $('input#user_status').val();
+
+    if (user_status == USR_MODERATING){
+        $('#chat_container').removeClass('hidden');
+    }
+
+    $('#delibot_annotation').change(function(){
+        $('#message').prop('disabled', false);
+        $('#msg_submit').prop('disabled', false)
+    });
+
+    $('form#chat_form').on('submit', function(e) {
+        var user_status = $('input#user_status').val();
+        e.preventDefault();
+        var message = $('input#message').val();
+        var annotation = $('#delibot_annotation').val();
+
+        if (message!=""){
+            socket.emit( 'deliresponse', {
+                user_id: global_user_id,
+                user_name: user_name,
+                type: CHAT_MESSAGE,
+                message: {'message': message, 'annotation': annotation},
+                room: room_id,
+                user_type: current_user_type,
+                user_status: user_status
+          });
+        }
+
+        if (current_user_type == 'human_delibot'){
+
+            $('#message').prop('disabled', true);
+            $('#msg_submit').prop('disabled', true)
+            $('#delibot_annotation').val('def');
+        }
+
+        $('input#message').val('').focus();
+
+     });
+
+
+    var card_click = $('input:checkbox').on('change', function(e){
+        var selection = get_card_selection();
+        var user_status = $('input#user_status').val();
+        socket.emit( 'response', {
+            user_id: global_user_id,
+            user_name: user_name,
+            type: WASON_GAME,
+            message: selection,
+            user_status: user_status,
+            room: room_id,
+            user_type: current_user_type
+        });
+
+        $('#btn-agree').prop('disabled', false);
+    });
+
+
+    var agree_clicked = $('#btn-agree').on('click', function(e){
+
+        $('#btn-agree').text('Revise Solution')
+
+        var selection = get_card_selection();
+        room_status = $('input#room_status').val();
+        var user_status = $('input#user_status').val();
+
+        socket.emit('response', {
+            user_id: global_user_id,
+            user_name: user_name,
+            type: WASON_AGREE,
+            message: selection,
+            room: room_id,
+            user_type: current_user_type,
+            user_status: user_status
+        });
+
+        if (user_status == USR_ONBOARDING){
+            $.notify("Thank you for submitting your solution. The game will start soon! Please wait for the other participants to submit their solo selections. (click to close)", {autoHide: false, className: 'info'});
+        }
+        $('#btn-agree').prop('disabled', true);
+
+    });
+
+    $('.DELIBOT').on('click', function(e){
+        id_type = e.target.id
+        socket.emit('delibot', { room_id: room_id, delitype: id_type});
+    });
+
+    socket.on('response', function(message_str) {
         msg =  JSON.parse(message_str);
         console.log(msg);
         switch(msg.type) {
@@ -457,151 +604,6 @@ $(function() {
             // code block
         }
     });
-
-    });
-
-
-    $('#leave_room').on('click', function(e){
-        if (confirm('Are you sure you want to leave? Leaving the room will exclude you from participation.')) {
-            var user_status = $('input#user_status').val();
-            socket.emit('leave', { user_name: user_name, room: room_id, user_id:global_user_id, user_status: user_status, user_type: current_user_type});
-            window.location.href = "/";
-        }
-    });
-
-   $('#final_submit').on('click', function(e){
-        if (confirm("Are you sure you want to Submit HIT? Press the button ONLY after you've submitted the solo solution, participated in the chat and submitted your final solution.")) {
-
-            var mturk_url = $('#mturk_url').val();
-            var selection = get_card_selection();
-            var room_status = $('input#room_status').val();
-            var user_status = $('input#user_status').val();
-
-            socket.emit('response', {
-                user_id: global_user_id,
-                user_name: user_name,
-                type: WASON_AGREE,
-                message: selection,
-                room: room_id,
-                user_type: current_user_type,
-                user_status: user_status
-            });
-
-            if (mturk_url != ''){
-                $('#mturk').submit();
-            }
-        }
-    });
-
-    $('#group_start').on('click', function(e){
-      $('#group_start').prop('disabled', true);
-      socket.emit('response', { user_name: 'SYSTEM_MODERATOR', room: room_id, user_id: -1, user_status: USR_MODERATING, type: "MODERATION", message: "GROUP_PHASE_STARTED", user_type: current_user_type});
-    });
-
-    $('#group_ended').on('click', function(e){
-      $('#group_ended').prop('disabled', true);
-      socket.emit('response', { user_name: 'SYSTEM_MODERATOR', room: room_id, user_id: -1, user_status: USR_MODERATING, type: "MODERATION", message: "GROUP_PHASE_ENDED", user_type: current_user_type});
-    });
-
-    $('.kick').on('click', function(e){
-        e.preventDefault();
-        if (confirm('Are you sure you want kick this user?.')) {
-
-            kick_user_id = $(this).val();
-            kick_user_name = $(this).attr('name');
-            kick_generic(kick_user_id, kick_user_name, room_id, true);
-        }
-    });
-
-    var user_status = $('input#user_status').val();
-
-    if (user_status == USR_MODERATING){
-        $('#chat_container').removeClass('hidden');
-    }
-
-    $('#delibot_annotation').change(function(){
-        $('#message').prop('disabled', false);
-        $('#msg_submit').prop('disabled', false)
-    });
-
-    $('form#chat_form').on('submit', function(e) {
-        var user_status = $('input#user_status').val();
-        e.preventDefault();
-        var message = $('input#message').val();
-        var annotation = $('#delibot_annotation').val();
-
-        if (message!=""){
-            socket.emit( 'deliresponse', {
-                user_id: global_user_id,
-                user_name: user_name,
-                type: CHAT_MESSAGE,
-                message: {'message': message, 'annotation': annotation},
-                room: room_id,
-                user_type: current_user_type,
-                user_status: user_status
-          });
-        }
-
-        if (current_user_type == 'human_delibot'){
-
-            $('#message').prop('disabled', true);
-            $('#msg_submit').prop('disabled', true)
-            $('#delibot_annotation').val('def');
-        }
-
-        $('input#message').val('').focus();
-
-     });
-
-
-    var card_click = $('input:checkbox').on('change', function(e){
-        var selection = get_card_selection();
-        var user_status = $('input#user_status').val();
-        socket.emit( 'response', {
-            user_id: global_user_id,
-            user_name: user_name,
-            type: WASON_GAME,
-            message: selection,
-            user_status: user_status,
-            room: room_id,
-            user_type: current_user_type
-        });
-
-        $('#btn-agree').prop('disabled', false);
-    });
-
-
-    var agree_clicked = $('#btn-agree').on('click', function(e){
-
-        $('#btn-agree').text('Revise Solution')
-
-        var selection = get_card_selection();
-        room_status = $('input#room_status').val();
-        var user_status = $('input#user_status').val();
-
-        socket.emit('response', {
-            user_id: global_user_id,
-            user_name: user_name,
-            type: WASON_AGREE,
-            message: selection,
-            room: room_id,
-            user_type: current_user_type,
-            user_status: user_status
-        });
-
-        if (user_status == USR_ONBOARDING){
-            $.notify("Thank you for submitting your solution. The game will start soon! Please wait for the other participants to submit their solo selections. (click to close)", {autoHide: false, className: 'info'});
-        }
-        $('#btn-agree').prop('disabled', true);
-
-    });
-
-    $('.DELIBOT').on('click', function(e){
-        id_type = e.target.id
-        socket.emit('delibot', { room_id: room_id, delitype: id_type});
-    });
-
-
 
     $("#message").bind("keydown", function( event ) {
         if (event.keyCode === $.ui.keyCode.TAB &&
