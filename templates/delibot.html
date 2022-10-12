@@ -113,7 +113,7 @@
             </div>
             <div class="game_buttons {{human_delibot_hide}}">
                 <button type="button" id="btn-agree" class="btn btn-success btn-lg">Submit Initial</button>
-                <button type="button" id="final_submit" class="btn btn-success btn-lg">Final Decision and Submit HIT</button>
+                <button type="button" id="final_submit" class="btn btn-success btn-lg">Final Decision</button>
             </div>
         </div>
         <hr/>
@@ -123,9 +123,9 @@
                 <b> <i>(you)</i> {{room_data.current_user}}</b>
                 <button id="leave_room" class="btn btn-danger btn-sm float-right pull-right">Leave room</button>
             </div>
-            <button id="deli_Moderation" class="btn btn-info btn-sm float-right pull-right DELIBOT">Deli Moderation</button>
-            <button id="deli_Reasoning" class="btn btn-info btn-sm float-right pull-right DELIBOT">Deli Reasoning</button>
-            <button id="deli_Solution" class="btn btn-info btn-sm float-right pull-right DELIBOT">Deli Solution</button>
+<!--            <button id="deli_Moderation" class="btn btn-info btn-sm float-right pull-right DELIBOT">Deli Moderation</button>-->
+<!--            <button id="deli_Reasoning" class="btn btn-info btn-sm float-right pull-right DELIBOT">Deli Reasoning</button>-->
+<!--            <button id="deli_Solution" class="btn btn-info btn-sm float-right pull-right DELIBOT">Deli Solution</button>-->
 
             {% for item in room_data.existing_users %}
             <div class="logged_user" id="{{item[1]}}">
@@ -160,17 +160,7 @@
             {%endfor%}
         </div>
         <form id="chat_form" class="sumbission" action="" method="POST">
-            {% if room_data.current_user_type == 'human_delibot'%}
-            <select name="delibot_annotation" id="delibot_annotation">
-                <option disabled selected value="def"> -- select an option -- </option>
-              <option value="reasoning">Reasoning</option>
-              <option value="solution">Solution (w/o reasons)</option>
-              <option value="moderation">Moderation</option>
-              <option value="none">None</option>
-            </select>
-            {%else%}
             <input type="hidden" id="delibot_annotation" value="no_annotation"/>
-            {%endif%}
             <input type="text" id="message" placeholder="Type a message"/>
             <input id="msg_submit" class="btn btn-primary" type="submit"/>
             <div class="note">TIP: Please revise your solution every time your change your mind (use the "Revise Solution" button).</div>
