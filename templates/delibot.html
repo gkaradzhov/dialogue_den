@@ -295,7 +295,7 @@ $(function() {
       socket.on("connect_error", function(err){
           console.log('connect_error due to ' +  err);
         });
-
+      socket.removeListener('response');
       socket.on('response', function(message_str) {
         msg =  JSON.parse(message_str);
         console.log(msg);
