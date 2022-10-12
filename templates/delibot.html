@@ -28,7 +28,7 @@
 <input id="mturk_url" type="hidden" value="{{room_data.mturk_return_url}}">
 
 <div class="timer_holder">
-    <div id="game_start_timer" class="hidden">The game will start soon, approximately in:</div>
+    <div id="game_start_timer" class="hidden">The game will start soon, approximately in: </div>
     <div id="game_play_timer" class="hidden">Please complete the task in:</div>
     <div id="timer"></div>
 </div>
@@ -43,85 +43,58 @@
     <div class="col-6">
         <div class="task">
             <h3>Task Description:</h3>
-            {% if room_data.current_user_type == 'human_delibot'%}
-            <div id="detailed_instructions">
-                <ol>
-                    <li>Read the instructions carefully.</li>
-                    <li>You have been picked at random to work as a moderator in this discussion.
-                    </li>
-                    <li>The rest of the group will complete a card selection task, where they have to choose from the
-                        presented cards below. First, they will complete the task by themselves, and after that a
-                        chatbox will appear on the right of the screen, where all of you should engage in discussion of
-                        what the correct answer is.
-                    </li>
-                    <li>During the discussion please ask questions to encourage the other participants to explain the
-                        reasoning behind their proposed solutions. You can also ask them what they think the solution
-                        is, and ask questions about how the discussion is going.
-                    </li>
-                    <li>You are not required to complete the task - your main goal is to facilitate the discussion and
-                        help the decision making processes.
-                    </li>
-                    <li>Finally, we ask you to mark each message before sending it according to its focal point. You can
-                        do this using the dropdown on the left of your message box. Possible ways to mark a message are:
-
+                {% if room_data.current_user_type == 'human_delibot'%}
+                    <div id="detailed_instructions">
                         <ol>
-                            <li><b>Reasoning</b>: Question about the reasons behind a certain solution (e.g. “Why do you
-                                think the answer is X?” or “What does that mean?”
+                            <li>Read the instructions carefully.</li>
+                            <li>You have been picked at random to work as a moderator in this discussion.
                             </li>
-                            <li><b>Solution without reasoning</b>: Question about solutions, that does not involve any
-                                questioning about <i>why</i> a specific solution is selected (e.g.”Are we going for this
-                                answer then?”)
-                            </li>
-                            <li><b>Moderation</b>: Question about the discussion (e.g. “What does person A think?”,
-                                “Should we vote on it?”)
-                            </li>
-                            <li><b>None</b>: If you send a message that does not belong to of any of the previous
-                                categories.
+                            <li>The rest of the group will complete a card selection task, where they have to choose from the presented cards below. First, they will complete the task by themselves, and after that a chatbox will appear on the right of the screen, where all of you should engage in discussion of what the correct answer is.</li>
+                            <li>During the discussion please ask questions to encourage the other participants to explain the reasoning behind their proposed solutions. You can also ask them what they think the solution is, and ask questions about how the discussion is going.
+</li>
+                            <li>You are not required to complete the task - your main goal is to facilitate the discussion and help the decision making processes.
+</li>
+                            <li>Finally, we ask you to mark each message before sending it according to its focal point. You can do this using the dropdown on the left of your message box. Possible ways to mark a message are:
+
+                                <ol>
+                                    <li><b>Reasoning</b>:  Question about the reasons behind a certain solution (e.g. “Why do you think the answer is X?” or “What does that mean?”</li>
+                                    <li><b>Solution without reasoning</b>: Question about solutions, that does not involve any questioning about <i>why</i> a specific solution is selected (e.g.”Are we going for this answer then?”)</li>
+                                    <li><b>Moderation</b>: Question about the discussion (e.g. “What does person A think?”, “Should we vote on it?”)</li>
+                                    <li><b>None</b>: If you send a message  that does not belong to  of any of the previous categories.</li>
+                                </ol>
+
                             </li>
                         </ol>
-
-                    </li>
-                </ol>
-            </div>
-            {% else %}
-            <div id="detailed_instructions">
-                <ol>
-                    <li>Read the instructions carefully. Finish the task by yourself by selecting the appropriate cards
-                        and pressing the "Submit Initial" button. Wait for the rest of the participants to complete the
-                        task (this may take a few minutes, but typically less than 3).
-                    </li>
-                    <li>Participate in a group discussion (via the chat), collaborate with the other participants and
-                        try to find the best solution together. Give your best effort in solving the task, discussing
-                        your arguments and solutions with the group.
-                        In the past, groups that collaborate well typically are better in solving the task.
-                    </li>
-                    <li>Every time you change your mind about the solution, please update it by selecting the new cards
-                        and pressing the "Revise Solution" button.
-                    </li>
-                    <li>You can submit the same answer, if you believe it's the correct one.</li>
-                    <li>You are expected to participate actively in the conversation for at least 5 minutes.</li>
-                    <!--                            <li>Press the Complete HIT button.</li>-->
-                    <li>Do not refresh the page at any time. Do not press the "Final Decision and Submit HIT" button
-                        unless you are done.
-                    </li>
-                </ol>
-            </div>
+                    </div>
+                {% else %}
+                    <div id="detailed_instructions">
+                        <ol>
+                            <li>Read the instructions carefully. Finish the task by yourself by selecting the appropriate cards and pressing the "Submit Initial" button. Wait for the rest of the participants to complete the task (this may take a few minutes, but typically less than 3).</li>
+                            <li>Participate in a group discussion (via the chat), collaborate with the other participants and try to find the best solution together. Give your best effort in solving the task, discussing your arguments and solutions with the group.
+                                In the past, groups that collaborate well typically are better in solving the task.</li>
+                            <li>Every time you change your mind about the solution, please update it by selecting the new cards and pressing the "Revise Solution" button.</li>
+                            <li>You can submit the same answer, if you believe it's the correct one.</li>
+                            <li>You are expected to participate actively in the conversation for at least 5 minutes.</li>
+<!--                            <li>Press the Complete HIT button.</li>-->
+                            <li>Do not refresh the page at any time. Do not press the "Final Decision and Submit HIT" button unless you are done.</li>
+                        </ol>
+                    </div>
             {% endif %}
 
             {% if room_data.current_user_type == 'human_delibot'%}
-            {% set human_delibot_hide='hidden' %}
-            {% set human_delibot_disable='disabled' %}
+                {% set human_delibot_hide='hidden' %}
+                {% set human_delibot_disable='disabled' %}
 
             {% else %}
-            {% set human_delibot_hide='' %}
-            {% set human_delibot_disable='' %}
+                {% set human_delibot_hide='' %}
+                {% set human_delibot_disable='' %}
             {% endif %}
 
             <div class="task_description {{human_delibot_hide}}">
                 <h3>Task:</h3>
                 Each of the <b>4 cards below</b> has a letter on one side and a number on the other.
                 <b>Which card(s) do you need to turn to test the rule: <br/>
-                    All cards with vowels on one side have an even number on the other.</b> <br/>
+                All cards with vowels on one side have an even number on the other.</b> <br/>
                 NB: Select <b>ONLY</b> the card(s) required to verify the rule. Most people get this task wrong.
             </div>
 
@@ -131,8 +104,7 @@
                 <div class='card_container'>
                     <div class='card'>{{card['value']}}</div>
                     {% if card['checked'] %}
-                    <input type="checkbox" {{human_delibot_disable}} checked id='{{card["value"]}}'
-                           value={{card["value"]}}>
+                    <input type="checkbox" {{human_delibot_disable}} checked id='{{card["value"]}}' value={{card["value"]}}>
                     {% else %}
                     <input type="checkbox" {{human_delibot_disable}} id='{{card["value"]}}' value={{card["value"]}}>
                     {% endif %}
@@ -141,8 +113,7 @@
             </div>
             <div class="game_buttons {{human_delibot_hide}}">
                 <button type="button" id="btn-agree" class="btn btn-success btn-lg">Submit Initial</button>
-                <button type="button" id="final_submit" class="btn btn-success btn-lg">Final Decision and Submit HIT
-                </button>
+                <button type="button" id="final_submit" class="btn btn-success btn-lg">Final Decision and Submit HIT</button>
             </div>
         </div>
         <hr/>
@@ -152,10 +123,8 @@
                 <b> <i>(you)</i> {{room_data.current_user}}</b>
                 <button id="leave_room" class="btn btn-danger btn-sm float-right pull-right">Leave room</button>
             </div>
-            <button id="deli_Moderation" class="btn btn-info btn-sm float-right pull-right DELIBOT">Deli Moderation
-            </button>
-            <button id="deli_Reasoning" class="btn btn-info btn-sm float-right pull-right DELIBOT">Deli Reasoning
-            </button>
+            <button id="deli_Moderation" class="btn btn-info btn-sm float-right pull-right DELIBOT">Deli Moderation</button>
+            <button id="deli_Reasoning" class="btn btn-info btn-sm float-right pull-right DELIBOT">Deli Reasoning</button>
             <button id="deli_Solution" class="btn btn-info btn-sm float-right pull-right DELIBOT">Deli Solution</button>
 
             {% for item in room_data.existing_users %}
@@ -172,8 +141,8 @@
             <br/>
             <hr>
             {% if room_data.mturk_return_url%}
-            <form id="mturk" action="{{room_data.mturk_return_url}}" method="post">
-            </form>
+                <form id="mturk" action="{{room_data.mturk_return_url}}" method="post">
+                </form>
             {% endif %}
             <hr>
             <b>Disclaimer:</b>
@@ -193,20 +162,18 @@
         <form id="chat_form" class="sumbission" action="" method="POST">
             {% if room_data.current_user_type == 'human_delibot'%}
             <select name="delibot_annotation" id="delibot_annotation">
-                <option disabled selected value="def"> -- select an option --</option>
-                <option value="reasoning">Reasoning</option>
-                <option value="solution">Solution (w/o reasons)</option>
-                <option value="moderation">Moderation</option>
-                <option value="none">None</option>
+                <option disabled selected value="def"> -- select an option -- </option>
+              <option value="reasoning">Reasoning</option>
+              <option value="solution">Solution (w/o reasons)</option>
+              <option value="moderation">Moderation</option>
+              <option value="none">None</option>
             </select>
             {%else%}
             <input type="hidden" id="delibot_annotation" value="no_annotation"/>
             {%endif%}
             <input type="text" id="message" placeholder="Type a message"/>
             <input id="msg_submit" class="btn btn-primary" type="submit"/>
-            <div class="note">TIP: Please revise your solution every time your change your mind (use the "Revise
-                Solution" button).
-            </div>
+            <div class="note">TIP: Please revise your solution every time your change your mind (use the "Revise Solution" button).</div>
 
         </form>
     </div>
@@ -217,8 +184,8 @@
 </body>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 <link href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" rel="Stylesheet">
-<script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.2/socket.io.js" integrity="sha512-VJ6+sp2E5rFQk05caiXXzQd1wBABpjEj1r5kMiLmGAAgwPItw1YpqsCCBtq8Yr1x6C49/mTpRdXtq8O2RcZhlQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js" ></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.0/socket.io.js" integrity="sha512-/xb5+PNOA079FJkngKI2jvID5lyiqdHXaUUcfmzE0X0BdpkgzIWHC59LOG90a2jDcOyRsd1luOr24UCCAG8NNw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script type="text/javascript" src="/static/utils.js"></script>
 <script type="text/javascript" src="/static/notify.min.js"></script>
 
@@ -229,6 +196,7 @@ $(function() {
     var room_id = $('input#chat_id').val();
     var timer = null;
     var room_status = $('#room_status').val();
+<!--    var sound = document.getElementById("audio");-->
     var user_name = $('input#user_name').val();
     var global_user_id = $('input#user_id').val();
     var current_user_type = $('#user_type').val();
@@ -242,6 +210,7 @@ $(function() {
     if (room_status == ROUTING_TIMER_STARTED || room_status == READY_TO_START){
         $.notify("The group phase of the game will start soon! Please submit your card selection. Once everyone does so, the game will start! (click to close)",  {autoHide: false, className: 'info'});
         activityWatcher(wakeup, kick);
+<!--        sound.play();-->
 
         if (room_status == ROUTING_TIMER_STARTED){
                 var user_status = $('input#user_status').val();
@@ -322,22 +291,178 @@ $(function() {
       };
 
 
-    var promiseConnection = new Promise(function (resolve, reject) {
-        socket.on( 'connect', function() {
-            console.log('connecting');
-            var user_status = $('input#user_status').val();
-            socket.emit('join', { 'room': room_id, 'user_name': user_name, 'user_status': user_status, user_type: current_user_type});
-            resolve(socket.id); // x8WIv7-mJelg7on_ALbx
-        });
-        socket.on('disconnect', function () {
-            console.log("LOG: just disconnected: " + socket.id)
-            reject(socket.id); // undefined
+    socket.on( 'connect', function() {
+        console.log('connecting');
+        var user_status = $('input#user_status').val();
+        socket.emit('join', { 'room': room_id, 'user_name': user_name, 'user_status': user_status, user_type: current_user_type});
+          socket.on('disconnect', function () {
+        console.log("LOG: just disconnected: " + socket.id)
+      })
 
-        });
+       socket.on('response', function(message_str) {
+        msg =  JSON.parse(message_str);
+        console.log(msg);
+        switch(msg.type) {
+            case CHAT_MESSAGE:
+                if(typeof msg.user_name !== 'undefined' ) {
+                        local_name = msg.user_name;
+                        local_id = msg.user_id;
+                        processed_message = boldMentions(msg.message.message);
+                        if (local_id == global_user_id){
+                            $( 'div.chatbox' ).append('<div class="message msg-mine"><b>' + local_name +': </b> ' + processed_message +'</div>' );
+                        }else{
+                            $( 'div.chatbox' ).append('<div class="message msg-other"><b>' + local_name +': </b> ' + processed_message + '</div>');
+                        }
+                        $('div.chatbox').scrollTop($('div.chatbox')[0].scrollHeight);
+                    }
+                break;
+            case JOIN_ROOM:
+               var user_status = $('input#user_status').val()
+
+               if (user_status == USR_MODERATING){
+                    $("#current_users").append("<div class='logged_user' id='" + msg.user_id + "'><b>" + msg.user_name + "</b> <button class='btn btn-danger btn-sm kick' value='" + msg.user_id + "' name='" + msg.user_name + "'>Kick user</button></div>");
+                    $('.kick').on('click', function(e){
+                        e.preventDefault();
+                        var user_id = $(this).val();
+                        var user_name = $(this).attr('name')
+                        socket.emit('leave', { user_name: user_name, room: room_id, user_id: user_id, user_status: 'KICKED', user_type: current_user_type});
+
+                        $('#'+user_id).remove();
+                        logged_users = logged_users.filter(function(el) { return el.label != "@"+user_name; });
+                        $("#message").bind("keydown", function( event ) {
+                            if (event.keyCode === $.ui.keyCode.TAB &&
+                                $(this).autocomplete("instance").menu.active ) {
+                              event.preventDefault();
+                            }
+                        }).autocomplete(autocomplete_options);
+                    });
+               }
+               else{
+                   $("#current_users").append("<div class='logged_user' id='" + msg.user_id + "'><b>" + msg.user_name + "</b></div>");
+               }
+
+                logged_users.push({'label': "@" + msg.user_name,'id': msg.user_id})
+                $("#message").bind("keydown", function(event){
+                    if (event.keyCode === $.ui.keyCode.TAB &&
+                        $(this).autocomplete("instance").menu.active ) {
+                      event.preventDefault();
+                    }
+                  }).autocomplete(autocomplete_options);
+                break;
+            case LEAVE_ROOM:
+                console.log("triggered leave room: " + msg)
+
+                $('#'+msg.user_id).remove();
+                logged_users = logged_users.filter(function(el) { return el.label != "@"+msg.user_name; });
+                $("#message").bind("keydown", function( event ) {
+                    if (event.keyCode === $.ui.keyCode.TAB &&
+                        $(this).autocomplete("instance").menu.active ) {
+                      event.preventDefault();
+                    }
+                }).autocomplete(autocomplete_options);
+                if (msg.user_id == global_user_id){
+                    window.location.href = "/";
+                }
+                break;
+            case WASON_FINISHED:
+                $('.task button').prop('disabled', true);
+                $('.task input').prop('disabled', true);
+                $('.timer_holder').addClass('hidden');
+                $.notify("Game Finished! Thank you for playing! (click to close)", {autoHide: false, className: 'success'});
+                $('input#room_status').val('GAME_FINISHED');
+                $(window).scrollTop(0);
+                break;
+            case WASON_AGREE:
+                target_user_id = msg.user_id;
+                //$('#' + target_user_id).addClass('wason-agreed');
+                break;
+            case ROUTING_TIMER_STARTED:
+                $.notify("The group phase of the game will start soon! Please submit your card selection. Once everyone does so, the game will start! (click to close)", {autoHide: false, className: 'info'});
+<!--                sound.play()-->
+                var date = msg.message;
+
+                $('#game_start_timer').removeClass('hidden');
+
+                var now = new Date();
+                var after_x_min = new Date(now);
+                after_x_min.setMinutes(now.getMinutes() + parseInt(date));
+                var countDownDate = after_x_min.getTime();
+
+                var selection = get_card_selection();
+                var user_status = $('input#user_status').val()
+                var timer = setInterval(function(){start_timer(countDownDate, true, "Waiting for player", function(){
+                    socket.emit('response', {
+                            user_id: global_user_id,
+                            user_name: user_name,
+                            type: ROUTING_TIMER_ELAPSED,
+                            room: room_id,
+                            user_status: user_status,
+                            message: selection,
+                            user_type: current_user_type
+                        });
+                    clearInterval(timer);
+                })}, 1000);
+
+                activityWatcher(wakeup, kick);
+                break;
+            case ROUTING_TIMER_ELAPSED:
+                $('input#room_status').val(READY_TO_START);
+                break;
+            case FINISHED_ONBOARDING:
+                $('.logged_user').removeClass('wason-agreed');
+                $('input#user_status').val(USR_PLAYING);
+                $('#btn-agree').prop('disabled', false);
+
+                var room_status = $('input#room_status').val()
+
+                if (room_status != ROOM_PLAYING){
+<!--                    sound.play()-->
+                    $.notify('Now you have to collaborate with the other participants in this conversation to solve the task together. (click to close)',  {autoHide: false, className: 'info'});
+                }
+                clearInterval(timer);
+                $('#chat_container').removeClass('hidden');
+                $('#game_play_timer').removeClass('hidden');
+                $('.task_description').removeClass('hidden');
+                $('#game_start_timer').addClass('hidden');
+
+                var date = msg.message;
+                var now = new Date();
+                var after_x_min = new Date(now);
+                after_x_min.setMinutes (now.getMinutes() + date);
+                var countDownDate = after_x_min.getTime()
+
+                clearInterval(timer);
+                var timer = setInterval(function(){start_timer(countDownDate, true, "Out of time", function(){
+                        $('#timer').text("Out of time");
+                        var selection = get_card_selection();
+                        var user_status = $('input#user_status').val()
+                        socket.emit('response', {
+                            user_id: global_user_id,
+                            user_name: user_name,
+                            type: 'OUT_OF_TIME',
+                            message: selection,
+                            room: room_id,
+                            user_status: user_status,
+                            user_type: current_user_type
+                        })
+                        clearInterval(timer);
+                        ;})}, 1000);
+                $('input#room_status').val(ROOM_PLAYING);
+
+                break;
+            default:
+                break;
+            // code block
+        }
     });
 
+      // use the ack function argument to send a response back
+      socket.on('isConnected', function(id, ackFn) {
+          let otherSocket = io.sockets.connected[id];
+          ackFn(!!otherSocket && otherSocket.connected);
+      });
 
-
+    });
 
 
     $('#leave_room').on('click', function(e){
@@ -480,164 +605,6 @@ $(function() {
         socket.emit('delibot', { room_id: room_id, delitype: id_type});
     });
 
-    promiseConnection
-    .then(function (socketID) {
-        console.log("in promise")
-        socket.on('response', function(message_str) {
-            msg =  JSON.parse(message_str);
-            console.log(msg);
-            switch(msg.type) {
-                case CHAT_MESSAGE:
-                    if(typeof msg.user_name !== 'undefined' ) {
-                            local_name = msg.user_name;
-                            local_id = msg.user_id;
-                            processed_message = boldMentions(msg.message.message);
-                            if (local_id == global_user_id){
-                                $( 'div.chatbox' ).append('<div class="message msg-mine"><b>' + local_name +': </b> ' + processed_message +'</div>' );
-                            }else{
-                                $( 'div.chatbox' ).append('<div class="message msg-other"><b>' + local_name +': </b> ' + processed_message + '</div>');
-                            }
-                            $('div.chatbox').scrollTop($('div.chatbox')[0].scrollHeight);
-                        }
-                    break;
-                case JOIN_ROOM:
-                   var user_status = $('input#user_status').val()
-
-                   if (user_status == USR_MODERATING){
-                        $("#current_users").append("<div class='logged_user' id='" + msg.user_id + "'><b>" + msg.user_name + "</b> <button class='btn btn-danger btn-sm kick' value='" + msg.user_id + "' name='" + msg.user_name + "'>Kick user</button></div>");
-                        $('.kick').on('click', function(e){
-                            e.preventDefault();
-                            var user_id = $(this).val();
-                            var user_name = $(this).attr('name')
-                            socket.emit('leave', { user_name: user_name, room: room_id, user_id: user_id, user_status: 'KICKED', user_type: current_user_type});
-
-                            $('#'+user_id).remove();
-                            logged_users = logged_users.filter(function(el) { return el.label != "@"+user_name; });
-                            $("#message").bind("keydown", function( event ) {
-                                if (event.keyCode === $.ui.keyCode.TAB &&
-                                    $(this).autocomplete("instance").menu.active ) {
-                                  event.preventDefault();
-                                }
-                            }).autocomplete(autocomplete_options);
-                        });
-                   }
-                   else{
-                       $("#current_users").append("<div class='logged_user' id='" + msg.user_id + "'><b>" + msg.user_name + "</b></div>");
-                   }
-
-                    logged_users.push({'label': "@" + msg.user_name,'id': msg.user_id})
-                    $("#message").bind("keydown", function(event){
-                        if (event.keyCode === $.ui.keyCode.TAB &&
-                            $(this).autocomplete("instance").menu.active ) {
-                          event.preventDefault();
-                        }
-                      }).autocomplete(autocomplete_options);
-                    break;
-                case LEAVE_ROOM:
-                    console.log("triggered leave room: " + msg)
-
-                    $('#'+msg.user_id).remove();
-                    logged_users = logged_users.filter(function(el) { return el.label != "@"+msg.user_name; });
-                    $("#message").bind("keydown", function( event ) {
-                        if (event.keyCode === $.ui.keyCode.TAB &&
-                            $(this).autocomplete("instance").menu.active ) {
-                          event.preventDefault();
-                        }
-                    }).autocomplete(autocomplete_options);
-                    if (msg.user_id == global_user_id){
-                        window.location.href = "/";
-                    }
-                    break;
-                case WASON_FINISHED:
-                    $('.task button').prop('disabled', true);
-                    $('.task input').prop('disabled', true);
-                    $('.timer_holder').addClass('hidden');
-                    $.notify("Game Finished! Thank you for playing! (click to close)", {autoHide: false, className: 'success'});
-                    $('input#room_status').val('GAME_FINISHED');
-                    $(window).scrollTop(0);
-                    break;
-                case WASON_AGREE:
-                    target_user_id = msg.user_id;
-                    //$('#' + target_user_id).addClass('wason-agreed');
-                    break;
-                case ROUTING_TIMER_STARTED:
-                    $.notify("The group phase of the game will start soon! Please submit your card selection. Once everyone does so, the game will start! (click to close)", {autoHide: false, className: 'info'});
-                    var date = msg.message;
-
-                    $('#game_start_timer').removeClass('hidden');
-
-                    var now = new Date();
-                    var after_x_min = new Date(now);
-                    after_x_min.setMinutes(now.getMinutes() + parseInt(date));
-                    var countDownDate = after_x_min.getTime();
-
-                    var selection = get_card_selection();
-                    var user_status = $('input#user_status').val()
-                    var timer = setInterval(function(){start_timer(countDownDate, true, "Waiting for player", function(){
-                        socket.emit('response', {
-                                user_id: global_user_id,
-                                user_name: user_name,
-                                type: ROUTING_TIMER_ELAPSED,
-                                room: room_id,
-                                user_status: user_status,
-                                message: selection,
-                                user_type: current_user_type
-                            });
-                        clearInterval(timer);
-                    })}, 1000);
-
-                    activityWatcher(wakeup, kick);
-                    break;
-                case ROUTING_TIMER_ELAPSED:
-                    $('input#room_status').val(READY_TO_START);
-                    break;
-                case FINISHED_ONBOARDING:
-                    $('.logged_user').removeClass('wason-agreed');
-                    $('input#user_status').val(USR_PLAYING);
-                    $('#btn-agree').prop('disabled', false);
-
-                    var room_status = $('input#room_status').val()
-
-                    if (room_status != ROOM_PLAYING){
-                        $.notify('Now you have to collaborate with the other participants in this conversation to solve the task together. (click to close)',  {autoHide: false, className: 'info'});
-                    }
-                    clearInterval(timer);
-                    $('#chat_container').removeClass('hidden');
-                    $('#game_play_timer').removeClass('hidden');
-                    $('.task_description').removeClass('hidden');
-                    $('#game_start_timer').addClass('hidden');
-
-                    var date = msg.message;
-                    var now = new Date();
-                    var after_x_min = new Date(now);
-                    after_x_min.setMinutes (now.getMinutes() + date);
-                    var countDownDate = after_x_min.getTime()
-
-                    clearInterval(timer);
-                    var timer = setInterval(function(){start_timer(countDownDate, true, "Out of time", function(){
-                            $('#timer').text("Out of time");
-                            var selection = get_card_selection();
-                            var user_status = $('input#user_status').val()
-                            socket.emit('response', {
-                                user_id: global_user_id,
-                                user_name: user_name,
-                                type: 'OUT_OF_TIME',
-                                message: selection,
-                                room: room_id,
-                                user_status: user_status,
-                                user_type: current_user_type
-                            })
-                            clearInterval(timer);
-                            ;})}, 1000);
-                    $('input#room_status').val(ROOM_PLAYING);
-
-                    break;
-                default:
-                    break;
-                // code block
-        }
-        });
-    });
 
 
     $("#message").bind("keydown", function( event ) {
@@ -671,6 +638,7 @@ $(function() {
     function wakeup(){
         status = $('input#room_status').val();
         if(status != 'GAME_FINISHED'){
+<!--            sound.play();-->
             $.notify("You have been inactive for a while. Please be mindful, that after a prolonged period of inactivity you will be excluded from the room. (click to close)", {autoHide: false, className: 'error'});
         }
     }
@@ -707,6 +675,5 @@ $(function() {
         prevKey = e.key.toUpperCase();
     });
 });
-
 </script>
 </html>
