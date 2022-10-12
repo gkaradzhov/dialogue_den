@@ -231,7 +231,6 @@ $(function() {
     var room_id = $('input#chat_id').val();
     var timer = null;
     var room_status = $('#room_status').val();
-<!--    var sound = document.getElementById("audio");-->
     var user_name = $('input#user_name').val();
     var global_user_id = $('input#user_id').val();
     var current_user_type = $('#user_type').val();
@@ -245,7 +244,6 @@ $(function() {
     if (room_status == ROUTING_TIMER_STARTED || room_status == READY_TO_START){
         $.notify("The group phase of the game will start soon! Please submit your card selection. Once everyone does so, the game will start! (click to close)",  {autoHide: false, className: 'info'});
         activityWatcher(wakeup, kick);
-<!--        sound.play();-->
 
         if (room_status == ROUTING_TIMER_STARTED){
                 var user_status = $('input#user_status').val();
@@ -332,17 +330,20 @@ $(function() {
             var user_status = $('input#user_status').val();
             socket.emit('join', { 'room': room_id, 'user_name': user_name, 'user_status': user_status, user_type: current_user_type});
             resolve(socket.id); // x8WIv7-mJelg7on_ALbx
+
+        socket.on('disconnect', function () {
+            console.log("LOG: just disconnected: " + socket.id)
+            reject(socket.id); // undefined
+
+        });
+
+
     });
 
 
-       socket.on('disconnect', function () {
-        console.log("LOG: just disconnected: " + socket.id)
-        reject(socket.id); // undefined
-
-      })
 
 
-    });
+
 
 
 
@@ -677,7 +678,6 @@ $(function() {
     function wakeup(){
         status = $('input#room_status').val();
         if(status != 'GAME_FINISHED'){
-<!--            sound.play();-->
             $.notify("You have been inactive for a while. Please be mindful, that after a prolonged period of inactivity you will be excluded from the room. (click to close)", {autoHide: false, className: 'error'});
         }
     }
