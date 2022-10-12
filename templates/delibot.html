@@ -191,7 +191,7 @@
 
 <script type="text/javascript">
 $(function() {
-    var socket = io.connect('https://' + document.domain, {autoConnect: true,  transports: ["websocket", "polling"], upgrade: true, reconnectionDelay:50});
+    var socket = io.connect('https://' + document.domain, {autoConnect: true,  transports: ["websocket", "polling"], upgrade: true});
 
     var room_id = $('input#chat_id').val();
     var timer = null;
@@ -248,10 +248,6 @@ $(function() {
         logged_users.push({'label': "@" + "{{user[0]}}", 'id': "{{user[1]}}"});
     {%endfor%}
 
-    socket.on("connect_error", (err) => {
-        socket.connect();
-    });
-
 
 
     var autocomplete_options = {
@@ -290,18 +286,22 @@ $(function() {
         }
       };
 
+
+    socket.on( 'connect', function() {
+        console.log('connecting');
+        var user_status = $('input#user_status').val();
+        socket.emit('join', { 'room': room_id, 'user_name': user_name, 'user_status': user_status, user_type: current_user_type});
+          socket.on('disconnect', function () {
+        console.log("LOG: just disconnected: " + socket.id)
+      })
+
       // use the ack function argument to send a response back
       socket.on('isConnected', function(id, ackFn) {
           let otherSocket = io.sockets.connected[id];
           ackFn(!!otherSocket && otherSocket.connected);
       });
 
-    socket.on( 'connect', function() {
-        console.log('connecting');
-        var user_status = $('input#user_status').val();
-        socket.emit('join', { 'room': room_id, 'user_name': user_name, 'user_status': user_status, user_type: current_user_type});
-
-       socket.on('response', function(message_str) {
+      socket.on('response', function(message_str) {
         msg =  JSON.parse(message_str);
         console.log(msg);
         switch(msg.type) {
