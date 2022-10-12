@@ -179,7 +179,7 @@
     </div>
 </div>
 <div class="footer"><a href="https://gkaradzhov.com">Georgi Karadzhov</a></div>
-<audio id="audio" src="/static/announcement.mp3" autostart="false" ></audio>
+<!--<audio id="audio" src="/static/announcement.mp3" autostart="false" ></audio>-->
 
 </body>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
@@ -196,7 +196,7 @@ $(function() {
     var room_id = $('input#chat_id').val();
     var timer = null;
     var room_status = $('#room_status').val();
-    var sound = document.getElementById("audio");
+<!--    var sound = document.getElementById("audio");-->
     var user_name = $('input#user_name').val();
     var global_user_id = $('input#user_id').val();
     var current_user_type = $('#user_type').val();
@@ -210,7 +210,7 @@ $(function() {
     if (room_status == ROUTING_TIMER_STARTED || room_status == READY_TO_START){
         $.notify("The group phase of the game will start soon! Please submit your card selection. Once everyone does so, the game will start! (click to close)",  {autoHide: false, className: 'info'});
         activityWatcher(wakeup, kick);
-        sound.play();
+<!--        sound.play();-->
 
         if (room_status == ROUTING_TIMER_STARTED){
                 var user_status = $('input#user_status').val();
@@ -511,7 +511,7 @@ $(function() {
                 break;
             case ROUTING_TIMER_STARTED:
                 $.notify("The group phase of the game will start soon! Please submit your card selection. Once everyone does so, the game will start! (click to close)", {autoHide: false, className: 'info'});
-                sound.play()
+<!--                sound.play()-->
                 var date = msg.message;
 
                 $('#game_start_timer').removeClass('hidden');
@@ -549,7 +549,7 @@ $(function() {
                 var room_status = $('input#room_status').val()
 
                 if (room_status != ROOM_PLAYING){
-                    sound.play()
+<!--                    sound.play()-->
                     $.notify('Now you have to collaborate with the other participants in this conversation to solve the task together. (click to close)',  {autoHide: false, className: 'info'});
                 }
                 clearInterval(timer);
@@ -620,7 +620,7 @@ $(function() {
     function wakeup(){
         status = $('input#room_status').val();
         if(status != 'GAME_FINISHED'){
-            sound.play();
+<!--            sound.play();-->
             $.notify("You have been inactive for a while. Please be mindful, that after a prolonged period of inactivity you will be excluded from the room. (click to close)", {autoHide: false, className: 'error'});
         }
     }

@@ -418,7 +418,7 @@ def get_context_solutions_users(postgre_messages, nlp):
     users = []
     tracker = [0]
     for m in wason_conversation.wason_messages:
-
+        print(m.origin)
         if m.origin != 'SYSTEM':
             users.append(m.origin.lower())
             context.append(m.clean_text)
