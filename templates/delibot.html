@@ -182,7 +182,7 @@
 <script type="text/javascript">
 $(function() {
     var socket = null;
-    var socket = io.connect('https://' + document.domain, {autoConnect: true,  transports: ["websocket", "polling"], upgrade: true, 'forceNew': true, 'sync disconnect on unload' : true});
+    var socket = io.connect('https://' + document.domain, {autoConnect: true,  transports: ["xhr-polling"], upgrade: false, 'forceNew': true, 'sync disconnect on unload' : true});
 
     var room_id = $('input#chat_id').val();
     var timer = null;
@@ -291,6 +291,10 @@ $(function() {
           let otherSocket = io.sockets.connected[id];
           ackFn(!!otherSocket && otherSocket.connected);
       });
+
+      socket.on("connect_error", function(err){
+          console.log('connect_error due to ${err.message}');
+        });
 
       socket.on('response', function(message_str) {
         msg =  JSON.parse(message_str);
