@@ -394,10 +394,14 @@ def delibot(json):
     create_broadcast_message(m)
 
 
-def create_broadcast_message(message):
+def test_callback():
+    print("Called")
 
+
+def create_broadcast_message(message):
+    print("Broadcasting", message.content)
     PG.insert_message(message)
-    socketio.emit('response', message.to_json(), room=message.room_id)
+    socketio.emit('response', message.to_json(), room=message.room_id, callback=test_callback)
 
 
 
