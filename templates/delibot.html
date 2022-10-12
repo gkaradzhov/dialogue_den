@@ -327,21 +327,23 @@ $(function() {
 
 
     var promiseConnection = new Promise(function (resolve, reject) {
-            socket.on( 'connect', function() {
-        console.log('connecting');
-        var user_status = $('input#user_status').val();
-        socket.emit('join', { 'room': room_id, 'user_name': user_name, 'user_status': user_status, user_type: current_user_type});
-          socket.on('disconnect', function () {
+        socket.on( 'connect', function() {
+            console.log('connecting');
+            var user_status = $('input#user_status').val();
+            socket.emit('join', { 'room': room_id, 'user_name': user_name, 'user_status': user_status, user_type: current_user_type});
+            resolve(socket.id); // x8WIv7-mJelg7on_ALbx
+    });
+        });
+
+       socket.on('disconnect', function () {
         console.log("LOG: just disconnected: " + socket.id)
+        reject(socket.id); // undefined
+
       })
 
-          // use the ack function argument to send a response back
-          socket.on('isConnected', function(id, ackFn) {
-              let otherSocket = io.sockets.connected[id];
-              ackFn(!!otherSocket && otherSocket.connected);
-          });
 
-        });
+
+
 
     });
 
@@ -488,6 +490,7 @@ $(function() {
 
     promiseConnection
     .then(function (socketID) {
+        console.log("in promise")
         socket.on('response', function(message_str) {
         msg =  JSON.parse(message_str);
         console.log(msg);
