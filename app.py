@@ -399,7 +399,7 @@ def test_callback():
 
 
 def create_broadcast_message(message):
-    print("Broadcasting", message.content)
+    print("Broadcasting", message.content, message.message_type)
     PG.insert_message(message)
     socketio.emit('response', message.to_json(), room=message.room_id, callback=test_callback)
 
@@ -441,6 +441,7 @@ def compensation_page():
 def on_join(data):
     print("redirected to JOIN")
     room = data['room']
+    print(room)
     join_room(room)
     send(data['user_name'] + ' has entered the room.', room=room)
 
