@@ -192,7 +192,7 @@
 <script type="text/javascript">
 $(function() {
     var socket = null;
-    var socket = io.connect('https://' + document.domain, {autoConnect: true,  transports: ["websocket", "polling"], upgrade: true, 'forceNew': true});
+    var socket = io.connect('https://' + document.domain, {autoConnect: true,  transports: ["websocket", "polling"], upgrade: true, 'forceNew': true, 'sync disconnect on unload' : true});
 
     var room_id = $('input#chat_id').val();
     var timer = null;
