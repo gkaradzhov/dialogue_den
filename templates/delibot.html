@@ -298,6 +298,163 @@ $(function() {
 
     });
 
+    socket.removeListener('response');
+      socket.on('response', function(message_str) {
+        msg =  JSON.parse(message_str);
+        console.log(msg);
+        switch(msg.type) {
+            case CHAT_MESSAGE:
+                if(typeof msg.user_name !== 'undefined' ) {
+                        local_name = msg.user_name;
+                        local_id = msg.user_id;
+                        processed_message = boldMentions(msg.message.message);
+                        if (local_id == global_user_id){
+                            $( 'div.chatbox' ).append('<div class="message msg-mine"><b>' + local_name +': </b> ' + processed_message +'</div>' );
+                        }else{
+                            $( 'div.chatbox' ).append('<div class="message msg-other"><b>' + local_name +': </b> ' + processed_message + '</div>');
+                        }
+                        $('div.chatbox').scrollTop($('div.chatbox')[0].scrollHeight);
+                    }
+                break;
+            case JOIN_ROOM:
+               var user_status = $('input#user_status').val()
+
+               if (user_status == USR_MODERATING){
+                    $("#current_users").append("<div class='logged_user' id='" + msg.user_id + "'><b>" + msg.user_name + "</b> <button class='btn btn-danger btn-sm kick' value='" + msg.user_id + "' name='" + msg.user_name + "'>Kick user</button></div>");
+                    $('.kick').on('click', function(e){
+                        e.preventDefault();
+                        var user_id = $(this).val();
+                        var user_name = $(this).attr('name')
+                        socket.emit('leave', { user_name: user_name, room: room_id, user_id: user_id, user_status: 'KICKED', user_type: current_user_type});
+
+                        $('#'+user_id).remove();
+                        logged_users = logged_users.filter(function(el) { return el.label != "@"+user_name; });
+                        $("#message").bind("keydown", function( event ) {
+                            if (event.keyCode === $.ui.keyCode.TAB &&
+                                $(this).autocomplete("instance").menu.active ) {
+                              event.preventDefault();
+                            }
+                        }).autocomplete(autocomplete_options);
+                    });
+               }
+               else{
+                   $("#current_users").append("<div class='logged_user' id='" + msg.user_id + "'><b>" + msg.user_name + "</b></div>");
+               }
+
+                logged_users.push({'label': "@" + msg.user_name,'id': msg.user_id})
+                $("#message").bind("keydown", function(event){
+                    if (event.keyCode === $.ui.keyCode.TAB &&
+                        $(this).autocomplete("instance").menu.active ) {
+                      event.preventDefault();
+                    }
+                  }).autocomplete(autocomplete_options);
+                break;
+            case LEAVE_ROOM:
+                console.log("triggered leave room: " + msg)
+
+                $('#'+msg.user_id).remove();
+                logged_users = logged_users.filter(function(el) { return el.label != "@"+msg.user_name; });
+                $("#message").bind("keydown", function( event ) {
+                    if (event.keyCode === $.ui.keyCode.TAB &&
+                        $(this).autocomplete("instance").menu.active ) {
+                      event.preventDefault();
+                    }
+                }).autocomplete(autocomplete_options);
+                if (msg.user_id == global_user_id){
+                    window.location.href = "/";
+                }
+                break;
+            case WASON_FINISHED:
+                $('.task button').prop('disabled', true);
+                $('.task input').prop('disabled', true);
+                $('.timer_holder').addClass('hidden');
+                $.notify("Game Finished! Thank you for playing! (click to close)", {autoHide: false, className: 'success'});
+                $('input#room_status').val('GAME_FINISHED');
+                $(window).scrollTop(0);
+                break;
+            case WASON_AGREE:
+                target_user_id = msg.user_id;
+                //$('#' + target_user_id).addClass('wason-agreed');
+                break;
+            case ROUTING_TIMER_STARTED:
+                $.notify("The group phase of the game will start soon! Please submit your card selection. Once everyone does so, the game will start! (click to close)", {autoHide: false, className: 'info'});
+<!--                sound.play()-->
+                var date = msg.message;
+
+                $('#game_start_timer').removeClass('hidden');
+
+                var now = new Date();
+                var after_x_min = new Date(now);
+                after_x_min.setMinutes(now.getMinutes() + parseInt(date));
+                var countDownDate = after_x_min.getTime();
+
+                var selection = get_card_selection();
+                var user_status = $('input#user_status').val()
+                var timer = setInterval(function(){start_timer(countDownDate, true, "Waiting for player", function(){
+                    socket.emit('response', {
+                            user_id: global_user_id,
+                            user_name: user_name,
+                            type: ROUTING_TIMER_ELAPSED,
+                            room: room_id,
+                            user_status: user_status,
+                            message: selection,
+                            user_type: current_user_type
+                        });
+                    clearInterval(timer);
+                })}, 1000);
+
+                activityWatcher(wakeup, kick);
+                break;
+            case ROUTING_TIMER_ELAPSED:
+                $('input#room_status').val(READY_TO_START);
+                break;
+            case FINISHED_ONBOARDING:
+                $('.logged_user').removeClass('wason-agreed');
+                $('input#user_status').val(USR_PLAYING);
+                $('#btn-agree').prop('disabled', false);
+
+                var room_status = $('input#room_status').val()
+
+                if (room_status != ROOM_PLAYING){
+<!--                    sound.play()-->
+                    $.notify('Now you have to collaborate with the other participants in this conversation to solve the task together. (click to close)',  {autoHide: false, className: 'info'});
+                }
+                clearInterval(timer);
+                $('#chat_container').removeClass('hidden');
+                $('#game_play_timer').removeClass('hidden');
+                $('.task_description').removeClass('hidden');
+                $('#game_start_timer').addClass('hidden');
+
+                var date = msg.message;
+                var now = new Date();
+                var after_x_min = new Date(now);
+                after_x_min.setMinutes (now.getMinutes() + date);
+                var countDownDate = after_x_min.getTime()
+
+                clearInterval(timer);
+                var timer = setInterval(function(){start_timer(countDownDate, true, "Out of time", function(){
+                        $('#timer').text("Out of time");
+                        var selection = get_card_selection();
+                        var user_status = $('input#user_status').val()
+                        socket.emit('response', {
+                            user_id: global_user_id,
+                            user_name: user_name,
+                            type: 'OUT_OF_TIME',
+                            message: selection,
+                            room: room_id,
+                            user_status: user_status,
+                            user_type: current_user_type
+                        })
+                        clearInterval(timer);
+                        ;})}, 1000);
+                $('input#room_status').val(ROOM_PLAYING);
+
+                break;
+            default:
+                break;
+            // code block
+        }
+    });
 
 
     $('#leave_room').on('click', function(e){
@@ -509,174 +666,6 @@ $(function() {
         }
         prevKey = e.key.toUpperCase();
     });
-
-    function sleep (time) {
-          return new Promise((resolve) => setTimeout(resolve, time));
-        }
-
-        // Usage!
-        sleep(150).then(() => {
-            // Do something after the sleep!
-        });
-
-        socket.removeListener('response');
-      socket.on('response', function(message_str) {
-        msg =  JSON.parse(message_str);
-        console.log(msg);
-        switch(msg.type) {
-            case CHAT_MESSAGE:
-                if(typeof msg.user_name !== 'undefined' ) {
-                        local_name = msg.user_name;
-                        local_id = msg.user_id;
-                        processed_message = boldMentions(msg.message.message);
-                        if (local_id == global_user_id){
-                            $( 'div.chatbox' ).append('<div class="message msg-mine"><b>' + local_name +': </b> ' + processed_message +'</div>' );
-                        }else{
-                            $( 'div.chatbox' ).append('<div class="message msg-other"><b>' + local_name +': </b> ' + processed_message + '</div>');
-                        }
-                        $('div.chatbox').scrollTop($('div.chatbox')[0].scrollHeight);
-                    }
-                break;
-            case JOIN_ROOM:
-               var user_status = $('input#user_status').val()
-
-               if (user_status == USR_MODERATING){
-                    $("#current_users").append("<div class='logged_user' id='" + msg.user_id + "'><b>" + msg.user_name + "</b> <button class='btn btn-danger btn-sm kick' value='" + msg.user_id + "' name='" + msg.user_name + "'>Kick user</button></div>");
-                    $('.kick').on('click', function(e){
-                        e.preventDefault();
-                        var user_id = $(this).val();
-                        var user_name = $(this).attr('name')
-                        socket.emit('leave', { user_name: user_name, room: room_id, user_id: user_id, user_status: 'KICKED', user_type: current_user_type});
-
-                        $('#'+user_id).remove();
-                        logged_users = logged_users.filter(function(el) { return el.label != "@"+user_name; });
-                        $("#message").bind("keydown", function( event ) {
-                            if (event.keyCode === $.ui.keyCode.TAB &&
-                                $(this).autocomplete("instance").menu.active ) {
-                              event.preventDefault();
-                            }
-                        }).autocomplete(autocomplete_options);
-                    });
-               }
-               else{
-                   $("#current_users").append("<div class='logged_user' id='" + msg.user_id + "'><b>" + msg.user_name + "</b></div>");
-               }
-
-                logged_users.push({'label': "@" + msg.user_name,'id': msg.user_id})
-                $("#message").bind("keydown", function(event){
-                    if (event.keyCode === $.ui.keyCode.TAB &&
-                        $(this).autocomplete("instance").menu.active ) {
-                      event.preventDefault();
-                    }
-                  }).autocomplete(autocomplete_options);
-                break;
-            case LEAVE_ROOM:
-                console.log("triggered leave room: " + msg)
-
-                $('#'+msg.user_id).remove();
-                logged_users = logged_users.filter(function(el) { return el.label != "@"+msg.user_name; });
-                $("#message").bind("keydown", function( event ) {
-                    if (event.keyCode === $.ui.keyCode.TAB &&
-                        $(this).autocomplete("instance").menu.active ) {
-                      event.preventDefault();
-                    }
-                }).autocomplete(autocomplete_options);
-                if (msg.user_id == global_user_id){
-                    window.location.href = "/";
-                }
-                break;
-            case WASON_FINISHED:
-                $('.task button').prop('disabled', true);
-                $('.task input').prop('disabled', true);
-                $('.timer_holder').addClass('hidden');
-                $.notify("Game Finished! Thank you for playing! (click to close)", {autoHide: false, className: 'success'});
-                $('input#room_status').val('GAME_FINISHED');
-                $(window).scrollTop(0);
-                break;
-            case WASON_AGREE:
-                target_user_id = msg.user_id;
-                //$('#' + target_user_id).addClass('wason-agreed');
-                break;
-            case ROUTING_TIMER_STARTED:
-                $.notify("The group phase of the game will start soon! Please submit your card selection. Once everyone does so, the game will start! (click to close)", {autoHide: false, className: 'info'});
-<!--                sound.play()-->
-                var date = msg.message;
-
-                $('#game_start_timer').removeClass('hidden');
-
-                var now = new Date();
-                var after_x_min = new Date(now);
-                after_x_min.setMinutes(now.getMinutes() + parseInt(date));
-                var countDownDate = after_x_min.getTime();
-
-                var selection = get_card_selection();
-                var user_status = $('input#user_status').val()
-                var timer = setInterval(function(){start_timer(countDownDate, true, "Waiting for player", function(){
-                    socket.emit('response', {
-                            user_id: global_user_id,
-                            user_name: user_name,
-                            type: ROUTING_TIMER_ELAPSED,
-                            room: room_id,
-                            user_status: user_status,
-                            message: selection,
-                            user_type: current_user_type
-                        });
-                    clearInterval(timer);
-                })}, 1000);
-
-                activityWatcher(wakeup, kick);
-                break;
-            case ROUTING_TIMER_ELAPSED:
-                $('input#room_status').val(READY_TO_START);
-                break;
-            case FINISHED_ONBOARDING:
-                $('.logged_user').removeClass('wason-agreed');
-                $('input#user_status').val(USR_PLAYING);
-                $('#btn-agree').prop('disabled', false);
-
-                var room_status = $('input#room_status').val()
-
-                if (room_status != ROOM_PLAYING){
-<!--                    sound.play()-->
-                    $.notify('Now you have to collaborate with the other participants in this conversation to solve the task together. (click to close)',  {autoHide: false, className: 'info'});
-                }
-                clearInterval(timer);
-                $('#chat_container').removeClass('hidden');
-                $('#game_play_timer').removeClass('hidden');
-                $('.task_description').removeClass('hidden');
-                $('#game_start_timer').addClass('hidden');
-
-                var date = msg.message;
-                var now = new Date();
-                var after_x_min = new Date(now);
-                after_x_min.setMinutes (now.getMinutes() + date);
-                var countDownDate = after_x_min.getTime()
-
-                clearInterval(timer);
-                var timer = setInterval(function(){start_timer(countDownDate, true, "Out of time", function(){
-                        $('#timer').text("Out of time");
-                        var selection = get_card_selection();
-                        var user_status = $('input#user_status').val()
-                        socket.emit('response', {
-                            user_id: global_user_id,
-                            user_name: user_name,
-                            type: 'OUT_OF_TIME',
-                            message: selection,
-                            room: room_id,
-                            user_status: user_status,
-                            user_type: current_user_type
-                        })
-                        clearInterval(timer);
-                        ;})}, 1000);
-                $('input#room_status').val(ROOM_PLAYING);
-
-                break;
-            default:
-                break;
-            // code block
-        }
-    });
-
 });
 </script>
 </html>
