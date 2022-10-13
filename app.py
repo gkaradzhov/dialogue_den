@@ -39,8 +39,8 @@ app.config.update(dict(
 ))
 
 talisman = Talisman(app, content_security_policy=None)
-socketio = flask_socketio.SocketIO(app, cors_allowed_origins='*', async_mode='gevent_uwsgi', logger=True, engineio_logger=True)
-
+socketio = flask_socketio.SocketIO(app, cors_allowed_origins='*', async_mode='eventlet', logger=True,
+                                   engineio_logger=True, always_connect=True)
 
 nlp = spacy.load('en_core_web_sm')
 
@@ -162,11 +162,11 @@ def route_to_room():
         #                                                   'worker_id': worker,
         #                                                   'turk_submit': return_url,
         #                                                   'campaign_id': campaign_id})
-        return render_template('onboarding.html', data={ 'assignment_id': assignment,
-                                                          'hit_id': hit,
-                                                          'worker_id': worker,
-                                                          'turk_submit': return_url,
-                                                          'campaign_id': campaign_id})
+        return render_template('onboarding.html', data={'assignment_id': assignment,
+                                                        'hit_id': hit,
+                                                        'worker_id': worker,
+                                                        'turk_submit': return_url,
+                                                        'campaign_id': campaign_id})
 
     active_room_id = PG.get_create_campaign_room(campaign_id)
 
@@ -174,6 +174,7 @@ def route_to_room():
         url_for('delibot', room_id=active_room_id, mturk_info=mturk_info_id, _scheme='https',
                 _external=True)))
     return resp
+
 
 @app.route('/unsuccessful_onboarding')
 @talisman(
@@ -267,7 +268,6 @@ def chatroom():
                                                                                               mturk_info[0],
                                                                                               current_user['user_id'])
 
-
     wason_initial = [d.content for d in running_dialogue if d.message_type == WASON_INITIAL][0]
 
     handle_routing(running_dialogue, logged_users, campaign['start_threshold'], campaign['start_time'],
@@ -347,7 +347,6 @@ def delibot():
                                                                                               mturk_info[0],
                                                                                               current_user['user_id'])
 
-
     wason_initial = [d.content for d in running_dialogue if d.message_type == WASON_INITIAL][0]
 
     handle_routing(running_dialogue, logged_users, campaign['start_threshold'], campaign['start_time'],
@@ -356,15 +355,17 @@ def delibot():
     # Have to get the room again, in case the status changed
     room = PG.get_single_room(room_id)
 
-    return render_template("delibot.html", room_data={'id': room_id, 'name': room.name, 'game': json.loads(wason_initial),
-                                                   'messages': messages, 'existing_users': logged_users,
-                                                   'current_user': current_user['user_name'],
-                                                   'current_user_id': current_user['user_id'],
-                                                   'current_user_type': user_type,
-                                                   'current_user_status': status, 'room_status': room.status,
-                                                   'mturk_return_url': formated_return_url,
-                                                   # 'mturk_return_url': 'test_post',
-                                                   "start_time": campaign['start_time']})
+    return render_template("delibot.html",
+                           room_data={'id': room_id, 'name': room.name, 'game': json.loads(wason_initial),
+                                      'messages': messages, 'existing_users': logged_users,
+                                      'current_user': current_user['user_name'],
+                                      'current_user_id': current_user['user_id'],
+                                      'current_user_type': user_type,
+                                      'current_user_status': status, 'room_status': room.status,
+                                      'mturk_return_url': formated_return_url,
+                                      # 'mturk_return_url': 'test_post',
+                                      "start_time": campaign['start_time']})
+
 
 @socketio.on('delibot')
 def delibot(json):
@@ -402,7 +403,6 @@ def create_broadcast_message(message):
     print("Broadcasting", message.content, message.message_type)
     PG.insert_message(message)
     socketio.emit('response', message.to_json(), room=message.room_id, callback=test_callback)
-
 
 
 @app.route('/create_room', methods=('GET', 'POST'))
@@ -576,6 +576,7 @@ def handle_response(json):
 
     validate_finish_game(all_messages, room_id)
 
+
 @socketio.on('deliresponse')
 def handle_response(json):
     print('redirected to response')
@@ -599,10 +600,10 @@ def handle_response(json):
     if 'delibot' not in set(users[-3:]) and len(tracker) >= 4:
         url = 'http://delibot.cl.cam.ac.uk/delibot2'
         myobj = {
-                 "context": context[-2:],
-                 "cards": solution,
-                 "users": users,
-                 "skip": context}
+            "context": context[-2:],
+            "cards": solution,
+            "users": users,
+            "skip": context}
 
         print(myobj)
         x = requests.post(url, json=myobj)
