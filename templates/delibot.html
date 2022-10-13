@@ -182,7 +182,7 @@
 <script type="text/javascript">
 $(function() {
     var socket = null;
-    var socket = io.connect('https://' + document.domain, {autoConnect: true,  transports: ["polling"]});
+    var socket = io.connect('https://' + document.domain, {autoConnect: true,  transports: ["polling"], rememberTransport: false});
     var room_id = $('input#chat_id').val();
     var timer = null;
     var room_status = $('#room_status').val();
