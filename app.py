@@ -28,6 +28,9 @@ from time import sleep
 import random
 
 from wason_message_processing import get_context_solutions_users
+# import eventlet
+# eventlet.monkey_patch()
+
 
 login_manager = flask_login.LoginManager()
 
@@ -650,7 +653,7 @@ def handle_signals():
 if __name__ == '__main__':
     app.run()
     try:
-        socketio.run(host='localhost', port=8898, app=app)
+        socketio.run(host='localhost', port=8898, app=app, log_output=True)
     finally:
         print("Exiting gracefully")
         # save_state()
