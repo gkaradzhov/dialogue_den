@@ -580,10 +580,10 @@ def handle_response(json):
     validate_finish_game(all_messages, room_id)
 
 
-def check_if_triggered(all_messages):
+def check_if_can_speak(all_messages):
     can_delibot_speak = True
     for item in all_messages:
-        if item.message_type == 'DELITRIGGERED':
+        if item.message_type == 'DELIBOT_TRIGGER':
             can_delibot_speak = False
         if item.origin == 'DEliBot':
             can_delibot_speak = True
@@ -604,10 +604,9 @@ def handle_response(json):
     handle_room_events(all_messages, room_id, m)
     validate_finish_game(all_messages, room_id)
 
-    check = check_if_triggered(all_messages)
+    check = check_if_can_speak(all_messages)
 
-    if check is False:
-
+    if check:
         m = Message(origin_id=-1, origin_name='SYSTEM', message_type='DELIBOT_TRIGGER', room_id=room_id,
                 content={'message': None}, user_status=None, user_type='SYSTEM')
         create_broadcast_message(m)
