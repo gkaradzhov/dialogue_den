@@ -605,18 +605,18 @@ def handle_response(json):
     validate_finish_game(all_messages, room_id)
 
     check = check_if_can_speak(all_messages)
-
+    print("Check: ", str(check))
     if check:
-        m = Message(origin_id=-1, origin_name='SYSTEM', message_type='DELIBOT_TRIGGER', room_id=room_id,
-                content={'message': None}, user_status=None, user_type='SYSTEM')
-        create_broadcast_message(m)
-
         context, solution, users, tracker = get_context_solutions_users(all_messages, nlp)
 
         print("Tracker: ", str(tracker))
         print("Users: ", str(users))
 
         if 'delibot' not in set(users[-3:]) and len(tracker) >= 4:
+            m = Message(origin_id=-1, origin_name='SYSTEM', message_type='DELIBOT_TRIGGER', room_id=room_id,
+                        content={'message': None}, user_status=None, user_type='SYSTEM')
+            create_broadcast_message(m)
+            
             url = 'http://delibot.cl.cam.ac.uk/delibot2'
             myobj = {
                 "context": context[-2:],
