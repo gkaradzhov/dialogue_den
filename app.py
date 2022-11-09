@@ -585,7 +585,7 @@ def check_if_triggered(all_messages):
     for item in all_messages:
         if item.message_type == 'DELITRIGGERED':
             can_delibot_speak = False
-        if item.origin_name == 'DEliBot':
+        if item.origin == 'DEliBot':
             can_delibot_speak = True
 
     return can_delibot_speak
