@@ -28,6 +28,7 @@ from time import sleep
 import random
 
 from wason_message_processing import get_context_solutions_users
+
 # import eventlet
 # eventlet.monkey_patch()
 
@@ -603,7 +604,6 @@ def handle_response(json):
     all_messages = PG.get_messages(room_id)
     handle_room_events(all_messages, room_id, m)
     validate_finish_game(all_messages, room_id)
-
 
     context, solution, users, tracker = get_context_solutions_users(all_messages, nlp)
 
