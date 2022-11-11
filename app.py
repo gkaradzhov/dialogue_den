@@ -610,30 +610,30 @@ def handle_response(json):
     print("Tracker: ", str(tracker))
     print("Users: ", str(users))
 
-    # check = check_if_can_speak(all_messages)
-    # if 'delibot' not in set(users[-3:]) and len(tracker) >= 4 and check:
-    #     m = Message(origin_id=-1, origin_name='SYSTEM', message_type='DELIBOT_TRIGGER', room_id=room_id,
-    #                 content={'message': None}, user_status=None, user_type='SYSTEM')
-    #     create_broadcast_message(m)
-    #
-    #     url = 'http://delibot.cl.cam.ac.uk/delibot2'
-    #     myobj = {
-    #         "context": context[-2:],
-    #         "cards": solution,
-    #         "users": users,
-    #         "skip": context}
-    #
-    #     print(myobj)
-    #     x = requests.post(url, json=myobj)
-    #     print(x.text)
-    #
-    #     # Second check before uttering to make sure that nothing changed since the last time
-    #     all_messages = PG.get_messages(room_id)
-    #     context, solution, users, tracker = get_context_solutions_users(all_messages, nlp)
-    #     if 'delibot' not in set(users[-3:]) and len(tracker) >= 4:
-    #         m = Message(origin_id=990, origin_name='DEliBot', message_type='CHAT_MESSAGE', room_id=room_id,
-    #                     content={'message': x.text}, user_status=USR_PLAYING, user_type='DELIBOT_SIMILARITY')
-    #         create_broadcast_message(m)
+    check = check_if_can_speak(all_messages)
+    if 'delibot' not in set(users[-3:]) and len(tracker) >= 4 and check:
+        m = Message(origin_id=-1, origin_name='SYSTEM', message_type='DELIBOT_TRIGGER', room_id=room_id,
+                    content={'message': None}, user_status=None, user_type='SYSTEM')
+        create_broadcast_message(m)
+
+        url = 'http://delibot.cl.cam.ac.uk/delibot2'
+        myobj = {
+            "context": context[-2:],
+            "cards": solution,
+            "users": users,
+            "skip": context}
+
+        print(myobj)
+        x = requests.post(url, json=myobj)
+        print(x.text)
+
+        # Second check before uttering to make sure that nothing changed since the last time
+        all_messages = PG.get_messages(room_id)
+        context, solution, users, tracker = get_context_solutions_users(all_messages, nlp)
+        if 'delibot' not in set(users[-3:]) and len(tracker) >= 4:
+            m = Message(origin_id=990, origin_name='DEliBot', message_type='CHAT_MESSAGE', room_id=room_id,
+                        content={'message': x.text}, user_status=USR_PLAYING, user_type='DELIBOT_SIMILARITY')
+            create_broadcast_message(m)
 
 
 def validate_finish_game(all_messages, room_id):
