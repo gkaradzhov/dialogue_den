@@ -50,8 +50,8 @@ nlp = spacy.load('en_core_web_sm')
 
 login_manager.init_app(app)
 
-#PG = PostgreConnection('localadasdda_cred.json')
-#MTURK_MANAGEMENT = MTurkManagement('local_creddadasasd.json')
+PG = PostgreConnection('localadasdda_cred.json')
+MTURK_MANAGEMENT = MTurkManagement('local_creddadasasd.json')
 admin_pass = os.environ.get('ADMIN')
 salt = os.environ.get('SALT')
 
