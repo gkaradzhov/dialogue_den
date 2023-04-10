@@ -8,137 +8,7 @@ from wason_message_processing import read_3_lvl_annotation_file, read_wason_dump
     preprocess_conversation_dump, calculate_stats
 
 
-def get_message_causing_changepoint(current_user, messages, num_messages):
-    res = []
-    # print(current_user)
-    # print(messages)
-    for item in messages[::-1]:
-        if len(res) == 0 and item['usr'] == current_user:
-            continue
-        if len(res) < num_messages:
-            res.append(item['message'].lower())
 
-    # print(res)
-    # print('----------------')
-    return res[::-1]
-
-
-def preprocess_train_supervised(data):
-    return_data = []
-    linguistic_training_data = []
-    total_gaps = 0
-    return_no_gaps = []
-    for conversation in data:
-        counted = True
-
-        conv_data = []
-        current_user_run = defaultdict(lambda: [])
-        total_user_participation = defaultdict(lambda: [])
-        user_submissions = defaultdict(lambda: 0)
-        last_user_submission = {}
-        messages = [{"usr": "SYSTEM", "message": 'BEGIN'}]
-        for item in conversation:
-            user_submissions[item['user']] = 0
-            last_user_submission[item['user']] = ""
-
-        dialogue_started = True
-        counted_messages = []
-        for event in conversation:
-            # print(event['user'], event['type'], event['content'])
-            if event['type'] == 'MESSAGE':
-                dialogue_started = True
-                if len(messages) >= 2:
-                    context = get_message_causing_changepoint(event['user'], messages, 2)
-                    if " <SEP> ".join(context) not in counted_messages:
-                        linguistic_training_data.append((" <SEP> ".join(context), 0))
-                        counted_messages.append(" <SEP> ".join(context))
-                messages.append({'usr': event['user'], 'message': event['content']})
-                for u_k in user_submissions.keys():
-                    total_user_participation[u_k].append(event['performance'])
-                    current_user_run[u_k].append(event['performance'])
-
-                if 'partial_solution' in event['full_ann']['additional'] \
-                        or 'complete_solution' in event['full_ann']['additional']:
-                    if last_user_submission[event['user']] != event['submission']:
-
-                        last_user_submission[event['user']] = event['submission']
-                        context = get_message_causing_changepoint(event['user'], messages, 2)
-
-                        if len(linguistic_training_data) > 0 and linguistic_training_data[-1] == (
-                                " <SEP> ".join(context), 0):
-                            linguistic_training_data = linguistic_training_data[:-1]
-                            counted_messages = counted_messages[:-1]
-                        if " <SEP> ".join(context) not in counted_messages:
-                            linguistic_training_data.append((" <SEP> ".join(context), 1))
-                            counted_messages.append(" <SEP> ".join(context))
-                        conv_data.append(current_user_run[event['user']])
-                        current_user_run[event['user']] = []
-                        total_user_participation[event['user']].append('CHANGEPOINT')
-
-        return_data.append(conv_data)
-        for k, v in total_user_participation.items():
-            return_no_gaps.append(v)
-
-    return return_data, return_no_gaps, linguistic_training_data
-
-
-def normalize_dict_dict(input_dict):
-    normalised_dict = defaultdict(lambda: defaultdict(lambda: 0))
-    total_sum = 0
-    for key_outer, item_outer in input_dict.items():
-        sum_key = sum(item_outer.values())
-        total_sum += sum_key
-
-        for key_pred, item_pred in item_outer.items():
-            normalised_dict[key_outer][key_pred] = item_pred / sum_key
-        normalised_dict[key_outer]['DEFAULT'] = 100 / sum_key
-
-    normalised_dict['DEFAULT']['DEFAULT'] = 100 / total_sum
-
-    return normalised_dict
-
-
-def get_smoothed_proba(item, collection, discount_factor=0.5):
-    if item in collection:
-        return collection[item]
-
-    sorted_collect = sorted(collection.keys())
-    upper = -1
-    lower = -1
-    for i in sorted_collect:
-        if item > i:
-            lower = i
-        elif item < i:
-            upper = i
-            break
-
-    return (collection.get(lower, 0) + collection.get(upper, 0)) * 0.5 * discount_factor
-
-
-def hazard_function(current_timestep, gaps):
-    current = get_smoothed_proba(current_timestep, gaps, 2)
-    s = current
-    for k, g in gaps.items():
-        if k > current_timestep:
-            s += g
-    return current / s
-
-
-def sequence_probability(sequence, conditionals, apriori):
-    previous = None
-    probability = 0
-    for item in sequence:
-        if previous is None:
-            probability = math.log(apriori.get(item, 0.0001))  # , 0.0001
-        else:
-            if previous in conditionals:
-                probability += math.log(conditionals[previous].get(item, conditionals[previous]['DEFAULT']))
-            #                 print(probability)
-            else:
-                probability += math.log(conditionals['DEFAULT']['DEFAULT'])
-        previous = item
-
-    return math.exp(probability)
 
 
 class ChangeOfMindPredictor:
@@ -153,15 +23,142 @@ class ChangeOfMindPredictor:
         self.model = model
         self.train_language_agnostic(data)
 
-    def joint_runtime_observed_x(self, current_run_x, runtime):
-        run_proba = get_smoothed_proba(runtime, self.runtime_probability)
+    def get_message_causing_changepoint(self, current_user, messages, num_messages):
+        res = []
+        # print(current_user)
+        # print(messages)
+        for item in messages[::-1]:
+            if len(res) == 0 and item['usr'] == current_user:
+                continue
+            if len(res) < num_messages:
+                res.append(item['message'].lower())
 
-        seq_prob = sequence_probability(current_run_x, self.value_conditional, self.value_prior)
+        # print(res)
+        # print('----------------')
+        return res[::-1]
+
+    def preprocess_train_supervised(self, data):
+        return_data = []
+        linguistic_training_data = []
+        total_gaps = 0
+        return_no_gaps = []
+        for conversation in data:
+            counted = True
+
+            conv_data = []
+            current_user_run = defaultdict(lambda: [])
+            total_user_participation = defaultdict(lambda: [])
+            user_submissions = defaultdict(lambda: 0)
+            last_user_submission = {}
+            messages = [{"usr": "SYSTEM", "message": 'BEGIN'}]
+            for item in conversation:
+                user_submissions[item['user']] = 0
+                last_user_submission[item['user']] = ""
+
+            dialogue_started = True
+            counted_messages = []
+            for event in conversation:
+                # print(event['user'], event['type'], event['content'])
+                if event['type'] == 'MESSAGE':
+                    dialogue_started = True
+                    if len(messages) >= 2:
+                        context = self.get_message_causing_changepoint(event['user'], messages, 2)
+                        if " <SEP> ".join(context) not in counted_messages:
+                            linguistic_training_data.append((" <SEP> ".join(context), 0))
+                            counted_messages.append(" <SEP> ".join(context))
+                    messages.append({'usr': event['user'], 'message': event['content']})
+                    for u_k in user_submissions.keys():
+                        total_user_participation[u_k].append(event['performance'])
+                        current_user_run[u_k].append(event['performance'])
+
+                    if 'partial_solution' in event['full_ann']['additional'] \
+                            or 'complete_solution' in event['full_ann']['additional']:
+                        if last_user_submission[event['user']] != event['submission']:
+
+                            last_user_submission[event['user']] = event['submission']
+                            context = self.get_message_causing_changepoint(event['user'], messages, 2)
+
+                            if len(linguistic_training_data) > 0 and linguistic_training_data[-1] == (
+                                    " <SEP> ".join(context), 0):
+                                linguistic_training_data = linguistic_training_data[:-1]
+                                counted_messages = counted_messages[:-1]
+                            if " <SEP> ".join(context) not in counted_messages:
+                                linguistic_training_data.append((" <SEP> ".join(context), 1))
+                                counted_messages.append(" <SEP> ".join(context))
+                            conv_data.append(current_user_run[event['user']])
+                            current_user_run[event['user']] = []
+                            total_user_participation[event['user']].append('CHANGEPOINT')
+
+            return_data.append(conv_data)
+            for k, v in total_user_participation.items():
+                return_no_gaps.append(v)
+
+        return return_data, return_no_gaps, linguistic_training_data
+
+    def normalize_dict_dict(self, input_dict):
+        normalised_dict = defaultdict(lambda: defaultdict(lambda: 0))
+        total_sum = 0
+        for key_outer, item_outer in input_dict.items():
+            sum_key = sum(item_outer.values())
+            total_sum += sum_key
+
+            for key_pred, item_pred in item_outer.items():
+                normalised_dict[key_outer][key_pred] = item_pred / sum_key
+            normalised_dict[key_outer]['DEFAULT'] = 100 / sum_key
+
+        normalised_dict['DEFAULT']['DEFAULT'] = 100 / total_sum
+
+        return normalised_dict
+
+    def get_smoothed_proba(self, item, collection, discount_factor=0.5):
+        if item in collection:
+            return collection[item]
+
+        sorted_collect = sorted(collection.keys())
+        upper = -1
+        lower = -1
+        for i in sorted_collect:
+            if item > i:
+                lower = i
+            elif item < i:
+                upper = i
+                break
+
+        return (collection.get(lower, 0) + collection.get(upper, 0)) * 0.5 * discount_factor
+
+    def hazard_function(self, current_timestep, gaps):
+        current = self.get_smoothed_proba(current_timestep, gaps, 2)
+        s = current
+        for k, g in gaps.items():
+            if k > current_timestep:
+                s += g
+        return current / s
+
+    def sequence_probability(self, sequence, conditionals, apriori):
+        previous = None
+        probability = 0
+        for item in sequence:
+            if previous is None:
+                probability = math.log(apriori.get(item, 0.0001))  # , 0.0001
+            else:
+                if previous in conditionals:
+                    probability += math.log(conditionals[previous].get(item, conditionals[previous]['DEFAULT']))
+                #                 print(probability)
+                else:
+                    probability += math.log(conditionals['DEFAULT']['DEFAULT'])
+            previous = item
+
+        return math.exp(probability)
+
+    def joint_runtime_observed_x(self, current_run_x, runtime):
+        run_proba = self.get_smoothed_proba(runtime, self.runtime_probability)
+
+        seq_prob = self.sequence_probability(current_run_x, self.value_conditional, self.value_prior)
 
         return run_proba * seq_prob
 
     def change_point_proba(self, run_step, gap_prior):
-        return 1 - hazard_function(run_step, gap_prior)
+        return 1 - self.hazard_function(run_step, gap_prior)
 
     def datum_changepoint(self, current_x, timestep):
         if timestep in self.datum_given_gap_proba:
@@ -170,7 +167,7 @@ class ChangeOfMindPredictor:
         else:
             data = self.datum_given_gap_proba['DEFAULT']['DEFAULT']
 
-        seq_prob = sequence_probability(current_x, self.value_conditional, self.value_prior)
+        seq_prob = self.sequence_probability(current_x, self.value_conditional, self.value_prior)
 
         return seq_prob * data
 
@@ -187,7 +184,7 @@ class ChangeOfMindPredictor:
     def calc_growth_proba(self, current_run, total_run):
         result = 0
         run_len_est = self.runtime_joint_observed_datum(len(current_run), current_run)
-        haz = hazard_function(len(current_run) - 1, self.gap_prior)
+        haz = self.hazard_function(len(current_run) - 1, self.gap_prior)
 
         if len(current_run) in self.datum_given_gap_proba:
             predictive_proba = self.datum_given_gap_proba[len(current_run)].get(current_run[-1], 0.00001)
@@ -209,7 +206,7 @@ class ChangeOfMindPredictor:
                 predictive_proba = self.datum_given_gap_proba[len(current_run)].get(datum, 0.00001)
             else:
                 predictive_proba = 0.0001
-            haz = hazard_function(len(current_run) - 1, self.gap_prior)
+            haz = self.hazard_function(len(current_run) - 1, self.gap_prior)
 
             result += run_len_est * predictive_proba * haz
 
@@ -217,7 +214,7 @@ class ChangeOfMindPredictor:
         return result
 
     def train_language_agnostic(self, data):
-        preprocessed_train, no_gaps, linguistic = preprocess_train_supervised(data)
+        preprocessed_train, no_gaps, linguistic = self.preprocess_train_supervised(data)
 
         total_run_changepoint = defaultdict(lambda: 0)
         total_run_continue = defaultdict(lambda: 0)
@@ -251,7 +248,7 @@ class ChangeOfMindPredictor:
                         value_conditional_counts[previous][element] += 1
                     previous = element
 
-        self.value_conditional = normalize_dict_dict(value_conditional_counts)
+        self.value_conditional = self.normalize_dict_dict(value_conditional_counts)
 
         for k, v in value_counts.items():
             self.value_prior[k] = v / total_events
@@ -269,7 +266,7 @@ class ChangeOfMindPredictor:
                     datum_given_gap[index + 1][e] += 1
                     gaps_run[index + 1] += 1
 
-        self.datum_given_gap_proba = normalize_dict_dict(datum_given_gap)
+        self.datum_given_gap_proba = self.normalize_dict_dict(datum_given_gap)
 
         for k, gap in gap_counts.items():
             self.runtime_probability[k] = (gaps_run[k] - gap) / gaps_run[k]
@@ -278,7 +275,7 @@ class ChangeOfMindPredictor:
             self.gap_prior[k] = v / total_gaps
 
         for item in range(1, 80):
-            self.hazards[item] = hazard_function(item, self.gap_prior)
+            self.hazards[item] = self.hazard_function(item, self.gap_prior)
 
     def predict_change_of_mind(self, conv_text, current_run, total_run):
 

@@ -21,7 +21,7 @@ from constants import JOIN_ROOM, CHAT_MESSAGE, LEAVE_ROOM, WASON_INITIAL, WASON_
     USR_ONBOARDING, USR_PLAYING, FINISHED_ONBOARDING, USR_MODERATING, ROUTING_TIMER_STARTED, SYSTEM_USER, SYSTEM_ID, \
     ROUTING_TIMER_ELAPSED, ROOM_READY_TO_START
 from data_persistency_utils import read_rooms_from_file, write_rooms_to_file
-from delitrigger import ChangeOfMindPredictor, get_smoothed_proba
+from delitrigger import ChangeOfMindPredictor
 from message import Room, Message
 from postgre_utils import PostgreConnection
 from sys_config import DIALOGUES_STABLE
