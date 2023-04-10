@@ -132,6 +132,8 @@ def trigger_finish(room_data):
 # A welcome message to test our server
 @app.route('/')
 def index():
+    aa = CHANGEPOINT.predict_change_of_mind(['Hi', "I think the answer is A and 2"], [0.5, 0.5, 0.5, 0.5], 22)
+    print(aa)
     return render_template('index.html')
 
 
