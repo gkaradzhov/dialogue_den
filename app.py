@@ -59,6 +59,7 @@ MTURK_MANAGEMENT = MTurkManagement('local_creddadasasd.json')
 admin_pass = os.environ.get('ADMIN')
 salt = os.environ.get('SALT')
 
+com = ChangeOfMindPredictor([], None)
 with open('models/changepoint', 'rb') as f:
     CHANGEPOINT = pickle.load(f)
 
