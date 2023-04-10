@@ -1,3 +1,5 @@
+from delitrigger import *
+
 import datetime
 import hashlib
 import json
@@ -21,7 +23,6 @@ from constants import JOIN_ROOM, CHAT_MESSAGE, LEAVE_ROOM, WASON_INITIAL, WASON_
     USR_ONBOARDING, USR_PLAYING, FINISHED_ONBOARDING, USR_MODERATING, ROUTING_TIMER_STARTED, SYSTEM_USER, SYSTEM_ID, \
     ROUTING_TIMER_ELAPSED, ROOM_READY_TO_START
 from data_persistency_utils import read_rooms_from_file, write_rooms_to_file
-from delitrigger import ChangeOfMindPredictor
 from message import Room, Message
 from postgre_utils import PostgreConnection
 from sys_config import DIALOGUES_STABLE
@@ -128,7 +129,11 @@ def trigger_finish(room_data):
             room.is_done = True
     write_rooms_to_file(existing_rooms)
 
+with open('models/changepoint', 'rb') as f:
+    CHANGEPOINT = pickle.load(f)
 
+aa = CHANGEPOINT.predict_change_of_mind(['Hi', "I think the answer is A and 2"], [0.5, 0.5, 0.5, 0.5], 22)
+print(aa)
 # A welcome message to test our server
 @app.route('/')
 def index():
@@ -677,12 +682,6 @@ def handle_signals():
 
 if __name__ == '__main__':
     app.run()
-    with open('models/changepoint', 'rb') as f:
-        CHANGEPOINT = pickle.load(f)
-
-    aa = CHANGEPOINT.predict_change_of_mind(['Hi', "I think the answer is A and 2"], [0.5, 0.5, 0.5, 0.5], 22)
-    print(aa)
-
     try:
         socketio.run(host='localhost', port=8898, app=app, log_output=True)
     finally:
