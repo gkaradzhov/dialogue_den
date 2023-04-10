@@ -383,7 +383,7 @@ def merge_with_solution_raw(conversation_external, supervised=False):
     else:
         sol_tracker = solution_tracker(conversation, supervised)
 
-    print(sol_tracker)
+    # print(sol_tracker)
     with_solutions = []
 
     latest_sol = {}
@@ -468,8 +468,8 @@ def get_context_solutions_users(postgre_messages, nlp):
 
         if pm.message_type in ['JOIN_ROOM', 'ROUTING_TIMER_ELAPSED', 'LEAVE_ROOM']:
             continue
-        print(pm.message_type)
-        print(pm.content)
+        # print(pm.message_type)
+        # print(pm.content)
         wason_conversation.raw_db_conversation.append({'message_type': pm.message_type,
                                                        'content': ast.literal_eval(pm.content),
                                                        'user_name': pm.origin,
@@ -487,7 +487,7 @@ def get_context_solutions_users(postgre_messages, nlp):
     users = []
     tracker = [0]
     for m in wason_conversation.wason_messages:
-        print(m.origin)
+        # print(m.origin)
         if m.origin != 'SYSTEM':
             users.append(m.origin.lower())
             context.append(m.clean_text)
@@ -699,7 +699,7 @@ def calculate_stats(conversations_dump):
                 last = gs[1]
                 result_stats['number_of_submits'] += 1
 
-    print(onboarding_versions)
+    # print(onboarding_versions)
     on_c = Counter(onboarding_versions).most_common(1)[0][1]
     fin_c = Counter(final_versions).most_common(1)[0][1]
 
