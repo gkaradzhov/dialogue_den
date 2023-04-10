@@ -58,13 +58,7 @@ PG = PostgreConnection('localadasdda_cred.json')
 MTURK_MANAGEMENT = MTurkManagement('local_creddadasasd.json')
 admin_pass = os.environ.get('ADMIN')
 salt = os.environ.get('SALT')
-
-com = ChangeOfMindPredictor([], None)
-with open('models/changepoint', 'rb') as f:
-    CHANGEPOINT = pickle.load(f)
-
-aa = CHANGEPOINT.predict_change_of_mind(['Hi', "I think the answer is A and 2"], [0.5, 0.5, 0.5, 0.5], 22)
-print(aa)
+CHANGEPOINT = None
 
 class User(flask_login.UserMixin):
     pass
@@ -681,6 +675,12 @@ def handle_signals():
 
 if __name__ == '__main__':
     app.run()
+    with open('models/changepoint', 'rb') as f:
+        CHANGEPOINT = pickle.load(f)
+
+    aa = CHANGEPOINT.predict_change_of_mind(['Hi', "I think the answer is A and 2"], [0.5, 0.5, 0.5, 0.5], 22)
+    print(aa)
+
     try:
         socketio.run(host='localhost', port=8898, app=app, log_output=True)
     finally:
