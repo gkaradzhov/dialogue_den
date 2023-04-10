@@ -1,14 +1,12 @@
 import math
-import dill
+from functools import partial
+
 import pickle
 from collections import defaultdict
 
 import spacy
 from wason_message_processing import read_3_lvl_annotation_file, read_wason_dump, merge_with_solution_raw, \
     preprocess_conversation_dump, calculate_stats
-
-
-
 
 
 class ChangeOfMindPredictor:
@@ -96,7 +94,7 @@ class ChangeOfMindPredictor:
         return return_data, return_no_gaps, linguistic_training_data
 
     def normalize_dict_dict(self, input_dict):
-        normalised_dict = defaultdict(lambda: defaultdict(lambda: 0))
+        normalised_dict = defaultdict(partial(defaultdict, int))
         total_sum = 0
         for key_outer, item_outer in input_dict.items():
             sum_key = sum(item_outer.values())
@@ -164,7 +162,7 @@ class ChangeOfMindPredictor:
     def datum_changepoint(self, current_x, timestep):
         if timestep in self.datum_given_gap_proba:
             dgp = self.datum_given_gap_proba[timestep].get(current_x[timestep],
-                                                            self.datum_given_gap_proba[timestep]['DEFAULT'])
+                                                           self.datum_given_gap_proba[timestep]['DEFAULT'])
         else:
             dgp = self.datum_given_gap_proba['DEFAULT']['DEFAULT']
 
@@ -337,5 +335,4 @@ if __name__ == "__main__":
     print(aa)
 
     with open('models/changepoint', 'wb') as f:
-        a = dill.dumps(comp)
-        f.write(a)
+        a = pickle.dump(comp, f)

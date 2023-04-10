@@ -2,7 +2,7 @@ import datetime
 import hashlib
 import json
 import os
-import dill
+import pickle
 import random
 import signal
 import time
@@ -60,7 +60,7 @@ admin_pass = os.environ.get('ADMIN')
 salt = os.environ.get('SALT')
 
 with open('models/changepoint', 'rb') as f:
-    CHANGEPOINT = dill.loads(f.read())
+    CHANGEPOINT = pickle.load(f)
 
 aa = CHANGEPOINT.predict_change_of_mind(['Hi', "I think the answer is A and 2"], [0.5, 0.5, 0.5, 0.5], 22)
 print(aa)
