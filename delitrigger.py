@@ -337,4 +337,5 @@ if __name__ == "__main__":
     print(aa)
 
     with open('models/changepoint', 'wb') as f:
-        dill.dump(comp, file=f, byref=True)
+        a = dill.dumps(comp)
+        f.write(a)

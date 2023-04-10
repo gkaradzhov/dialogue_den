@@ -60,7 +60,7 @@ admin_pass = os.environ.get('ADMIN')
 salt = os.environ.get('SALT')
 
 with open('models/changepoint', 'rb') as f:
-    CHANGEPOINT = dill.load(f)
+    CHANGEPOINT = dill.loads(f.read())
 
 aa = CHANGEPOINT.predict_change_of_mind(['Hi', "I think the answer is A and 2"], [0.5, 0.5, 0.5, 0.5], 22)
 print(aa)
