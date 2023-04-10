@@ -2,6 +2,7 @@ import datetime
 import hashlib
 import json
 import os
+import pickle
 import random
 import signal
 import time
@@ -20,6 +21,7 @@ from constants import JOIN_ROOM, CHAT_MESSAGE, LEAVE_ROOM, WASON_INITIAL, WASON_
     USR_ONBOARDING, USR_PLAYING, FINISHED_ONBOARDING, USR_MODERATING, ROUTING_TIMER_STARTED, SYSTEM_USER, SYSTEM_ID, \
     ROUTING_TIMER_ELAPSED, ROOM_READY_TO_START
 from data_persistency_utils import read_rooms_from_file, write_rooms_to_file
+from delitrigger import ChangeOfMindPredictor
 from message import Room, Message
 from postgre_utils import PostgreConnection
 from sys_config import DIALOGUES_STABLE
@@ -27,7 +29,8 @@ from utils import generate_user, MTurkManagement
 from time import sleep
 import random
 
-from wason_message_processing import get_context_solutions_users
+from wason_message_processing import get_context_solutions_users, preprocess_conversation_dump, merge_with_solution_raw, \
+    read_wason_dump, read_3_lvl_annotation_file
 
 # import eventlet
 # eventlet.monkey_patch()
@@ -55,6 +58,39 @@ MTURK_MANAGEMENT = MTurkManagement('local_creddadasasd.json')
 admin_pass = os.environ.get('ADMIN')
 salt = os.environ.get('SALT')
 
+annotations = read_3_lvl_annotation_file('data/annotated_data.tsv')
+raw_data = read_wason_dump('data/all/')
+
+data = []
+for item in raw_data:
+    annotated = False
+    anno_item = None
+    for anno in annotations:
+        if item.identifier == anno.identifier:
+            annotated = True
+            item.wason_messages = anno.wason_messages
+
+    current = []
+    prepr = preprocess_conversation_dump(item.raw_db_conversation)
+    item.preprocess_everything(nlp)
+    messages = merge_with_solution_raw(item, False)
+
+    usr_sol = {}
+    for s_t in messages:
+        if s_t.origin in s_t.annotation:
+            current.append({'type': s_t.type, 'performance': s_t.annotation['team_performance'], 'user': s_t.origin,
+                            'change': s_t.annotation['performance_change'], 'room_id': s_t.identifier,
+                            'submission': "".join(s_t.annotation[s_t.origin]), "full_ann": s_t.annotation,
+                            "content": s_t.content})
+    data.append(current)
+
+with open('models/bow_full_delidata.model', 'rb') as f:
+    clf2 = pickle.load(f)
+
+print(len(data))
+comp = ChangeOfMindPredictor(data, clf2)
+aa = comp.predict_change_of_mind(['Hi', "I think the answer is A and 2"], [0.5, 0.5, 0.5, 0.5], 22)
+print(aa)
 
 class User(flask_login.UserMixin):
     pass
