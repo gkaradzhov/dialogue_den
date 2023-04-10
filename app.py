@@ -2,7 +2,7 @@ import datetime
 import hashlib
 import json
 import os
-import pickle
+import dill
 import random
 import signal
 import time
@@ -58,38 +58,10 @@ MTURK_MANAGEMENT = MTurkManagement('local_creddadasasd.json')
 admin_pass = os.environ.get('ADMIN')
 salt = os.environ.get('SALT')
 
-annotations = read_3_lvl_annotation_file('data/annotated_data.tsv')
-raw_data = read_wason_dump('data/all/')
+with open('models/changepoint', 'wr') as f:
+    CHANGEPOINT = dill.load(f)
 
-data = []
-for item in raw_data:
-    annotated = False
-    anno_item = None
-    for anno in annotations:
-        if item.identifier == anno.identifier:
-            annotated = True
-            item.wason_messages = anno.wason_messages
-
-    current = []
-    prepr = preprocess_conversation_dump(item.raw_db_conversation)
-    item.preprocess_everything(nlp)
-    messages = merge_with_solution_raw(item, False)
-
-    usr_sol = {}
-    for s_t in messages:
-        if s_t.origin in s_t.annotation:
-            current.append({'type': s_t.type, 'performance': s_t.annotation['team_performance'], 'user': s_t.origin,
-                            'change': s_t.annotation['performance_change'], 'room_id': s_t.identifier,
-                            'submission': "".join(s_t.annotation[s_t.origin]), "full_ann": s_t.annotation,
-                            "content": s_t.content})
-    data.append(current)
-
-with open('models/bow_full_delidata.model', 'rb') as f:
-    clf2 = pickle.load(f)
-
-print(len(data))
-comp = ChangeOfMindPredictor(data, clf2)
-aa = comp.predict_change_of_mind(['Hi', "I think the answer is A and 2"], [0.5, 0.5, 0.5, 0.5], 22)
+aa = CHANGEPOINT.predict_change_of_mind(['Hi', "I think the answer is A and 2"], [0.5, 0.5, 0.5, 0.5], 22)
 print(aa)
 
 class User(flask_login.UserMixin):

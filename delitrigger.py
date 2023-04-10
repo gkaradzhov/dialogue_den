@@ -1,4 +1,5 @@
 import math
+import dill
 import pickle
 from collections import defaultdict
 
@@ -336,3 +337,6 @@ if __name__ == "__main__":
     comp = ChangeOfMindPredictor(data, clf2)
     aa = comp.predict_change_of_mind(['Hi', "I think the answer is A and 2"], [0.5, 0.5, 0.5, 0.5], 22)
     print(aa)
+
+    with open('models/changepoint', 'wb') as f:
+        dill.dump(comp, f)
