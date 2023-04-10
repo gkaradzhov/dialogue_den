@@ -58,7 +58,7 @@ MTURK_MANAGEMENT = MTurkManagement('local_creddadasasd.json')
 admin_pass = os.environ.get('ADMIN')
 salt = os.environ.get('SALT')
 
-with open('models/changepoint', 'wr') as f:
+with open('models/changepoint', 'rb') as f:
     CHANGEPOINT = dill.load(f)
 
 aa = CHANGEPOINT.predict_change_of_mind(['Hi', "I think the answer is A and 2"], [0.5, 0.5, 0.5, 0.5], 22)
