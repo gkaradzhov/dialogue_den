@@ -37,6 +37,12 @@ from wason_message_processing import get_context_solutions_users, preprocess_con
 # import eventlet
 # eventlet.monkey_patch()
 
+test = ChangeOfMindPredictor(None, None)
+with open('models/changepoint', 'rb') as f:
+    CHANGEPOINT = pickle.load(f)
+
+aa = CHANGEPOINT.predict_change_of_mind(['Hi', "I think the answer is A and 2"], [0.5, 0.5, 0.5, 0.5], 22)
+print(aa)
 
 login_manager = flask_login.LoginManager()
 
@@ -59,7 +65,7 @@ PG = PostgreConnection('localadasdda_cred.json')
 MTURK_MANAGEMENT = MTurkManagement('local_creddadasasd.json')
 admin_pass = os.environ.get('ADMIN')
 salt = os.environ.get('SALT')
-CHANGEPOINT = None
+
 
 class User(flask_login.UserMixin):
     pass
@@ -129,11 +135,7 @@ def trigger_finish(room_data):
             room.is_done = True
     write_rooms_to_file(existing_rooms)
 
-with open('models/changepoint', 'rb') as f:
-    CHANGEPOINT = pickle.load(f)
 
-aa = CHANGEPOINT.predict_change_of_mind(['Hi', "I think the answer is A and 2"], [0.5, 0.5, 0.5, 0.5], 22)
-print(aa)
 # A welcome message to test our server
 @app.route('/')
 def index():

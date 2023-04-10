@@ -10,7 +10,8 @@ from wason_message_processing import read_3_lvl_annotation_file, read_wason_dump
 
 
 class ChangeOfMindPredictor:
-    def __init__(self, input_data, model):
+    def __init__(self, input_data=None, model=None):
+
         self.runtime_probability = {}
         self.value_conditional = {}
         self.value_prior = {}
@@ -19,7 +20,8 @@ class ChangeOfMindPredictor:
         self.total_run_continue_proba = {}
         self.total_run_changepoint_proba = {}
         self.model = model
-        self.train_language_agnostic(input_data)
+        if input_data is not None:
+            self.train_language_agnostic(input_data)
 
     def get_message_causing_changepoint(self, current_user, in_messages, num_messages):
         res = []
