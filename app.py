@@ -683,6 +683,8 @@ def handle_signals():
 
 
 if __name__ == '__main__':
+    from delitrigger import *
+
     app.run()
     try:
         socketio.run(host='localhost', port=8898, app=app, log_output=True)
