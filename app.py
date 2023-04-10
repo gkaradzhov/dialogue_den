@@ -1,4 +1,4 @@
-from delitrigger import *
+from delitrigger import ChangeOfMindPredictor
 
 import datetime
 import hashlib
@@ -37,12 +37,7 @@ from wason_message_processing import get_context_solutions_users, preprocess_con
 # import eventlet
 # eventlet.monkey_patch()
 
-test = ChangeOfMindPredictor(None, None)
-with open('models/changepoint', 'rb') as f:
-    CHANGEPOINT = pickle.load(f)
 
-aa = CHANGEPOINT.predict_change_of_mind(['Hi', "I think the answer is A and 2"], [0.5, 0.5, 0.5, 0.5], 22)
-print(aa)
 
 login_manager = flask_login.LoginManager()
 
@@ -60,6 +55,13 @@ socketio = flask_socketio.SocketIO(app, cors_allowed_origins='*', async_mode='ev
 nlp = spacy.load('en_core_web_sm')
 
 login_manager.init_app(app)
+
+test = ChangeOfMindPredictor(None, None)
+with open('models/changepoint', 'rb') as f:
+    CHANGEPOINT = pickle.load(f)
+
+aa = CHANGEPOINT.predict_change_of_mind(['Hi', "I think the answer is A and 2"], [0.5, 0.5, 0.5, 0.5], 22)
+print(aa)
 
 PG = PostgreConnection('localadasdda_cred.json')
 MTURK_MANAGEMENT = MTurkManagement('local_creddadasasd.json')
@@ -683,7 +685,7 @@ def handle_signals():
 
 
 if __name__ == '__main__':
-    from delitrigger import *
+    from delitrigger import ChangeOfMindPredictor
 
     app.run()
     try:
