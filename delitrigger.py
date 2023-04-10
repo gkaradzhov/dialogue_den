@@ -111,7 +111,8 @@ class ChangeOfMindPredictor:
         return normalised_dict
 
     def get_smoothed_proba(self, search_element, collection, discount_factor=0.5):
-        if search_element in collection:
+
+        if search_element in collection.keys():
             return collection[search_element]
 
         sorted_collect = sorted(collection.keys())
