@@ -6,12 +6,14 @@ import joblib
 from collections import defaultdict
 
 import spacy
+import json
+
 from wason_message_processing import read_3_lvl_annotation_file, read_wason_dump, merge_with_solution_raw, \
     preprocess_conversation_dump, calculate_stats
 
 
-class ChangeOfMindPredictor:
-    def __init__(self, input_data=None, model=None):
+class ChangeOfMindTrainer:
+    def __init__(self, input_data=None):
 
         self.runtime_probability = {}
         self.value_conditional = {}
@@ -20,9 +22,16 @@ class ChangeOfMindPredictor:
         self.gap_prior = {}
         self.total_run_continue_proba = {}
         self.total_run_changepoint_proba = {}
-        self.model = model
+        self.datum_given_gap_proba = {}
         if input_data is not None:
             self.train_language_agnostic(input_data)
+            self.save_states()
+
+    def save_states(self):
+        with open('models/changeofmindstates.json', 'w') as f:
+            json.dump([self.runtime_probability, self.value_conditional, self.value_prior, self.hazards, self.gap_prior,
+                       self.total_run_continue_proba, self.total_run_changepoint_proba, self.datum_given_gap_proba],
+                      f, ensure_ascii=False, indent=4)
 
     def get_message_causing_changepoint(self, current_user, in_messages, num_messages):
         res = []
@@ -136,6 +145,152 @@ class ChangeOfMindPredictor:
                 s += g
         return c / s
 
+    def train_language_agnostic(self, processed_input):
+        preprocessed_train, no_gaps, linguistic = self.preprocess_train_supervised(processed_input)
+
+        total_run_changepoint = defaultdict(lambda: 0)
+        total_run_continue = defaultdict(lambda: 0)
+        total_runs = defaultdict(lambda: 0)
+
+        for user_conv in no_gaps:
+            for index, run in enumerate(user_conv):
+                total_runs[index] += 1
+                if run == 'CHANGEPOINT':
+                    total_run_changepoint[index] += 1
+                else:
+                    total_run_continue[index] += 1
+
+        for key, val in total_run_changepoint.items():
+            self.total_run_changepoint_proba[key] = val / total_runs[key]
+
+        for key, val in total_run_continue.items():
+            self.total_run_continue_proba[key] = val / total_runs[key]
+
+        value_counts = defaultdict(lambda: 0)
+        value_conditional_counts = defaultdict(lambda: defaultdict(lambda: 0))
+
+        total_events = 0
+        for conversation in preprocessed_train:
+            previous = None
+            for run in conversation:
+                for element in run:
+                    total_events += 1
+                    value_counts[element] += 1
+                    if previous is not None:
+                        value_conditional_counts[previous][element] += 1
+                    previous = element
+
+        self.value_conditional = self.normalize_dict_dict(value_conditional_counts)
+
+        for k, v in value_counts.items():
+            self.value_prior[k] = v / total_events
+
+        gap_counts = defaultdict(lambda: 0)
+        gaps_run = defaultdict(lambda: 0)
+        datum_given_gap = defaultdict(lambda: defaultdict(lambda: 0))
+
+        total_gaps = 0
+        for conversation in preprocessed_train:
+            total_gaps += len(conversation)
+            for run in conversation:
+                gap_counts[len(run)] += 1
+                for index, e in enumerate(run):
+                    datum_given_gap[index + 1][e] += 1
+                    gaps_run[index + 1] += 1
+
+        self.datum_given_gap_proba = self.normalize_dict_dict(datum_given_gap)
+
+        for k, gap in gap_counts.items():
+            self.runtime_probability[k] = (gaps_run[k] - gap) / gaps_run[k]
+
+        for k, v in gap_counts.items():
+            self.gap_prior[k] = v / total_gaps
+
+        for ind in range(1, 80):
+            self.hazards[ind] = self.hazard_function(ind, self.gap_prior)
+
+
+class ChangeOfMindPredictor:
+    def __init__(self, saved_states_path='models/changeofmindstates.json', model_path='models/bow_full_delidata.model'):
+        self.runtime_probability = {}
+        self.value_conditional = {}
+        self.value_prior = {}
+        self.hazards = {}
+        self.gap_prior = {}
+        self.total_run_continue_proba = {}
+        self.total_run_changepoint_proba = {}
+        self.datum_given_gap_proba = {}
+        with open(saved_states_path, 'r') as f:
+            loaded_dicts = json.load(f)
+            loaded_dicts = [self.convert_keys_to_number(d) for d in loaded_dicts]
+
+            self.runtime_probability, self.value_conditional, self.value_prior, self.hazards, self.gap_prior, self.total_run_continue_proba, self.total_run_changepoint_proba, self.datum_given_gap_proba = loaded_dicts
+        with open(model_path, 'rb') as f:
+            self.model = pickle.load(f)
+
+    def is_number(self, s):
+        try:
+            float(s)
+            return True
+        except ValueError:
+            return False
+
+    def convert_keys_to_number(self, d):
+        new_dict = {}
+        for k, v in d.items():
+            if isinstance(v, dict):
+                v = self.convert_keys_to_number(v)
+
+            if self.is_number(k) and k != "DEFAULT":
+                try:
+                    key = int(k)
+                except ValueError:
+                    key = float(k)
+            else:
+                key = k
+            new_dict[key] = v
+        return new_dict
+
+    def get_smoothed_proba(self, search_element, collection, discount_factor=0.5):
+
+        if search_element in collection.keys():
+            return collection[search_element]
+
+        sorted_collect = sorted(collection.keys())
+        upper = -1
+        lower = -1
+        for i in sorted_collect:
+            if search_element > i:
+                lower = i
+            elif search_element < i:
+                upper = i
+                break
+
+        return (collection.get(lower, 0) + collection.get(upper, 0)) * 0.5 * discount_factor
+
+    def hazard_function(self, current_timestep, gaps):
+        c = self.get_smoothed_proba(current_timestep, gaps, 2)
+        s = c
+        for k, g in gaps.items():
+            if k > current_timestep:
+                s += g
+        return c / s
+
+    def predict_change_of_mind(self, conv_text, current_run, total_run):
+        cha = self.calc_changepoint_proba(current_run, total_run)
+        growth_proba = self.calc_growth_proba(current_run, total_run)
+        if cha + growth_proba == 0:
+            ocp_proba = 0
+        else:
+            ocp_proba = cha / (cha + growth_proba)
+
+        ocp_prediction = 1 if ocp_proba > 0.75 else 0
+
+        ling_output = self.model.predict_proba(["<SEP>".join(conv_text[-2])])[0][1]
+        ling_prediction = 1 if ling_output >= 0.606 else 0
+
+        return max(ocp_prediction, ling_prediction)
+
     def sequence_probability(self, sequence, conditionals, apriori):
         previous = None
         probability = 0
@@ -215,86 +370,6 @@ class ChangeOfMindPredictor:
         result *= total_run_calc
         return result
 
-    def train_language_agnostic(self, processed_input):
-        preprocessed_train, no_gaps, linguistic = self.preprocess_train_supervised(processed_input)
-
-        total_run_changepoint = defaultdict(lambda: 0)
-        total_run_continue = defaultdict(lambda: 0)
-        total_runs = defaultdict(lambda: 0)
-
-        for user_conv in no_gaps:
-            for index, run in enumerate(user_conv):
-                total_runs[index] += 1
-                if run == 'CHANGEPOINT':
-                    total_run_changepoint[index] += 1
-                else:
-                    total_run_continue[index] += 1
-
-        for key, val in total_run_changepoint.items():
-            self.total_run_changepoint_proba[key] = val / total_runs[key]
-
-        for key, val in total_run_continue.items():
-            self.total_run_continue_proba[key] = val / total_runs[key]
-
-        value_counts = defaultdict(lambda: 0)
-        value_conditional_counts = defaultdict(lambda: defaultdict(lambda: 0))
-
-        total_events = 0
-        for conversation in preprocessed_train:
-            previous = None
-            for run in conversation:
-                for element in run:
-                    total_events += 1
-                    value_counts[element] += 1
-                    if previous is not None:
-                        value_conditional_counts[previous][element] += 1
-                    previous = element
-
-        self.value_conditional = self.normalize_dict_dict(value_conditional_counts)
-
-        for k, v in value_counts.items():
-            self.value_prior[k] = v / total_events
-
-        gap_counts = defaultdict(lambda: 0)
-        gaps_run = defaultdict(lambda: 0)
-        datum_given_gap = defaultdict(lambda: defaultdict(lambda: 0))
-
-        total_gaps = 0
-        for conversation in preprocessed_train:
-            total_gaps += len(conversation)
-            for run in conversation:
-                gap_counts[len(run)] += 1
-                for index, e in enumerate(run):
-                    datum_given_gap[index + 1][e] += 1
-                    gaps_run[index + 1] += 1
-
-        self.datum_given_gap_proba = self.normalize_dict_dict(datum_given_gap)
-
-        for k, gap in gap_counts.items():
-            self.runtime_probability[k] = (gaps_run[k] - gap) / gaps_run[k]
-
-        for k, v in gap_counts.items():
-            self.gap_prior[k] = v / total_gaps
-
-        for ind in range(1, 80):
-            self.hazards[ind] = self.hazard_function(ind, self.gap_prior)
-
-    def predict_change_of_mind(self, conv_text, current_run, total_run):
-
-        cha = self.calc_changepoint_proba(current_run, total_run)
-        growth_proba = self.calc_growth_proba(current_run, total_run)
-        if cha + growth_proba == 0:
-            ocp_proba = 0
-        else:
-            ocp_proba = cha / (cha + growth_proba)
-
-        ocp_prediction = 1 if ocp_proba > 0.75 else 0
-
-        ling_output = self.model.predict_proba(["<SEP>".join(conv_text[-2])])[0][1]
-        ling_prediction = 1 if ling_output >= 0.606 else 0
-
-        return max(ocp_prediction, ling_prediction)
-
 
 if __name__ == "__main__":
 
@@ -329,12 +404,9 @@ if __name__ == "__main__":
                                 "content": s_t.content})
         data.append(current)
 
-    with open('models/bow_full_delidata.model', 'rb') as f:
-        clf2 = pickle.load(f)
-
     print(len(data))
-    comp = ChangeOfMindPredictor(data, clf2)
+    trainer = ChangeOfMindTrainer(data)
+
+    comp = ChangeOfMindPredictor()
     aa = comp.predict_change_of_mind(['Hi', "I think the answer is A and 2"], [0.5, 0.5, 0.5, 0.5], 22)
     print(aa)
-
-    joblib.dump(comp, 'models/changepoint')

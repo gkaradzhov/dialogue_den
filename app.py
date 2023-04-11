@@ -57,10 +57,8 @@ nlp = spacy.load('en_core_web_sm')
 
 login_manager.init_app(app)
 
-with open('models/bow_full_delidata.model', 'rb') as f:
-    clf2 = pickle.load(f)
+CHANGEOFMIND = ChangeOfMindPredictor()
 
-print(clf2.predict_proba(["Hi"]))
 PG = PostgreConnection('localadasdda_cred.json')
 MTURK_MANAGEMENT = MTurkManagement('local_creddadasasd.json')
 admin_pass = os.environ.get('ADMIN')
@@ -139,7 +137,7 @@ def trigger_finish(room_data):
 # A welcome message to test our server
 @app.route('/')
 def index():
-    aa = CHANGEPOINT.predict_change_of_mind(['Hi', "I think the answer is A and 2"], [0.5, 0.5, 0.5, 0.5], 22)
+    aa = CHANGEOFMIND.predict_change_of_mind(['Hi', "I think the answer is A and 2"], [0.5, 0.5, 0.5, 0.5], 22)
     print(aa)
     return render_template('index.html')
 
