@@ -1,4 +1,3 @@
-
 import datetime
 import hashlib
 import json
@@ -7,6 +6,8 @@ import pickle
 import random
 import signal
 import time
+from collections import defaultdict
+
 import joblib
 from datetime import timezone
 from os import path
@@ -38,7 +39,6 @@ from wason_message_processing import get_context_solutions_users, preprocess_con
 # eventlet.monkey_patch()
 
 
-
 login_manager = flask_login.LoginManager()
 
 app = Flask(__name__)
@@ -63,6 +63,8 @@ PG = PostgreConnection('localadasdda_cred.json')
 MTURK_MANAGEMENT = MTurkManagement('local_creddadasasd.json')
 admin_pass = os.environ.get('ADMIN')
 salt = os.environ.get('SALT')
+
+ROOM_STATE_TRACKER = defaultdict()
 
 
 class User(flask_login.UserMixin):
@@ -137,8 +139,6 @@ def trigger_finish(room_data):
 # A welcome message to test our server
 @app.route('/')
 def index():
-    aa = CHANGEOFMIND.predict_change_of_mind(['Hi', "I think the answer is A and 2"], [0.5, 0.5, 0.5, 0.5], 22)
-    print(aa)
     return render_template('index.html')
 
 
@@ -320,7 +320,7 @@ def delibot():
         return render_template('unsuccessful_onboarding.html')
 
     is_moderator = request.args.get('moderator', False)
-
+    ROOM_STATE_TRACKER[room_id] = {"sol_tracker": [], "current_run": [], 'last_com': 0, 'last_intervention': 0}
     room = PG.get_single_room(room_id)
     running_dialogue = PG.get_messages(room.room_id)
     messages = [d for d in running_dialogue if d.message_type == CHAT_MESSAGE]
@@ -603,8 +603,8 @@ def check_if_can_speak(all_messages):
     return can_delibot_speak
 
 
-@socketio.on('deliresponse')
-def handle_response(json):
+@socketio.on('deliresponse_old')
+def handle_response_old(json):
     print('redirected to response')
     print('received my event: ' + str(json))
     room_id = json['room']
@@ -645,6 +645,62 @@ def handle_response(json):
             m = Message(origin_id=990, origin_name='DEliBot', message_type='CHAT_MESSAGE', room_id=room_id,
                         content={'message': x.text}, user_status=USR_PLAYING, user_type='DELIBOT_SIMILARITY')
             create_broadcast_message(m)
+
+
+@socketio.on('deliresponse')
+def handle_response(json):
+    print('redirected to response')
+    print('received my event: ' + str(json))
+    room_id = json['room']
+    m = Message(origin_id=json['user_id'], origin_name=json['user_name'], message_type=json['type'], room_id=room_id,
+                content=json['message'], user_status=json['user_status'], user_type=json.get('user_type', None))
+
+    create_broadcast_message(m)
+    all_messages = PG.get_messages(room_id)
+    handle_room_events(all_messages, room_id, m)
+    validate_finish_game(all_messages, room_id)
+
+    context, solution, users, tracker = get_context_solutions_users(all_messages, nlp)
+    ROOM_STATE_TRACKER[room_id]["sol_tracker"] = tracker
+    ROOM_STATE_TRACKER[room_id]["current_run"].append(tracker[-1])
+    has_com = CHANGEOFMIND.predict_change_of_mind(context, ROOM_STATE_TRACKER[room_id]["current_run"], len(context))
+    if has_com == 1:
+        ROOM_STATE_TRACKER[room_id]["current_run"] = []
+        ROOM_STATE_TRACKER[room_id]["last_com"] = 0
+    else:
+        ROOM_STATE_TRACKER[room_id]["last_com"] += 1
+
+    ROOM_STATE_TRACKER[room_id]["last_intervention"] = None
+
+    check = check_if_can_speak(all_messages)
+    if check and \
+            ((ROOM_STATE_TRACKER[room_id]["last_intervention"] >= 5 and ROOM_STATE_TRACKER[room_id]["last_com"] >= 5) or
+             ROOM_STATE_TRACKER[room_id]["last_intervention"] >= 10):
+        ROOM_STATE_TRACKER[room_id]["last_intervention"] = 0
+        m = Message(origin_id=-1, origin_name='SYSTEM', message_type='DELIBOT_TRIGGER', room_id=room_id,
+                    content={'message': None}, user_status=None, user_type='SYSTEM')
+        create_broadcast_message(m)
+
+        url = 'http://delibot.cl.cam.ac.uk/delibot2'
+        myobj = {
+            "context": context[-2:],
+            "cards": solution,
+            "users": users,
+            "skip": context}
+
+        print(myobj)
+        x = requests.post(url, json=myobj)
+        print(x.text)
+
+        # Second check before uttering to make sure that nothing changed since the last time
+        all_messages = PG.get_messages(room_id)
+        context, solution, users, tracker = get_context_solutions_users(all_messages, nlp)
+        if 'delibot' not in set(users[-3:]) and len(tracker) >= 4:
+            m = Message(origin_id=990, origin_name='DEliBot', message_type='CHAT_MESSAGE', room_id=room_id,
+                        content={'message': x.text}, user_status=USR_PLAYING, user_type='DELIBOT_RC1')
+            create_broadcast_message(m)
+    else:
+        ROOM_STATE_TRACKER[room_id]["last_intervention"] += 1
 
 
 def validate_finish_game(all_messages, room_id):
