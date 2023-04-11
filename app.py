@@ -7,6 +7,7 @@ import pickle
 import random
 import signal
 import time
+import joblib
 from datetime import timezone
 from os import path
 import requests
@@ -42,7 +43,7 @@ login_manager = flask_login.LoginManager()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'this_secret_key_potato_21_kaxvhsdferfx3d34'
-from .delitrigger import ChangeOfMindPredictor
+from delitrigger import ChangeOfMindPredictor
 
 app.config.update(dict(
     PREFERRED_URL_SCHEME='https'
@@ -57,8 +58,7 @@ nlp = spacy.load('en_core_web_sm')
 login_manager.init_app(app)
 
 test = ChangeOfMindPredictor(None, None)
-with open('models/changepoint', 'rb') as f:
-    CHANGEPOINT = pickle.load(f)
+CHANGEPOINT = joblib.load('models/changepoint')
 
 aa = CHANGEPOINT.predict_change_of_mind(['Hi', "I think the answer is A and 2"], [0.5, 0.5, 0.5, 0.5], 22)
 print(aa)

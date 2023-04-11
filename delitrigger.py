@@ -1,7 +1,8 @@
 import math
+import pickle
 from functools import partial
 
-import pickle
+import joblib
 from collections import defaultdict
 
 import spacy
@@ -336,5 +337,4 @@ if __name__ == "__main__":
     aa = comp.predict_change_of_mind(['Hi', "I think the answer is A and 2"], [0.5, 0.5, 0.5, 0.5], 22)
     print(aa)
 
-    with open('models/changepoint', 'wb') as f:
-        a = pickle.dump(comp, f)
+    joblib.dump(comp, 'models/changepoint')
