@@ -57,12 +57,10 @@ nlp = spacy.load('en_core_web_sm')
 
 login_manager.init_app(app)
 
-test = ChangeOfMindPredictor(None, None)
-CHANGEPOINT = joblib.load('models/changepoint')
+with open('models/bow_full_delidata.model', 'rb') as f:
+    clf2 = pickle.load(f)
 
-aa = CHANGEPOINT.predict_change_of_mind(['Hi', "I think the answer is A and 2"], [0.5, 0.5, 0.5, 0.5], 22)
-print(aa)
-
+print(clf2.predict_proba(["Hi"]))
 PG = PostgreConnection('localadasdda_cred.json')
 MTURK_MANAGEMENT = MTurkManagement('local_creddadasasd.json')
 admin_pass = os.environ.get('ADMIN')
