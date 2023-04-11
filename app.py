@@ -681,7 +681,7 @@ def handle_response(json):
                     content={'message': None}, user_status=None, user_type='SYSTEM')
         create_broadcast_message(m)
 
-        url = 'http://delibot.cl.cam.ac.uk/delibot2'
+        url = 'http://delibot.cl.cam.ac.uk/delibot3'
         myobj = {
             "context": context[-2:],
             "cards": solution,
