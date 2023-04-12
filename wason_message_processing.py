@@ -108,6 +108,7 @@ class WasonConversation:
             for raw in self.raw_db_conversation:
                 if item.identifier == raw['message_id']:
                     content = raw['content']
+            print(content)
             doc = tagger(content)
             item.content_pos = [a.pos_ for a in doc]
             item.content_tokenised = self.tknzr.tokenize(content)
