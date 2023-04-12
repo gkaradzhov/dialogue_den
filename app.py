@@ -694,11 +694,13 @@ def handle_response(json):
 
         # Second check before uttering to make sure that nothing changed since the last time
         all_messages = PG.get_messages(room_id)
-        context, solution, users, tracker = get_context_solutions_users(all_messages, nlp)
+        context, solution, users, tracker, participation = get_context_solutions_users(all_messages, nlp)
         if 'delibot' not in set(users[-3:]) and len(tracker) >= 4:
             m = Message(origin_id=990, origin_name='DEliBot', message_type='CHAT_MESSAGE', room_id=room_id,
                         content={'message': x.text}, user_status=USR_PLAYING, user_type='DELIBOT_RC1')
             create_broadcast_message(m)
+        else:
+            ROOM_STATE_TRACKER[room_id]["last_intervention"] += 1
     else:
         ROOM_STATE_TRACKER[room_id]["last_intervention"] += 1
 
