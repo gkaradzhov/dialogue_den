@@ -286,7 +286,7 @@ class ChangeOfMindPredictor:
 
         ocp_prediction = 1 if ocp_proba > 0.75 else 0
 
-        ling_output = self.model.predict_proba(["<SEP>".join(conv_text[-2])])[0][1]
+        ling_output = self.model.predict_proba(["<SEP>".join(conv_text[-2:])])[0][1]
         ling_prediction = 1 if ling_output >= 0.606 else 0
 
         return max(ocp_prediction, ling_prediction)

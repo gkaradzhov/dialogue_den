@@ -670,7 +670,6 @@ def handle_response(json):
     else:
         ROOM_STATE_TRACKER[room_id]["last_com"] += 1
 
-    ROOM_STATE_TRACKER[room_id]["last_intervention"] = None
 
     check = check_if_can_speak(all_messages)
     if check and \
