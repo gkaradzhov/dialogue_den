@@ -660,7 +660,7 @@ def handle_response(json):
     handle_room_events(all_messages, room_id, m)
     validate_finish_game(all_messages, room_id)
 
-    context, solution, users, tracker = get_context_solutions_users(all_messages, nlp)
+    context, solution, users, tracker, participation = get_context_solutions_users(all_messages, nlp)
     ROOM_STATE_TRACKER[room_id]["sol_tracker"] = tracker
     ROOM_STATE_TRACKER[room_id]["current_run"].append(tracker[-1])
     has_com = CHANGEOFMIND.predict_change_of_mind(context, ROOM_STATE_TRACKER[room_id]["current_run"], len(context))
@@ -685,7 +685,8 @@ def handle_response(json):
             "context": context[-2:],
             "cards": solution,
             "users": users,
-            "skip": context}
+            "skip": context,
+            "participation_feats": participation}
 
         print(myobj)
         x = requests.post(url, json=myobj)

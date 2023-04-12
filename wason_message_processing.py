@@ -459,6 +459,57 @@ def merge_with_solution_raw(conversation_external, supervised=False):
     return with_solutions
 
 
+def featurise_solution_participation(raw_conv):
+    features = {}
+
+    participation_tracker = defaultdict(lambda: 0)
+    participation_normalised = {}
+    messages = 0
+    participation_at_10 = {'0': 0}
+    participation_at_20 = {'0': 0}
+
+    for raw in raw_conv:
+        if raw['message_type'] == 'CHAT_MESSAGE':
+            messages += 1
+            participation_tracker[raw['user_name']] += 1
+            for k_abs, v_abs in participation_tracker.items():
+                participation_normalised[k_abs + '_participation'] = v_abs / messages
+                if messages == 10:
+                    participation_at_10 = participation_normalised
+                if messages == 20:
+                    participation_at_20 = participation_normalised
+        else:
+            if raw['user_name'] not in participation_tracker:
+                participation_tracker[raw['user_name']] = 0
+
+        return [*create_participation_feats(participation_at_10),
+                *create_participation_feats(participation_at_20),
+                *create_participation_feats(participation_normalised),
+                ]
+
+
+def create_participation_feats(participation):
+    if len(participation) == 0:
+        return [0, 0, 0, 0]
+
+    dominating_50 = 0
+    dominating_40 = 0
+    completely_silent_participant = 0
+    moderatly_silent = 0
+
+    for us, part in participation.items():
+        if part >= 0.5:
+            dominating_50 = 1
+        elif part >= 0.4:
+            dominating_40 = 1
+        elif part == 0:
+            completely_silent_participant = 1
+        elif part >= 0 and part <= 0.2:
+            moderatly_silent = 1
+
+    return [dominating_50, dominating_40, completely_silent_participant, moderatly_silent]
+
+
 def get_context_solutions_users(postgre_messages, nlp):
     wason_conversation = WasonConversation(postgre_messages[0].room_id)
     for pm in postgre_messages:
@@ -474,7 +525,7 @@ def get_context_solutions_users(postgre_messages, nlp):
                                                        'user_name': pm.origin,
                                                        'message_id': pm.unique_id,
                                                        'user_status': pm.user_status})
-
+    participation_features = featurise_solution_participation(wason_conversation.raw_db_conversation)
     wason_conversation.wason_messages_from_raw()
     wason_conversation.preprocess_everything(nlp)
     messages = merge_with_solution_raw(wason_conversation, False)
@@ -498,7 +549,7 @@ def get_context_solutions_users(postgre_messages, nlp):
         if 'sol_tracker' in m.annotation and m.annotation['sol_tracker'] is not None:
             cards.extend(list(m.annotation['sol_tracker']))
 
-    return context, cards, users, tracker
+    return context, cards, users, tracker, participation_features
 
 
 def read_wason_dump(dump_path):
