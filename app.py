@@ -663,7 +663,7 @@ def handle_response(json):
     context, solution, users, tracker, participation = get_context_solutions_users(all_messages, nlp)
     ROOM_STATE_TRACKER[room_id]["sol_tracker"] = tracker
     ROOM_STATE_TRACKER[room_id]["current_run"].append(tracker[-1])
-    has_com = CHANGEOFMIND.predict_change_of_mind(context, ROOM_STATE_TRACKER[room_id]["current_run"], len(context))
+    has_com, meta_obj = CHANGEOFMIND.predict_change_of_mind(context, ROOM_STATE_TRACKER[room_id]["current_run"], len(context))
     if has_com == 1:
         ROOM_STATE_TRACKER[room_id]["current_run"] = []
         ROOM_STATE_TRACKER[room_id]["last_com"] = 0
@@ -677,7 +677,7 @@ def handle_response(json):
              ROOM_STATE_TRACKER[room_id]["last_intervention"] >= 10):
         ROOM_STATE_TRACKER[room_id]["last_intervention"] = 0
         m = Message(origin_id=-1, origin_name='SYSTEM', message_type='DELIBOT_TRIGGER', room_id=room_id,
-                    content={'message': None}, user_status=None, user_type='SYSTEM')
+                    content=meta_obj, user_status=None, user_type='SYSTEM')
         create_broadcast_message(m)
 
         url = 'http://delibot.cl.cam.ac.uk/delibot3'
@@ -690,14 +690,13 @@ def handle_response(json):
 
         print(myobj)
         x = requests.post(url, json=myobj)
-        print(x.text)
 
         # Second check before uttering to make sure that nothing changed since the last time
         all_messages = PG.get_messages(room_id)
         context, solution, users, tracker, participation = get_context_solutions_users(all_messages, nlp)
         if 'delibot' not in set(users[-3:]) and len(tracker) >= 4:
             m = Message(origin_id=990, origin_name='DEliBot', message_type='CHAT_MESSAGE', room_id=room_id,
-                        content={'message': x.text}, user_status=USR_PLAYING, user_type='DELIBOT_RC1')
+                        content={'message': x.content['text'], 'meta': x.content['meta']}, user_status=USR_PLAYING, user_type='DELIBOT_RC1')
             create_broadcast_message(m)
         else:
             ROOM_STATE_TRACKER[room_id]["last_intervention"] += 1

@@ -220,6 +220,7 @@ class ChangeOfMindPredictor:
         self.total_run_continue_proba = {}
         self.total_run_changepoint_proba = {}
         self.datum_given_gap_proba = {}
+        self.model_path = model_path
         with open(saved_states_path, 'r') as f:
             loaded_dicts = json.load(f)
             loaded_dicts = [self.convert_keys_to_number(d) for d in loaded_dicts]
@@ -277,19 +278,27 @@ class ChangeOfMindPredictor:
         return c / s
 
     def predict_change_of_mind(self, conv_text, current_run, total_run):
+        prediction_object = {}
         cha = self.calc_changepoint_proba(current_run, total_run)
         growth_proba = self.calc_growth_proba(current_run, total_run)
         if cha + growth_proba == 0:
             ocp_proba = 0
         else:
             ocp_proba = cha / (cha + growth_proba)
+        prediction_object['current_run'] = current_run
+        prediction_object['BOCP'] = ocp_proba
+        prediction_object['BOCP_threshold'] = 0.75
 
         ocp_prediction = 1 if ocp_proba > 0.75 else 0
 
         ling_output = self.model.predict_proba(["<SEP>".join(conv_text[-2:])])[0][1]
+        prediction_object['linguistic_thresh'] = 0.606
+        prediction_object['linguistic_proba'] = ling_output
+        prediction_object['linguistic_path'] = self.model_path
+
         ling_prediction = 1 if ling_output >= 0.606 else 0
 
-        return max(ocp_prediction, ling_prediction)
+        return max(ocp_prediction, ling_prediction), prediction_object
 
     def sequence_probability(self, sequence, conditionals, apriori):
         previous = None
@@ -408,5 +417,7 @@ if __name__ == "__main__":
     trainer = ChangeOfMindTrainer(data)
 
     comp = ChangeOfMindPredictor()
-    aa = comp.predict_change_of_mind(['Hi', "I think the answer is A and 2"], [0.5, 0.5, 0.5, 0.5], 22)
+    aa, obj = comp.predict_change_of_mind(['Hi', "I think the answer is A and 2"], [0.5, 0.5, 0.5, 0.5], 22)
     print(aa)
+    print(obj)
+    pass
