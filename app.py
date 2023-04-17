@@ -663,18 +663,20 @@ def handle_response(json):
     context, solution, users, tracker, participation = get_context_solutions_users(all_messages, nlp)
     ROOM_STATE_TRACKER[room_id]["sol_tracker"] = tracker
     ROOM_STATE_TRACKER[room_id]["current_run"].append(tracker[-1])
-    has_com, meta_obj = CHANGEOFMIND.predict_change_of_mind(context, ROOM_STATE_TRACKER[room_id]["current_run"], len(context))
+    # has_com, meta_obj = CHANGEOFMIND.predict_change_of_mind(context, ROOM_STATE_TRACKER[room_id]["current_run"],
+    #                                                         len(context))
+    has_com = 0
+    meta_obj = {"type": "hardcoded_every4utterances"}
     if has_com == 1:
         ROOM_STATE_TRACKER[room_id]["current_run"] = []
         ROOM_STATE_TRACKER[room_id]["last_com"] = 0
     else:
         ROOM_STATE_TRACKER[room_id]["last_com"] += 1
 
-
     check = check_if_can_speak(all_messages)
-    if check and \
-            ((ROOM_STATE_TRACKER[room_id]["last_intervention"] >= 5 and ROOM_STATE_TRACKER[room_id]["last_com"] >= 5) or
-             ROOM_STATE_TRACKER[room_id]["last_intervention"] >= 10):
+    if check and ROOM_STATE_TRACKER[room_id]["last_intervention"] >= 4:
+        # ((ROOM_STATE_TRACKER[room_id]["last_intervention"] >= 5 and ROOM_STATE_TRACKER[room_id]["last_com"] >= 5) or
+        #  ROOM_STATE_TRACKER[room_id]["last_intervention"] >= 10):
         ROOM_STATE_TRACKER[room_id]["last_intervention"] = 0
         m = Message(origin_id=-1, origin_name='SYSTEM', message_type='DELIBOT_TRIGGER', room_id=room_id,
                     content=meta_obj, user_status=None, user_type='SYSTEM')
@@ -696,7 +698,8 @@ def handle_response(json):
         context, solution, users, tracker, participation = get_context_solutions_users(all_messages, nlp)
         if 'delibot' not in set(users[-3:]) and len(tracker) >= 4:
             m = Message(origin_id=990, origin_name='DEliBot', message_type='CHAT_MESSAGE', room_id=room_id,
-                        content={'message': x.content['text'], 'meta': x.content['meta']}, user_status=USR_PLAYING, user_type='DELIBOT_RC1')
+                        content={'message': x.content['text'], 'meta': x.content['meta']}, user_status=USR_PLAYING,
+                        user_type='DELIBOT_RC1')
             create_broadcast_message(m)
         else:
             ROOM_STATE_TRACKER[room_id]["last_intervention"] += 1
