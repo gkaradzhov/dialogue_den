@@ -198,7 +198,7 @@
         </form>
     </div>
 </div>
-<div id="dialog-form" title="Questions" style="display:none;">
+<div id="dialog-form" title="Questions" style="display:none;height: auto; width: 1000px; top: 795px; left: 439px;">
   <form>
     <fieldset>
       <h3>How helpful was the DElibot for the discussion? (in terms of aiding collaboration and argumentation) </h3>
@@ -210,20 +210,20 @@
       <label for="q1-a3">Very helpful</label><br>
 
       <h3>How natural were the responses by the DEliBot? (did they fit the context, was it something that a person could say) </h3>
-      <input type="radio" id="q2-a1" name="question1" value="negative">
+      <input type="radio" id="q2-a1" name="question2" value="negative">
       <label for="q1-a1">Not natural</label><br>
-      <input type="radio" id="q2-a2" name="question1" value="neutral">
+      <input type="radio" id="q2-a2" name="question2" value="neutral">
       <label for="q1-a2">It was ok</label><br>
-      <input type="radio" id="q2-a3" name="question1" value="positive">
+      <input type="radio" id="q2-a3" name="question2" value="positive">
       <label for="q1-a3">Very natural</label><br>
 
 
       <h3>How often did the DEliBot intervene? </h3>
-      <input type="radio" id="q3-a1" name="question1" value="not_enough">
+      <input type="radio" id="q3-a1" name="question3" value="not_enough">
       <label for="q1-a1">Not often enough</label><br>
-      <input type="radio" id="q3-a2" name="question1" value="just_right">
+      <input type="radio" id="q3-a2" name="question3" value="just_right">
       <label for="q1-a2">Just right</label><br>
-      <input type="radio" id="q3-a3" name="question1" value="too_much">
+      <input type="radio" id="q3-a3" name="question3" value="too_much">
       <label for="q1-a3">Too much, that it was annoying</label><br>
       <!-- Add more questions similarly -->
       <h3>Is there anything else that you wish to add:</h3>
@@ -530,13 +530,35 @@ $(function() {
         }
     });
 
+    function validateForm() {
+      // Validate Question 1
+      if (!$('input[name="question1"]:checked').val()) {
+        return false;
+      }
+
+      if (!$('input[name="question2"]:checked').val()) {
+        return false;
+      }
+
+      if (!$('input[name="question3"]:checked').val()) {
+        return false;
+      }
+
+      return true;
+    }
+
     $("#dialog-form").dialog({
       autoOpen: false,
       height: 400,
       width: 350,
       modal: true,
       buttons: {
-        "Submit": function() {
+      "Submit": function() {
+      if (!validateForm()) {
+        alert("Please answer all the questions.");
+        return;
+      }
+
           // Handle form submission
           let answers = {
             question1: $('input[name="question1"]:checked').val(),
