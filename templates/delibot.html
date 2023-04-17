@@ -198,6 +198,43 @@
         </form>
     </div>
 </div>
+<div id="dialog-form" title="Questions" style="display:none;">
+  <form>
+    <fieldset>
+      <h3>How helpful was the DElibot for the discussion? (in terms of aiding collaboration and argumentation) </h3>
+      <input type="radio" id="q1-a1" name="question1" value="negative">
+      <label for="q1-a1">Not helpful at all</label><br>
+      <input type="radio" id="q1-a2" name="question1" value="neutral">
+      <label for="q1-a2">It was ok</label><br>
+      <input type="radio" id="q1-a3" name="question1" value="positive">
+      <label for="q1-a3">Very helpful</label><br>
+
+      <h3>How natural were the responses by the DEliBot? (did they fit the context, was it something that a person could say) </h3>
+      <input type="radio" id="q2-a1" name="question1" value="negative">
+      <label for="q1-a1">Not natural</label><br>
+      <input type="radio" id="q2-a2" name="question1" value="neutral">
+      <label for="q1-a2">It was ok</label><br>
+      <input type="radio" id="q2-a3" name="question1" value="positive">
+      <label for="q1-a3">Very natural</label><br>
+
+
+      <h3>How often did the DEliBot intervene? </h3>
+      <input type="radio" id="q3-a1" name="question1" value="not_enough">
+      <label for="q1-a1">Not often enough</label><br>
+      <input type="radio" id="q3-a2" name="question1" value="just_right">
+      <label for="q1-a2">Just right</label><br>
+      <input type="radio" id="q3-a3" name="question1" value="too_much">
+      <label for="q1-a3">Too much, that it was annoying</label><br>
+      <!-- Add more questions similarly -->
+      <h3>Is there anything else that you wish to add:</h3>
+      <textarea id="free-text" rows="4" cols="50"></textarea>
+
+      <h2>Are you sure you want to Submit HIT? Press the button ONLY after you've submitted the solo solution, participated in the chat, submitted your final solution and filled the questionnaire above.</h2>
+      <input type="submit" id="submit-form" tabindex="-1" style="position:absolute; top:-1000px">
+    </fieldset>
+  </form>
+</div>
+
 <div class="footer"><a href="https://gkaradzhov.com">Georgi Karadzhov</a></div>
 <!--<audio id="audio" src="/static/announcement.mp3" autostart="false" ></audio>-->
 
@@ -493,15 +530,29 @@ $(function() {
         }
     });
 
-   $('#final_submit').on('click', function(e){
-        if (confirm("Are you sure you want to Submit HIT? Press the button ONLY after you've submitted the solo solution, participated in the chat and submitted your final solution.")) {
+    $("#dialog-form").dialog({
+      autoOpen: false,
+      height: 400,
+      width: 350,
+      modal: true,
+      buttons: {
+        "Submit": function() {
+          // Handle form submission
+          let answers = {
+            question1: $('input[name="question1"]:checked').val(),
+            question2: $('input[name="question2"]:checked').val(),
+            question3: $('input[name="question3"]:checked').val(),
 
-            var mturk_url = $('#mturk_url').val();
-            var selection = get_card_selection();
-            var room_status = $('input#room_status').val();
-            var user_status = $('input#user_status').val();
+            // Collect answers for other questions similarly
+            freeText: $('#free-text').val()
+          };
+          console.log(answers); // Use the answers object as needed
+           var mturk_url = $('#mturk_url').val();
+           var selection = get_card_selection();
+           var room_status = $('input#room_status').val();
+           var user_status = $('input#user_status').val();
 
-            socket.emit('response', {
+           socket.emit('response', {
                 user_id: global_user_id,
                 user_name: user_name,
                 type: WASON_AGREE,
@@ -514,8 +565,23 @@ $(function() {
             if (mturk_url != ''){
                 $('#mturk').submit();
             }
+        },
+        Cancel: function() {
+          $(this).dialog("close");
         }
+      },
+      close: function() {
+        // Reset the form when the dialog is closed
+        $('input[name="question1"]').prop('checked', false);
+        // Reset other questions similarly
+        $('#free-text').val('');
+      }
     });
+
+    $("#final_submit").on("click", function() {
+      $("#dialog-form").dialog("open");
+    });
+
 
     $('#group_start').on('click', function(e){
       $('#group_start').prop('disabled', true);
