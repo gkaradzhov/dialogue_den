@@ -226,6 +226,12 @@ class PostgreConnection:
         else:
             return False
 
+    def record_feedback(self, room_id, user_id, feedback):
+        self.__execute(
+            "INSERT INTO room_feedback (id, room_id, origin_id, feedback) "
+            "VALUES (%s, %s, %s, %s) RETURNING ID",
+            (str(uuid.uuid4()), room_id, user_id, feedback))
+
 # pg = PostgreConnection('creds.json', True)
 
 

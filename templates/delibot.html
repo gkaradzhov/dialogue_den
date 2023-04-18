@@ -549,8 +549,8 @@ $(function() {
 
     $("#dialog-form").dialog({
       autoOpen: false,
-      height: 400,
-      width: 350,
+      height: 600,
+      width: 1000,
       modal: true,
       buttons: {
       "Submit": function() {
@@ -561,13 +561,14 @@ $(function() {
 
           // Handle form submission
           let answers = {
-            question1: $('input[name="question1"]:checked').val(),
-            question2: $('input[name="question2"]:checked').val(),
-            question3: $('input[name="question3"]:checked').val(),
+            helpfulness: $('input[name="question1"]:checked').val(),
+            fluency: $('input[name="question2"]:checked').val(),
+            timing: $('input[name="question3"]:checked').val(),
 
             // Collect answers for other questions similarly
-            freeText: $('#free-text').val()
+            other_feedbacl: $('#free-text').val()
           };
+
           console.log(answers); // Use the answers object as needed
            var mturk_url = $('#mturk_url').val();
            var selection = get_card_selection();
@@ -582,6 +583,15 @@ $(function() {
                 room: room_id,
                 user_type: current_user_type,
                 user_status: user_status
+            });
+
+
+           let answersJson = JSON.stringify(answers);
+
+           socket.emit('post_feedback', {
+                user_id: global_user_id,
+                content: answersJson,
+                room: room_id
             });
 
             if (mturk_url != ''){

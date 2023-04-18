@@ -646,6 +646,16 @@ def handle_response_old(json):
                         content={'message': x.text}, user_status=USR_PLAYING, user_type='DELIBOT_SIMILARITY')
             create_broadcast_message(m)
 
+@socketio.on("post_feedback")
+def handle_feedback(json):
+    PG.record_feedback(json['room'], json['user_id'], json['content'])
+    # user_id: global_user_id,
+    # user_name: user_name,
+    # content: answersJson,
+    # room: room_id
+
+    pass
+
 
 @socketio.on('deliresponse')
 def handle_response(json):
