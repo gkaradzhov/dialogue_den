@@ -702,13 +702,13 @@ def handle_response(json):
 
         print(myobj)
         x = requests.post(url, json=myobj)
-
+        print(x)
         # Second check before uttering to make sure that nothing changed since the last time
         all_messages = PG.get_messages(room_id)
         context, solution, users, tracker, participation = get_context_solutions_users(all_messages, nlp)
         if 'delibot' not in set(users[-3:]) and len(tracker) >= 4:
             m = Message(origin_id=990, origin_name='DEliBot', message_type='CHAT_MESSAGE', room_id=room_id,
-                        content={'message': x.content['text'], 'meta': x.content['meta']}, user_status=USR_PLAYING,
+                        content={'message': x.json()['text'], 'meta': x.json()['meta']}, user_status=USR_PLAYING,
                         user_type='DELIBOT_RC1')
             create_broadcast_message(m)
         else:
