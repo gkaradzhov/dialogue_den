@@ -547,7 +547,7 @@ def get_context_solutions_users(postgre_messages, nlp):
                 tracker.append(tracker[-1])
 
         if 'sol_tracker' in m.annotation and m.annotation['sol_tracker'] is not None:
-            cards.extend(list(m.annotation['sol_tracker']))
+            cards = list(m.annotation['sol_tracker'])
 
     return context, cards, users, tracker, participation_features
 

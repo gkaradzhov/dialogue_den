@@ -676,7 +676,7 @@ def handle_response(json):
     # has_com, meta_obj = CHANGEOFMIND.predict_change_of_mind(context, ROOM_STATE_TRACKER[room_id]["current_run"],
     #                                                         len(context))
     has_com = 0
-    meta_obj = {"type": "hardcoded_every4utterances"}
+    meta_obj = {"type": "hardcoded_every3utterances"}
     if has_com == 1:
         ROOM_STATE_TRACKER[room_id]["current_run"] = []
         ROOM_STATE_TRACKER[room_id]["last_com"] = 0
@@ -684,7 +684,7 @@ def handle_response(json):
         ROOM_STATE_TRACKER[room_id]["last_com"] += 1
 
     check = check_if_can_speak(all_messages)
-    if check and ROOM_STATE_TRACKER[room_id]["last_intervention"] >= 4:
+    if check and ROOM_STATE_TRACKER[room_id]["last_intervention"] >= 2:
         # ((ROOM_STATE_TRACKER[room_id]["last_intervention"] >= 5 and ROOM_STATE_TRACKER[room_id]["last_com"] >= 5) or
         #  ROOM_STATE_TRACKER[room_id]["last_intervention"] >= 10):
         ROOM_STATE_TRACKER[room_id]["last_intervention"] = 0
