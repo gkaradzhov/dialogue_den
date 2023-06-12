@@ -86,8 +86,9 @@ class WasonMessage:
         self.annotation = annotation_obj
         self.content_tokenised = []
         self.content_pos = []
-        self.clean_text = ""
+        self.no_solution_text = ""
         self.type = type
+        self.clean_text = ""
 
     def merge_annotations(self, external_annotation_object):
         new_ann_dict = {**self.annotation, **external_annotation_object}
@@ -103,13 +104,16 @@ class WasonConversation:
 
     def preprocess_everything(self, tagger):
         for item in self.wason_messages:
-            content = item.content
-            for raw in self.raw_db_conversation:
-                if item.identifier == raw['message_id']:
-                    content = raw['content']['message'] if type(raw['content']) == dict else raw['content']
-            doc = tagger(content)
+            doc = tagger(item.content)
             item.content_pos = [a.pos_ for a in doc]
-            item.content_tokenised = self.tknzr.tokenize(content)
+            item.content_tokenised = self.tknzr.tokenize(item.content)
+
+    def remove_solutions(self):
+        initial_cards = self.get_initial_cards()
+
+        for item in self.wason_messages:
+            no_sol = [a if a not in initial_cards else '' for a in item.content_tokenised]
+            item.no_solution_text = " ".join(no_sol)
 
     def clean_special_tokens(self):
         initial_cards = self.get_initial_cards()
@@ -118,7 +122,7 @@ class WasonConversation:
         for item in self.wason_messages:
             clean_tokens = []
             for token in item.content_tokenised:
-                if token.upper() in initial_cards:
+                if token.upper() in initial_cards and token != 'I':
                     clean_tokens.append('<CARD>')
                 elif token.upper().replace('@', '') in users_upper:
                     clean_tokens.append('<MENTION>')
@@ -126,6 +130,35 @@ class WasonConversation:
                     clean_tokens.append(token)
 
             item.clean_text = " ".join(clean_tokens)
+
+    def clean_special_tokens_2(self):
+        initial_cards = self.get_initial_cards()
+        users = self.get_users()
+        users_upper = [u.upper() for u in users if u != 'SYSTEM']
+        for item in self.wason_messages:
+            clean_tokens = []
+            for token in item.content_tokenised:
+                if token.upper() in initial_cards and token != 'I' and token != 'a':
+                    clean_tokens.append('<CARD>')
+                elif token.upper().replace('@', '') in users_upper:
+                    clean_tokens.append('<MENTION>')
+                elif token.upper().replace('@', '') == 'GUINEA':
+                    clean_tokens.append('<MENTION>')
+                elif token.upper() == "PIG":
+                    continue
+                else:
+                    clean_tokens.append(token)
+
+            item.clean_text = " ".join(clean_tokens)
+
+    def get_users(self):
+        animals = ["Cat", "Guinea pig", "Alpaca", "Bat", "Beaver", "Bee", "Chipmunk", "Dolphin", "Duck", "Falcon",
+                   "Kiwi", "Lobster", "Ox", "Leopard", "Zebra", "Llama", "Narwhal", 'Lion', 'Tiger', "Hedgehog",
+                   "Giraffe", 'Puffin', 'Unicorn', 'Koala', 'Raven', 'Emu', 'Butterfly', 'Hamster', 'Panda', 'Narwahl']
+        animals_upper = []
+        for item in animals:
+            animals_upper.append(item.upper())
+        return animals_upper
 
     def get_initial_cards(self):
         cards = set()
@@ -135,20 +168,20 @@ class WasonConversation:
                 break
         return cards
 
-    def get_users(self):
-        users = set()
-        for item in self.wason_messages:
-            users.add(item.origin)
-        return users
-
     def wason_messages_from_raw(self):
         self.wason_messages = []
         for m in self.raw_db_conversation:
             if m['message_type'] == 'CHAT_MESSAGE':
-                self.wason_messages.append(WasonMessage(origin=m['user_name'],
-                                                        content=m['content'],
-                                                        identifier=m['message_id'],
-                                                        annotation_obj={}))
+                if type(m['content']) is not dict:
+                    self.wason_messages.append(WasonMessage(origin=m['user_name'],
+                                                            content=m['content'],
+                                                            identifier=m['message_id'],
+                                                            annotation_obj={}))
+                else:
+                    self.wason_messages.append(WasonMessage(origin=m['user_name'],
+                                                            content=m['content']['message'],
+                                                            identifier=m['message_id'],
+                                                            annotation_obj={**m['content'].get("meta", {})}))
 
     def to_street_crowd_format(self):
         data = []
@@ -169,7 +202,6 @@ class WasonConversation:
                 internal.merge_annotations(external.annotation)
             else:
                 print("Internal != External: {} {}".format(internal.identifier, external.identifier))
-
 
 allowed = {
     'vowels': {'A', 'O', 'U', 'E', 'I', 'Y'},
@@ -482,10 +514,10 @@ def featurise_solution_participation(raw_conv):
             if raw['user_name'] not in participation_tracker:
                 participation_tracker[raw['user_name']] = 0
 
-        return [*create_participation_feats(participation_at_10),
-                *create_participation_feats(participation_at_20),
-                *create_participation_feats(participation_normalised),
-                ]
+    return [*create_participation_feats(participation_at_10),
+            *create_participation_feats(participation_at_20),
+            *create_participation_feats(participation_normalised),
+            ]
 
 
 def create_participation_feats(participation):
