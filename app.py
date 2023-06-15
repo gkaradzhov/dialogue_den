@@ -694,7 +694,7 @@ def handle_response(json):
 
         url = 'http://delibot.cl.cam.ac.uk/delibot3'
         myobj = {
-            "context": context[-2:],
+            "context": context,
             "cards": solution,
             "users": users,
             "skip": context,
