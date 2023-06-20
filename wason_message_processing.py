@@ -580,8 +580,11 @@ def get_context_solutions_users(postgre_messages, nlp):
 
         if 'sol_tracker' in m.annotation and m.annotation['sol_tracker'] is not None:
             cards = list(m.annotation['sol_tracker'])
-
-    return context, cards, users, tracker, participation_features
+        users_filtered = []
+        for i in users:
+            if i.lower() != 'delibot' and 'owl' not in i.lower():
+                users_filtered.append(i)
+    return context, cards, users_filtered, tracker, participation_features
 
 
 def read_wason_dump(dump_path):
