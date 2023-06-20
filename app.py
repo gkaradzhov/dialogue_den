@@ -594,12 +594,20 @@ def handle_response(json):
 
 def check_if_can_speak(all_messages):
     can_delibot_speak = True
+    time_since_delitrigger = 0
     for item in all_messages:
         if item.message_type == 'DELIBOT_TRIGGER':
             can_delibot_speak = False
+            time_since_delitrigger = 0
+
         if item.origin == 'DEliBot':
             can_delibot_speak = True
-
+        if can_delibot_speak is False:
+            time_since_delitrigger += 1
+        if time_since_delitrigger >= 6:
+            can_delibot_speak = True
+            time_since_delitrigger = 0
+        
     return can_delibot_speak
 
 
@@ -645,6 +653,7 @@ def handle_response_old(json):
             m = Message(origin_id=990, origin_name='DEliBot', message_type='CHAT_MESSAGE', room_id=room_id,
                         content={'message': x.text}, user_status=USR_PLAYING, user_type='DELIBOT_SIMILARITY')
             create_broadcast_message(m)
+
 
 @socketio.on("post_feedback")
 def handle_feedback(json):
