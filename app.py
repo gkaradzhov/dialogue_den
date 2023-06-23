@@ -186,7 +186,7 @@ def route_to_room():
     active_room_id = PG.get_create_campaign_room(campaign_id)
 
     resp = make_response(redirect(
-        url_for('delibot', room_id=active_room_id, mturk_info=mturk_info_id, _scheme='https',
+        url_for('chatroom', room_id=active_room_id, mturk_info=mturk_info_id, _scheme='https',
                 _external=True)))
     return resp
 
@@ -607,7 +607,7 @@ def check_if_can_speak(all_messages):
         if time_since_delitrigger >= 6:
             can_delibot_speak = True
             time_since_delitrigger = 0
-        
+
     return can_delibot_speak
 
 
