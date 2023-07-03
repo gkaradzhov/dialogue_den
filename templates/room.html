@@ -612,6 +612,15 @@ $(function() {
         }
     });
 
+    function validateForm() {
+      // Validate Question 1
+      if (!$('input[name="question1"]:checked').val()) {
+        return false;
+      }
+
+      return true;
+    }
+
     $("#dialog-form").dialog({
       autoOpen: false,
       height: 600,
