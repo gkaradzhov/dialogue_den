@@ -178,6 +178,29 @@
         </form>
     </div>
 </div>
+<div id="dialog-form" title="Questions" style="display:none;">
+  <form>
+    <fieldset>
+      <h3> Did your group have a good discussion? How would you rate the quality of the discussion?</h3>
+      <input type="radio" id="q1-a1" name="question1" value="negative">
+      <label for="q1-a1">Not productive at all</label><br>
+      <input type="radio" id="q1-a2" name="question1" value="neutral">
+      <label for="q1-a2">It was ok</label><br>
+      <input type="radio" id="q1-a3" name="question1" value="positive">
+      <label for="q1-a3">Very helpful</label><br>
+
+      <h3>Who was the most useful member of your group?</h3>
+      <textarea id="most_usefull_free-text" rows="1" cols="50"></textarea>
+
+      <h3>Is there anything else that you wish to add:</h3>
+      <textarea id="free-text" rows="4" cols="50"></textarea>
+
+      <h2>Are you sure you want to Submit HIT? Press the button ONLY after you've submitted the solo solution, participated in the chat, submitted your final solution and filled the questionnaire above.</h2>
+      <input type="submit" id="submit-form" tabindex="-1" style="position:absolute; top:-1000px">
+    </fieldset>
+  </form>
+</div>
+
 <div class="footer"><a href="https://gkaradzhov.com">Georgi Karadzhov</a></div>
 <audio id="audio" src="/static/announcement.mp3" autostart="false" ></audio>
 
@@ -300,29 +323,29 @@ $(function() {
         }
     });
 
-   $('#final_submit').on('click', function(e){
-        if (confirm("Are you sure you want to Submit HIT? Press the button ONLY after you've submitted the solo solution, participated in the chat and submitted your final solution.")) {
+<!--   $('#final_submit').on('click', function(e){-->
+<!--        if (confirm("Are you sure you want to Submit HIT? Press the button ONLY after you've submitted the solo solution, participated in the chat and submitted your final solution.")) {-->
 
-            var mturk_url = $('#mturk_url').val();
-            var selection = get_card_selection();
-            var room_status = $('input#room_status').val();
-            var user_status = $('input#user_status').val();
+<!--            var mturk_url = $('#mturk_url').val();-->
+<!--            var selection = get_card_selection();-->
+<!--            var room_status = $('input#room_status').val();-->
+<!--            var user_status = $('input#user_status').val();-->
 
-            socket.emit('response', {
-                user_id: global_user_id,
-                user_name: user_name,
-                type: WASON_AGREE,
-                message: selection,
-                room: room_id,
-                user_type: current_user_type,
-                user_status: user_status
-            });
+<!--            socket.emit('response', {-->
+<!--                user_id: global_user_id,-->
+<!--                user_name: user_name,-->
+<!--                type: WASON_AGREE,-->
+<!--                message: selection,-->
+<!--                room: room_id,-->
+<!--                user_type: current_user_type,-->
+<!--                user_status: user_status-->
+<!--            });-->
 
-            if (mturk_url != ''){
-                $('#mturk').submit();
-            }
-        }
-    });
+<!--            if (mturk_url != ''){-->
+<!--                $('#mturk').submit();-->
+<!--            }-->
+<!--        }-->
+<!--    });-->
 
     $('#group_start').on('click', function(e){
       $('#group_start').prop('disabled', true);
@@ -587,6 +610,71 @@ $(function() {
                 break;
             // code block
         }
+    });
+
+    $("#dialog-form").dialog({
+      autoOpen: false,
+      height: 600,
+      width: 1000,
+      modal: true,
+      buttons: {
+      "Submit": function() {
+      if (!validateForm()) {
+        alert("Please answer all the questions.");
+        return;
+      }
+
+          // Handle form submission
+          let answers = {
+            helpfulness: $('input[name="question1"]:checked').val(),
+            most_helpful: $('#most_usefull_free').val()
+            // Collect answers for other questions similarly
+            other_feedbacl: $('#free-text').val()
+          };
+
+          console.log(answers); // Use the answers object as needed
+           var mturk_url = $('#mturk_url').val();
+           var selection = get_card_selection();
+           var room_status = $('input#room_status').val();
+           var user_status = $('input#user_status').val();
+
+           socket.emit('response', {
+                user_id: global_user_id,
+                user_name: user_name,
+                type: WASON_AGREE,
+                message: selection,
+                room: room_id,
+                user_type: current_user_type,
+                user_status: user_status
+            });
+
+
+           let answersJson = JSON.stringify(answers);
+
+           socket.emit('post_feedback', {
+                user_id: global_user_id,
+                content: answersJson,
+                room: room_id
+            });
+
+            if (mturk_url != ''){
+                $('#mturk').submit();
+            }
+        },
+        Cancel: function() {
+          $(this).dialog("close");
+        }
+      },
+      close: function() {
+        // Reset the form when the dialog is closed
+        $('input[name="question1"]').prop('checked', false);
+        // Reset other questions similarly
+        $('#free-text').val('');
+      }
+    });
+
+    $("#final_submit").on("click", function() {
+      $("#dialog-form").dialog("open");
     });
 
     $("#message").bind("keydown", function( event ) {

@@ -442,7 +442,7 @@ $(function() {
                 break;
             case ROUTING_TIMER_STARTED:
                 $.notify("The group phase of the game will start soon! Please submit your card selection. Once everyone does so, the game will start! (click to close)", {autoHide: false, className: 'info'});
-<!--                sound.play()-->
+                sound.play()
                 var date = msg.message;
 
                 $('#game_start_timer').removeClass('hidden');
@@ -480,7 +480,7 @@ $(function() {
                 var room_status = $('input#room_status').val()
 
                 if (room_status != ROOM_PLAYING){
-<!--                    sound.play()-->
+                    sound.play()
                     $.notify('Now you have to collaborate with the other participants in this conversation to solve the task together. (click to close)',  {autoHide: false, className: 'info'});
                 }
                 clearInterval(timer);
