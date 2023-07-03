@@ -183,11 +183,16 @@ def route_to_room():
                                                         'turk_submit': return_url,
                                                         'campaign_id': campaign_id})
 
-    active_room_id = PG.get_create_campaign_room(campaign_id)
+    active_room_id, type = PG.get_create_campaign_room(campaign_id)
 
-    resp = make_response(redirect(
-        url_for('chatroom', room_id=active_room_id, mturk_info=mturk_info_id, _scheme='https',
-                _external=True)))
+    if type == 'chat':
+        resp = make_response(redirect(
+            url_for('chatroom', room_id=active_room_id, mturk_info=mturk_info_id, _scheme='https',
+                    _external=True)))
+    else:
+        resp = make_response(redirect(
+            url_for('delibot', room_id=active_room_id, mturk_info=mturk_info_id, _scheme='https',
+                    _external=True)))
     return resp
 
 
