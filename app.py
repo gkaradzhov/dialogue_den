@@ -185,6 +185,7 @@ def route_to_room():
 
     active_room_id, type = PG.get_create_campaign_room(campaign_id)
 
+    print(type)
     if type == 'chat':
         resp = make_response(redirect(
             url_for('chatroom', room_id=active_room_id, mturk_info=mturk_info_id, _scheme='https',
