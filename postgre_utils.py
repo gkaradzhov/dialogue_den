@@ -186,8 +186,8 @@ class PostgreConnection:
             return r.room_id, type
         else:
             type = self.__execute(
-                "SELECT content FROM message WHERE room_id={} and message_type='ROOM_TYPE'".format(rooms[0]))
-            if len(type) == 0:
+                "SELECT content FROM message WHERE room_id=%s and message_type='ROOM_TYPE'", rooms[0])
+            if type is None or len(type) == 0:
                 type = 'chat'
             else:
                 type = type[0]
