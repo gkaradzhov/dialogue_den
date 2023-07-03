@@ -86,6 +86,8 @@ class PostgreConnection:
         wason_game = generate_wason_cards()
         m = Message(origin_name='SYSTEM', message_type=WASON_INITIAL, room_id=room.room_id,
                     origin_id='-1', content=json.dumps(wason_game))
+        self.insert_message(m)
+
         m = Message(origin_name='SYSTEM', message_type='ROOM_TYPE', room_id=room.room_id,
                     origin_id='-1', content=optional_type)
         self.insert_message(m)
