@@ -191,7 +191,7 @@ class PostgreConnection:
                 type = 'chat'
             else:
                 print('here', type)
-                type = type[0]
+                type = type[0][0]
             return rooms[0], type
 
     def set_room_status(self, room_id, status):
