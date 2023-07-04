@@ -636,7 +636,7 @@ $(function() {
           // Handle form submission
           let answers = {
             helpfulness: $('input[name="question1"]:checked').val(),
-            most_helpful: $('#most_usefull_free').val(),
+            most_helpful: $('#most_usefull_free-text').val(),
             // Collect answers for other questions similarly
             other_feedbacl: $('#free-text').val()
           };
@@ -679,6 +679,7 @@ $(function() {
         $('input[name="question1"]').prop('checked', false);
         // Reset other questions similarly
         $('#free-text').val('');
+        $('#most_usefull_free-text').val('');
       }
     });
 
