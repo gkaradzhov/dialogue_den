@@ -70,7 +70,9 @@ class Selector(BaseEstimator, TransformerMixin):
             transformed.append(x[self.key])
         return transformed
 
-CHANGEOFMIND = None
+
+with open('models/bow_full_delidata_withparticipation.model', 'rb') as f:
+    CHANGEOFMIND = pickle.load(f, fix_imports=True)
 
 PG = PostgreConnection('localadasdda_cred.json')
 MTURK_MANAGEMENT = MTurkManagement('local_creddadasasd.json')
