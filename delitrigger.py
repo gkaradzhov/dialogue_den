@@ -312,7 +312,6 @@ class ChangeOfMindPredictor:
         ling_output = self.model.predict_proba([{'text': "<SEP>".join(conv_text[-2:]), 'part': participation}])[0][1]
         prediction_object['linguistic_thresh'] = 0.5
         prediction_object['linguistic_proba'] = ling_output
-        prediction_object['linguistic_path'] = self.model_path
 
         ling_prediction = 1 if ling_output >= 0.50 else 0
         print("Preds ", ocp_proba, ling_output)
