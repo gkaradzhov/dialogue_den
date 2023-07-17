@@ -11,22 +11,7 @@ from wason_message_processing import read_3_lvl_annotation_file, read_wason_dump
     preprocess_conversation_dump, calculate_stats
 
 
-class Selector(BaseEstimator, TransformerMixin):
-    """
-    Transformer to select a single column from the data frame to perform additional transformations on
-    Use on numeric columns in the data
-    """
-    def __init__(self, key):
-        self.key = key
 
-    def fit(self, X, y=None):
-        return self
-
-    def transform(self, X):
-        transformed = []
-        for x in X:
-          transformed.append(x[self.key])
-        return transformed
 
 class ChangeOfMindTrainer:
     def __init__(self, input_data=None):
@@ -225,6 +210,23 @@ class ChangeOfMindTrainer:
         for ind in range(1, 80):
             self.hazards[ind] = self.hazard_function(ind, self.gap_prior)
 
+class Selector(BaseEstimator, TransformerMixin):
+    """
+    Transformer to select a single column from the data frame to perform additional transformations on
+    Use on numeric columns in the data
+    """
+
+    def __init__(self, key):
+        self.key = key
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        transformed = []
+        for x in X:
+            transformed.append(x[self.key])
+        return transformed
 
 class ChangeOfMindPredictor:
     def __init__(self, saved_states_path='models/changeofmindstates.json', model_path='models/bow_full_delidata_withparticipation.model'):
@@ -237,6 +239,7 @@ class ChangeOfMindPredictor:
         self.total_run_changepoint_proba = {}
         self.datum_given_gap_proba = {}
         self.model_path = model_path
+        sss = Selector(aa)
         with open(saved_states_path, 'r') as f:
             loaded_dicts = json.load(f)
             loaded_dicts = [self.convert_keys_to_number(d) for d in loaded_dicts]
