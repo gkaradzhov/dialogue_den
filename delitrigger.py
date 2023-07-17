@@ -11,6 +11,23 @@ import json
 from wason_message_processing import read_3_lvl_annotation_file, read_wason_dump, merge_with_solution_raw, \
     preprocess_conversation_dump, calculate_stats
 
+from sklearn.base import BaseEstimator, TransformerMixin
+class Selector(BaseEstimator, TransformerMixin):
+    """
+    Transformer to select a single column from the data frame to perform additional transformations on
+    Use on numeric columns in the data
+    """
+    def __init__(self, key):
+        self.key = key
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        transformed = []
+        for x in X:
+          transformed.append(x[self.key])
+        return transformed
 
 class ChangeOfMindTrainer:
     def __init__(self, input_data=None):

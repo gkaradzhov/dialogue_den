@@ -35,7 +35,7 @@ login_manager = flask_login.LoginManager()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'this_secret_key_potato_21_kaxvhsdferfx3d34'
-from delitrigger import ChangeOfMindPredictor
+from delitrigger import ChangeOfMindPredictor, Selector
 
 app.config.update(dict(
     PREFERRED_URL_SCHEME='https'
