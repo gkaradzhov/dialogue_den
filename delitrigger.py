@@ -239,7 +239,7 @@ class ChangeOfMindPredictor:
         self.total_run_changepoint_proba = {}
         self.datum_given_gap_proba = {}
         self.model_path = model_path
-        sss = Selector(aa)
+        sss = Selector('aa')
         with open(saved_states_path, 'r') as f:
             loaded_dicts = json.load(f)
             loaded_dicts = [self.convert_keys_to_number(d) for d in loaded_dicts]
