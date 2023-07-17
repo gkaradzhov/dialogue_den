@@ -70,9 +70,15 @@ class Selector(BaseEstimator, TransformerMixin):
             transformed.append(x[self.key])
         return transformed
 
+class CustomUnpickler(pickle.Unpickler):
+    def find_class(self, module, name):
+        if module == '__main__':
+            module = 'delitrigger'
+        return super().find_class(module, name)
 
 with open('models/bow_full_delidata_withparticipation.model', 'rb') as f:
-    CHANGEOFMIND = pickle.load(f, fix_imports=True)
+    unpickler = CustomUnpickler(f)
+    CHANGEOFMIND = unpickler.load()
 
 PG = PostgreConnection('localadasdda_cred.json')
 MTURK_MANAGEMENT = MTurkManagement('local_creddadasasd.json')
@@ -887,7 +893,7 @@ def validate_finish_game(all_messages, room_id):
     finished_onboarding = check_finished(all_messages, USR_ONBOARDING, room.status)
     if finished_onboarding:
         m = Message(origin_id=SYSTEM_ID, origin_name=SYSTEM_USER, message_type=FINISHED_ONBOARDING, room_id=room_id,
-                    content=7)
+                    content=10)
         create_broadcast_message(m)
         PG.set_room_status(room_id, 'FINISHED_ONBOARDING')
 
