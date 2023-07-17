@@ -2,38 +2,30 @@ import datetime
 import hashlib
 import json
 import os
-import pickle
 import random
-import signal
-import time
 from collections import defaultdict
-
-import joblib
 from datetime import timezone
 from os import path
-import requests
+from time import sleep
+
 import flask_login
 import flask_socketio
+import requests
 import spacy as spacy
 from flask import Flask, request, render_template, redirect, make_response, url_for
 from flask_socketio import join_room, leave_room
 from flask_socketio import send
 from flask_talisman import Talisman
 
-from constants import JOIN_ROOM, CHAT_MESSAGE, LEAVE_ROOM, WASON_INITIAL, WASON_AGREE, WASON_GAME, WASON_FINISHED, \
-    USR_ONBOARDING, USR_PLAYING, FINISHED_ONBOARDING, USR_MODERATING, ROUTING_TIMER_STARTED, SYSTEM_USER, SYSTEM_ID, \
+from constants import JOIN_ROOM, CHAT_MESSAGE, LEAVE_ROOM, WASON_INITIAL, WASON_AGREE, WASON_GAME, USR_ONBOARDING, \
+    USR_PLAYING, FINISHED_ONBOARDING, USR_MODERATING, ROUTING_TIMER_STARTED, SYSTEM_USER, SYSTEM_ID, \
     ROUTING_TIMER_ELAPSED, ROOM_READY_TO_START
 from data_persistency_utils import read_rooms_from_file, write_rooms_to_file
 from message import Room, Message
 from postgre_utils import PostgreConnection
 from sys_config import DIALOGUES_STABLE
 from utils import generate_user, MTurkManagement
-from time import sleep
-import random
-import math
-
-from wason_message_processing import get_context_solutions_users, preprocess_conversation_dump, merge_with_solution_raw, \
-    read_wason_dump, read_3_lvl_annotation_file
+from wason_message_processing import get_context_solutions_users
 
 # import eventlet
 # eventlet.monkey_patch()
@@ -190,9 +182,13 @@ def route_to_room():
         resp = make_response(redirect(
             url_for('chatroom', room_id=active_room_id, mturk_info=mturk_info_id, _scheme='https',
                     _external=True)))
-    else:
+    elif type == 'delibot':
         resp = make_response(redirect(
             url_for('delibot', room_id=active_room_id, mturk_info=mturk_info_id, _scheme='https',
+                    _external=True)))
+    else:
+        resp = make_response(redirect(
+            url_for('delibot2', room_id=active_room_id, mturk_info=mturk_info_id, _scheme='https',
                     _external=True)))
     return resp
 
@@ -387,6 +383,85 @@ def delibot():
                                       # 'mturk_return_url': 'test_post',
                                       "start_time": campaign['start_time']})
 
+
+@app.route('/delibot2')
+@talisman(
+
+    frame_options='ALLOW-FROM',
+    frame_options_allow_from='https://mturk.com',
+)
+def delibot2():
+    sl = random.randint(0, 2) + random.random()
+    sleep(sl)
+    room_id = request.args.get('room_id')
+    mturk_info_id = request.args.get('mturk_info', None)
+
+    has_user = PG.check_for_user(mturk_info_id=mturk_info_id)
+    print("Has user chat room", str(has_user))
+    if has_user:
+        return render_template('unsuccessful_onboarding.html')
+
+    is_moderator = request.args.get('moderator', False)
+    ROOM_STATE_TRACKER[room_id] = {"sol_tracker": [], "current_run": [], 'last_com': 0, 'last_intervention': 0}
+    room = PG.get_single_room(room_id)
+    running_dialogue = PG.get_messages(room.room_id)
+    messages = [d for d in running_dialogue if d.message_type == CHAT_MESSAGE]
+
+    logged_users = set()
+    for item in running_dialogue:
+        if item.message_type == JOIN_ROOM:
+            logged_users.add((item.origin, item.origin_id))
+        elif item.message_type == LEAVE_ROOM and (item.origin, item.origin_id) in logged_users:
+            logged_users.remove((item.origin, item.origin_id))
+
+    user_type = 'participant'
+    if is_moderator == "True":
+        user_type = 'moderator'
+
+    campaign = PG.get_campaign(room.campaign)
+
+    if len(logged_users) == 0:
+        random_float = random.random()
+        if random_float < campaign['user_moderator_chance']:
+            user_type = 'human_delibot'
+
+    current_user = generate_user([d[0] for d in logged_users], user_type)
+
+    if is_moderator:
+        status = USR_MODERATING
+    else:
+        status = USR_ONBOARDING
+    m = Message(origin_name=current_user['user_name'], message_type=JOIN_ROOM, room_id=room_id,
+                origin_id=current_user['user_id'], user_status=status, user_type=user_type)
+    create_broadcast_message(m)
+
+    formated_return_url = None
+    if mturk_info_id:
+        PG.update_mturk_user_id(mturk_info_id, current_user['user_id'])
+        mturk_info = PG.get_mturk_info(mturk_info_id)
+        if mturk_info:
+            formated_return_url = '{}/mturk/externalSubmit?assignmentId={}&user_id={}'.format(mturk_info[1],
+                                                                                              mturk_info[0],
+                                                                                              current_user['user_id'])
+
+    wason_initial = [d.content for d in running_dialogue if d.message_type == WASON_INITIAL][0]
+
+    handle_routing(running_dialogue, logged_users, campaign['start_threshold'], campaign['start_time'],
+                   campaign['close_threshold'], room.room_id)
+
+    # Have to get the room again, in case the status changed
+    room = PG.get_single_room(room_id)
+
+    return render_template("delibot2.html",
+                           room_data={'id': room_id, 'name': room.name, 'game': json.loads(wason_initial),
+                                      'messages': messages, 'existing_users': logged_users,
+                                      'current_user': current_user['user_name'],
+                                      'current_user_id': current_user['user_id'],
+                                      'current_user_type': user_type,
+                                      'current_user_status': status, 'room_status': room.status,
+                                      'mturk_return_url': formated_return_url,
+                                      # 'mturk_return_url': 'test_post',
+                                      "start_time": campaign['start_time']})
 
 @socketio.on('delibot')
 def delibot(json):
@@ -672,9 +747,66 @@ def handle_feedback(json):
     pass
 
 
+@socketio.on('deliresponse2')
+def handle_response_2(json):
+
+    print('redirected to response @ DELIBOT 2')
+    print('received my event: ' + str(json))
+    room_id = json['room']
+    m = Message(origin_id=json['user_id'], origin_name=json['user_name'], message_type=json['type'], room_id=room_id,
+                content=json['message'], user_status=json['user_status'], user_type=json.get('user_type', None))
+
+    create_broadcast_message(m)
+    all_messages = PG.get_messages(room_id)
+    handle_room_events(all_messages, room_id, m)
+    validate_finish_game(all_messages, room_id)
+
+    context, solution, users, tracker, participation = get_context_solutions_users(all_messages, nlp)
+    ROOM_STATE_TRACKER[room_id]["sol_tracker"] = tracker
+    ROOM_STATE_TRACKER[room_id]["current_run"].append(tracker[-1])
+    has_com, meta_obj = CHANGEOFMIND.predict_change_of_mind(context, ROOM_STATE_TRACKER[room_id]["current_run"],
+                                                            len(context), participation)
+    # has_com = 0
+    # meta_obj = {"type": "hardcoded_every3utterances"}
+    if has_com == 1:
+        ROOM_STATE_TRACKER[room_id]["current_run"] = []
+        ROOM_STATE_TRACKER[room_id]["last_com"] = 0
+    else:
+        ROOM_STATE_TRACKER[room_id]["last_com"] += 1
+
+    check = check_if_can_speak(all_messages)
+    if check and (
+            (ROOM_STATE_TRACKER[room_id]["last_intervention"] >= 5 and ROOM_STATE_TRACKER[room_id]["last_com"] >= 5) or
+            ROOM_STATE_TRACKER[room_id]["last_intervention"] >= 10):
+        ROOM_STATE_TRACKER[room_id]["last_intervention"] = 0
+        m = Message(origin_id=-1, origin_name='SYSTEM', message_type='DELIBOT_TRIGGER', room_id=room_id,
+                    content=meta_obj, user_status=None, user_type='SYSTEM')
+        create_broadcast_message(m)
+
+        url = 'http://delibot.cl.cam.ac.uk/delibot4'
+        myobj = {
+            "context": context,
+            "cards": solution,
+            "users": users,
+            "skip": context,
+            "participation_feats": participation}
+
+        print(myobj)
+        x = requests.post(url, json=myobj)
+        print(x)
+
+        m = Message(origin_id=990, origin_name='DEliBot', message_type='CHAT_MESSAGE', room_id=room_id,
+                    content={'message': x.json()['text'], 'meta': x.json()['meta']}, user_status=USR_PLAYING,
+                    user_type='DELIBOT_2')
+        create_broadcast_message(m)
+
+    else:
+        ROOM_STATE_TRACKER[room_id]["last_intervention"] += 1
+
+
 @socketio.on('deliresponse')
 def handle_response(json):
-    print('redirected to response')
+    print('redirected to response @ DELIBOT 1')
     print('received my event: ' + str(json))
     room_id = json['room']
     m = Message(origin_id=json['user_id'], origin_name=json['user_name'], message_type=json['type'], room_id=room_id,
@@ -726,7 +858,6 @@ def handle_response(json):
 
     else:
         ROOM_STATE_TRACKER[room_id]["last_intervention"] += 1
-
 
 def validate_finish_game(all_messages, room_id):
     room = PG.get_single_room(room_id)

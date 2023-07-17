@@ -211,7 +211,7 @@ class ChangeOfMindTrainer:
 
 
 class ChangeOfMindPredictor:
-    def __init__(self, saved_states_path='models/changeofmindstates.json', model_path='models/bow_full_delidata.model'):
+    def __init__(self, saved_states_path='models/changeofmindstates.json', model_path='models/bow_full_delidata_withparticipation.model'):
         self.runtime_probability = {}
         self.value_conditional = {}
         self.value_prior = {}
@@ -277,7 +277,7 @@ class ChangeOfMindPredictor:
                 s += g
         return c / s
 
-    def predict_change_of_mind(self, conv_text, current_run, total_run):
+    def predict_change_of_mind(self, conv_text, current_run, total_run, participation):
         prediction_object = {}
         cha = self.calc_changepoint_proba(current_run, total_run)
         growth_proba = self.calc_growth_proba(current_run, total_run)
@@ -287,17 +287,18 @@ class ChangeOfMindPredictor:
             ocp_proba = cha / (cha + growth_proba)
         prediction_object['current_run'] = current_run
         prediction_object['BOCP'] = ocp_proba
-        prediction_object['BOCP_threshold'] = 0.75
+        prediction_object['BOCP_threshold'] = 0.5
+        prediction_object['BOCP_adjustment'] = 0.85
 
-        ocp_prediction = 1 if ocp_proba > 0.75 else 0
+        ocp_prediction = 1 if 0.85 * ocp_proba > 0.5 else 0
 
-        ling_output = self.model.predict_proba(["<SEP>".join(conv_text[-2:])])[0][1]
-        prediction_object['linguistic_thresh'] = 0.606
+        ling_output = self.model.predict_proba([{'text': "<SEP>".join(conv_text[-2:]), 'part': participation}])[0][1]
+        prediction_object['linguistic_thresh'] = 0.5
         prediction_object['linguistic_proba'] = ling_output
         prediction_object['linguistic_path'] = self.model_path
 
-        ling_prediction = 1 if ling_output >= 0.606 else 0
-
+        ling_prediction = 1 if ling_output >= 0.50 else 0
+        print("Preds ", ocp_proba, ling_output)
         return max(ocp_prediction, ling_prediction), prediction_object
 
     def sequence_probability(self, sequence, conditionals, apriori):

@@ -181,7 +181,7 @@ class PostgreConnection:
         if len(rooms) == 0:
             room_name = "{}_{}".format(time.time(), campaign_id)
             r = Room(room_name, campaign=campaign_id)
-            type = random.choice(['chat', 'delibot'])
+            type = random.choice(['chat', 'chat', 'delibot', 'delibot', 'delibot2', 'delibot2', 'delibot2', 'delibot2', 'delibot2'])
             self.create_room(r, type)
             return r.room_id, type
         else:
