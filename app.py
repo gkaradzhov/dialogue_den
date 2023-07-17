@@ -2,6 +2,7 @@ import datetime
 import hashlib
 import json
 import os
+import pickle
 import random
 from collections import defaultdict
 from datetime import timezone
@@ -69,7 +70,7 @@ class Selector(BaseEstimator, TransformerMixin):
             transformed.append(x[self.key])
         return transformed
 
-CHANGEOFMIND = ChangeOfMindPredictor()
+CHANGEOFMIND = None
 
 PG = PostgreConnection('localadasdda_cred.json')
 MTURK_MANAGEMENT = MTurkManagement('local_creddadasasd.json')
@@ -936,7 +937,8 @@ if __name__ == '__main__':
                 transformed.append(x[self.key])
             return transformed
     s = Selector('aa')
-
+    with open('models/bow_full_delidata_withparticipation.model', 'rb') as f:
+        CHANGEOFMIND = pickle.load(f, fix_imports=True)
     app.run()
     try:
         socketio.run(host='localhost', port=8898, app=app, log_output=True)
