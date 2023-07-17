@@ -895,6 +895,26 @@ def handle_signals():
 if __name__ == '__main__':
     from delitrigger import ChangeOfMindPredictor, Selector
 
+    from sklearn.base import BaseEstimator, TransformerMixin
+
+
+    class Selector(BaseEstimator, TransformerMixin):
+        """
+        Transformer to select a single column from the data frame to perform additional transformations on
+        Use on numeric columns in the data
+        """
+
+        def __init__(self, key):
+            self.key = key
+
+        def fit(self, X, y=None):
+            return self
+
+        def transform(self, X):
+            transformed = []
+            for x in X:
+                transformed.append(x[self.key])
+            return transformed
     s = Selector('aa')
 
     app.run()
