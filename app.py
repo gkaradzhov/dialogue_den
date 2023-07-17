@@ -893,7 +893,7 @@ def handle_signals():
 
 
 if __name__ == '__main__':
-    from delitrigger import ChangeOfMindPredictor
+    from delitrigger import ChangeOfMindPredictor, Selector
 
     app.run()
     try:

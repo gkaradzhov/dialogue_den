@@ -1,17 +1,16 @@
+import json
 import math
 import pickle
+from collections import defaultdict
 from functools import partial
 
-import joblib
-from collections import defaultdict
-
 import spacy
-import json
+from sklearn.base import BaseEstimator, TransformerMixin
 
 from wason_message_processing import read_3_lvl_annotation_file, read_wason_dump, merge_with_solution_raw, \
     preprocess_conversation_dump, calculate_stats
 
-from sklearn.base import BaseEstimator, TransformerMixin
+
 class Selector(BaseEstimator, TransformerMixin):
     """
     Transformer to select a single column from the data frame to perform additional transformations on
