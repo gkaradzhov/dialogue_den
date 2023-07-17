@@ -229,7 +229,7 @@ class Selector(BaseEstimator, TransformerMixin):
         return transformed
 
 class ChangeOfMindPredictor:
-    def __init__(self, saved_states_path='models/changeofmindstates.json', model_path='models/bow_full_delidata_withparticipation.model'):
+    def __init__(self, saved_states_path='models/changeofmindstates.json', model=None):
         self.runtime_probability = {}
         self.value_conditional = {}
         self.value_prior = {}
@@ -238,14 +238,13 @@ class ChangeOfMindPredictor:
         self.total_run_continue_proba = {}
         self.total_run_changepoint_proba = {}
         self.datum_given_gap_proba = {}
-        self.model_path = model_path
         with open(saved_states_path, 'r') as f:
             loaded_dicts = json.load(f)
             loaded_dicts = [self.convert_keys_to_number(d) for d in loaded_dicts]
 
             self.runtime_probability, self.value_conditional, self.value_prior, self.hazards, self.gap_prior, self.total_run_continue_proba, self.total_run_changepoint_proba, self.datum_given_gap_proba = loaded_dicts
-        with open(model_path, 'rb') as f:
-            self.model = pickle.load(f)
+
+        self.model = model
 
     def is_number(self, s):
         try:

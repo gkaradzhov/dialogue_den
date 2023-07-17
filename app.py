@@ -78,7 +78,8 @@ class CustomUnpickler(pickle.Unpickler):
 
 with open('models/bow_full_delidata_withparticipation.model', 'rb') as f:
     unpickler = CustomUnpickler(f)
-    CHANGEOFMIND = unpickler.load()
+    model = unpickler.load()
+    CHANGEOFMIND = ChangeOfMindPredictor(model=model)
 
 PG = PostgreConnection('localadasdda_cred.json')
 MTURK_MANAGEMENT = MTurkManagement('local_creddadasasd.json')
