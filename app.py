@@ -7,6 +7,7 @@ from collections import defaultdict
 from datetime import timezone
 from os import path
 from time import sleep
+from sklearn.base import BaseEstimator, TransformerMixin
 
 import flask_login
 import flask_socketio
@@ -48,6 +49,25 @@ socketio = flask_socketio.SocketIO(app, cors_allowed_origins='*', async_mode='ev
 nlp = spacy.load('en_core_web_sm')
 
 login_manager.init_app(app)
+
+
+class Selector(BaseEstimator, TransformerMixin):
+    """
+    Transformer to select a single column from the data frame to perform additional transformations on
+    Use on numeric columns in the data
+    """
+
+    def __init__(self, key):
+        self.key = key
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        transformed = []
+        for x in X:
+            transformed.append(x[self.key])
+        return transformed
 
 CHANGEOFMIND = ChangeOfMindPredictor()
 
