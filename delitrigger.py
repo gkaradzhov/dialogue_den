@@ -310,10 +310,10 @@ class ChangeOfMindPredictor:
         ocp_prediction = 1 if 0.85 * ocp_proba > 0.5 else 0
 
         ling_output = self.model.predict_proba([{'text': "<SEP>".join(conv_text[-2:]), 'part': participation}])[0][1]
-        prediction_object['linguistic_thresh'] = 0.505
+        prediction_object['linguistic_thresh'] = 0.5
         prediction_object['linguistic_proba'] = ling_output
 
-        ling_prediction = 1 if ling_output >= 0.505 else 0
+        ling_prediction = 1 if ling_output >= 0.5 else 0
         print("Preds ", ocp_proba, ling_output)
         return max(ocp_prediction, ling_prediction), prediction_object
 
