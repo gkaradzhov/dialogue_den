@@ -797,10 +797,6 @@ def handle_response_2(json):
     has_com, meta_obj = CHANGEOFMIND.predict_change_of_mind(context, ROOM_STATE_TRACKER[room_id]["current_run"],
                                                             len(context), participation)
 
-    print(has_com, meta_obj)
-    print(ROOM_STATE_TRACKER[room_id])
-    # has_com = 0
-    # meta_obj = {"type": "hardcoded_every3utterances"}
     if has_com == 1:
         ROOM_STATE_TRACKER[room_id]["current_run"] = []
         ROOM_STATE_TRACKER[room_id]["last_com"] = 0
@@ -809,8 +805,8 @@ def handle_response_2(json):
 
     check = check_if_can_speak(all_messages)
     if check and (
-            (ROOM_STATE_TRACKER[room_id]["last_intervention"] >= 3 and ROOM_STATE_TRACKER[room_id]["last_com"] >= 3) or
-            ROOM_STATE_TRACKER[room_id]["last_intervention"] >= 5 or len(context) == 3):
+            (ROOM_STATE_TRACKER[room_id]["last_intervention"] >= 2 and ROOM_STATE_TRACKER[room_id]["last_com"] >= 2) or
+            ROOM_STATE_TRACKER[room_id]["last_intervention"] >= 4 or len(context) == 3):
         ROOM_STATE_TRACKER[room_id]["last_intervention"] = 0
         m = Message(origin_id=-1, origin_name='SYSTEM', message_type='DELIBOT_TRIGGER', room_id=room_id,
                     content=meta_obj, user_status=None, user_type='SYSTEM')
