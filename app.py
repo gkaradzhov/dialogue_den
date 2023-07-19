@@ -798,6 +798,7 @@ def handle_response_2(json):
                                                             len(context), participation)
 
     print(has_com, meta_obj)
+    print(ROOM_STATE_TRACKER[room_id] >= 3)
     # has_com = 0
     # meta_obj = {"type": "hardcoded_every3utterances"}
     if has_com == 1:
