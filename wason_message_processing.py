@@ -574,7 +574,7 @@ def get_context_solutions_users(postgre_messages, nlp):
             users.append(m.origin.lower())
             context.append(m.clean_text)
             if 'sol_tracker' in m.annotation and m.annotation['sol_tracker'] is not None:
-                tracker.append(m.annotation['performance_change'])
+                tracker.append(m.annotation['team_performance'])
             else:
                 tracker.append(tracker[-1])
 
