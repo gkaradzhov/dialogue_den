@@ -796,6 +796,8 @@ def handle_response_2(json):
     ROOM_STATE_TRACKER[room_id]["current_run"].append(tracker[-1])
     has_com, meta_obj = CHANGEOFMIND.predict_change_of_mind(context, ROOM_STATE_TRACKER[room_id]["current_run"],
                                                             len(context), participation)
+
+    print(has_com, meta_obj)
     # has_com = 0
     # meta_obj = {"type": "hardcoded_every3utterances"}
     if has_com == 1:
