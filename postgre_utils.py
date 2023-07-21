@@ -1,11 +1,11 @@
 import json
 import os
 import random
+import time
 import uuid
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta
 
 import psycopg2
-import time
 from psycopg2.pool import ThreadedConnectionPool
 
 from constants import WASON_INITIAL
@@ -181,7 +181,9 @@ class PostgreConnection:
         if len(rooms) == 0:
             room_name = "{}_{}".format(time.time(), campaign_id)
             r = Room(room_name, campaign=campaign_id)
-            type = random.choice(['chat', 'delibot', 'delibot2', 'delibot2', 'delibot2'])
+            type = random.choice(
+                ['chat', 'delibot', 'delibot', 'delibot2', 'delibot2', 'delibot2', 'delibot2', 'delibot2', 'delibot2',
+                 'delibot2'])
             self.create_room(r, type)
             return r.room_id, type
         else:
