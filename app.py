@@ -76,7 +76,7 @@ class CustomUnpickler(pickle.Unpickler):
             module = 'delitrigger'
         return super().find_class(module, name)
 
-with open('models/bow_full_delidata_withparticipation.model', 'rb') as f:
+with open('models/bow.model', 'rb') as f:
     unpickler = CustomUnpickler(f)
     model = unpickler.load()
     CHANGEOFMIND = ChangeOfMindPredictor(model=model)
