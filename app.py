@@ -35,7 +35,7 @@ from wason_message_processing import get_context_solutions_users
 
 login_manager = flask_login.LoginManager()
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='/static')
 app.config['SECRET_KEY'] = 'this_secret_key_potato_21_kaxvhsdferfx3d34'
 from delitrigger import ChangeOfMindPredictor, Selector
 s = Selector('aa')
@@ -493,6 +493,19 @@ def delibot2():
                                       # 'mturk_return_url': 'test_post',
                                       "start_time": campaign['start_time']})
 
+
+@app.route('/partial_test')
+def test_partial():
+    return render_template("generic_room.html", room_data={'id': 0, 'name': 0, 'game': 0,
+                                      'messages': [], 'existing_users': [],
+                                      'current_user': 0,
+                                      'current_user_id': 0,
+                                      'current_user_type': 0,
+                                      'current_user_status': 0, 'room_status': 0,
+                                      'mturk_return_url': 0,
+                                      # 'mturk_return_url': 'test_post',
+                                      "start_time": 0})
+
 @socketio.on('delibot')
 def delibot(json):
     room_id = json.get('room_id', None)
@@ -947,7 +960,7 @@ if __name__ == '__main__':
     s = Selector('aa')
     with open('models/bow_full_delidata_withparticipation.model', 'rb') as f:
         CHANGEOFMIND = pickle.load(f, fix_imports=True)
-    app.run()
+    app.run(port=8898, ssl_context='adhoc')
     try:
         socketio.run(host='localhost', port=8898, app=app, log_output=True)
     finally:

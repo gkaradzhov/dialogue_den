@@ -18,6 +18,12 @@
     <title>Dialogue Den</title>
 </head>
 <body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<link href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" rel="Stylesheet">
+<script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js" ></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.0/socket.io.js" integrity="sha512-/xb5+PNOA079FJkngKI2jvID5lyiqdHXaUUcfmzE0X0BdpkgzIWHC59LOG90a2jDcOyRsd1luOr24UCCAG8NNw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+
 <input id="chat_id" type="hidden" value="{{room_data.id}}"/>
 <input id="user_id" type="hidden" value="{{room_data.current_user_id}}"/>
 <input id="user_name" type="hidden" value="{{room_data.current_user}}"/>
@@ -28,7 +34,7 @@
 <input id="mturk_url" type="hidden" value="{{room_data.mturk_return_url}}">
 
 <div class="timer_holder">
-    <div id="game_start_timer" class="hidden">The game will start soon, approximately in:</div>
+    <div id="game_start_timer" class="hidden">The game will start soon, approximately in: </div>
     <div id="game_play_timer" class="hidden">Please complete the task in:</div>
     <div id="timer"></div>
 </div>
@@ -42,106 +48,7 @@
 <div class="row">
     <div class="col-6">
         <div class="task">
-            <h3>Task Description:</h3>
-            {% if room_data.current_user_type == 'human_delibot'%}
-            <div id="detailed_instructions">
-                <ol>
-                    <li>Read the instructions carefully.</li>
-                    <li>You have been picked at random to work as a moderator in this discussion.
-                    </li>
-                    <li>The rest of the group will complete a card selection task, where they have to choose from the
-                        presented cards below. First, they will complete the task by themselves, and after that a
-                        chatbox will appear on the right of the screen, where all of you should engage in discussion of
-                        what the correct answer is.
-                    </li>
-                    <li>During the discussion please ask questions to encourage the other participants to explain the
-                        reasoning behind their proposed solutions. You can also ask them what they think the solution
-                        is, and ask questions about how the discussion is going.
-                    </li>
-                    <li>You are not required to complete the task - your main goal is to facilitate the discussion and
-                        help the decision making processes.
-                    </li>
-                    <li>Finally, we ask you to mark each message before sending it according to its focal point. You can
-                        do this using the dropdown on the left of your message box. Possible ways to mark a message are:
-
-                        <ol>
-                            <li><b>Reasoning</b>: Question about the reasons behind a certain solution (e.g. “Why do you
-                                think the answer is X?” or “What does that mean?”
-                            </li>
-                            <li><b>Solution without reasoning</b>: Question about solutions, that does not involve any
-                                questioning about <i>why</i> a specific solution is selected (e.g.”Are we going for this
-                                answer then?”)
-                            </li>
-                            <li><b>Moderation</b>: Question about the discussion (e.g. “What does person A think?”,
-                                “Should we vote on it?”)
-                            </li>
-                            <li><b>None</b>: If you send a message that does not belong to of any of the previous
-                                categories.
-                            </li>
-                        </ol>
-
-                    </li>
-                </ol>
-            </div>
-            {% else %}
-            <div id="detailed_instructions">
-                <ol>
-                    <li>Read the instructions carefully. Finish the task by yourself by selecting the appropriate cards
-                        and pressing the "Submit Initial" button. Wait for the rest of the participants to complete the
-                        task (this may take a few minutes, but typically less than 3).
-                    </li>
-                    <li>Participate in a group discussion (via the chat), collaborate with the other participants and
-                        try to find the best solution together.
-                    </li>
-                    <li>Give your best effort in solving the task, responding to the questions and suggestions of the other participants, including the Delibot. In previous studies, groups that collaborate well - discussing their arguments and solutions among each other - are typically better in solving the task.</li>
-                    <li>Every time you change your mind about the solution, please update it by selecting the new cards
-                        and pressing the "Revise Solution" button.
-                    </li>
-                    <li>You can submit the same answer, if you believe it's the correct one.</li>
-                    <li>You are expected to participate actively in the conversation for at least 5 minutes.</li>
-                    <!--                            <li>Press the Complete HIT button.</li>-->
-                    <li>Do not refresh the page at any time. Do not press the "Final Decision and Submit HIT" button
-                        unless you are done.
-                    </li>
-                </ol>
-            </div>
-            {% endif %}
-
-            {% if room_data.current_user_type == 'human_delibot'%}
-            {% set human_delibot_hide='hidden' %}
-            {% set human_delibot_disable='disabled' %}
-
-            {% else %}
-            {% set human_delibot_hide='' %}
-            {% set human_delibot_disable='' %}
-            {% endif %}
-
-            <div class="task_description {{human_delibot_hide}}">
-                <h3>Task:</h3>
-                Each of the <b>4 cards below</b> has a letter on one side and a number on the other.
-                <b>Which card(s) do you need to turn to test the rule: <br/>
-                    All cards with vowels on one side have an even number on the other.</b> <br/>
-                NB: Select <b>ONLY</b> the card(s) required to verify the rule. Most people get this task wrong.
-            </div>
-
-            <div class='cards_list'>
-                {% for card in room_data.game%}
-                {% set attr = 'checked' if card['checked'] == 'True' else '' %}
-                <div class='card_container'>
-                    <div class='card'>{{card['value']}}</div>
-                    {% if card['checked'] %}
-                    <input type="checkbox" {{human_delibot_disable}} checked id='{{card["value"]}}'
-                           value={{card["value"]}}>
-                    {% else %}
-                    <input type="checkbox" {{human_delibot_disable}} id='{{card["value"]}}' value={{card["value"]}}>
-                    {% endif %}
-                </div>
-                {% endfor %}
-            </div>
-            <div class="game_buttons {{human_delibot_hide}}">
-                <button type="button" id="btn-agree" class="btn btn-success btn-lg">Submit Initial</button>
-                <button type="button" id="final_submit" class="btn btn-success btn-lg">Final Decision and Submit HIT</button>
-            </div>
+            {% include "partials/test.html" %}
         </div>
         <hr/>
         <h3>Logged users:</h3>
@@ -150,9 +57,9 @@
                 <b> <i>(you)</i> {{room_data.current_user}}</b>
                 <button id="leave_room" class="btn btn-danger btn-sm float-right pull-right">Leave room</button>
             </div>
-            <!--            <button id="deli_Moderation" class="btn btn-info btn-sm float-right pull-right DELIBOT">Deli Moderation</button>-->
-            <!--            <button id="deli_Reasoning" class="btn btn-info btn-sm float-right pull-right DELIBOT">Deli Reasoning</button>-->
-            <!--            <button id="deli_Solution" class="btn btn-info btn-sm float-right pull-right DELIBOT">Deli Solution</button>-->
+<!--            <button id="deli_Moderation" class="btn btn-info btn-sm float-right pull-right DELIBOT">Deli Moderation</button>-->
+<!--            <button id="deli_Reasoning" class="btn btn-info btn-sm float-right pull-right DELIBOT">Deli Reasoning</button>-->
+<!--            <button id="deli_Solution" class="btn btn-info btn-sm float-right pull-right DELIBOT">Deli Solution</button>-->
 
             {% for item in room_data.existing_users %}
             <div class="logged_user" id="{{item[1]}}">
@@ -168,8 +75,8 @@
             <br/>
             <hr>
             {% if room_data.mturk_return_url%}
-            <form id="mturk" action="{{room_data.mturk_return_url}}" method="post">
-            </form>
+                <form id="mturk" action="{{room_data.mturk_return_url}}" method="post">
+                </form>
             {% endif %}
             <hr>
             <b>Disclaimer:</b>
@@ -187,12 +94,20 @@
             {%endfor%}
         </div>
         <form id="chat_form" class="sumbission" action="" method="POST">
+            {% if room_data.current_user_type == 'human_delibot'%}
+            <select name="delibot_annotation" id="delibot_annotation">
+                <option disabled selected value="def"> -- select an option -- </option>
+              <option value="reasoning">Reasoning</option>
+              <option value="solution">Solution (w/o reasons)</option>
+              <option value="moderation">Moderation</option>
+              <option value="none">None</option>
+            </select>
+            {%else%}
             <input type="hidden" id="delibot_annotation" value="no_annotation"/>
+            {%endif%}
             <input type="text" id="message" placeholder="Type a message"/>
             <input id="msg_submit" class="btn btn-primary" type="submit"/>
-            <div class="note">TIP: Please revise your solution every time your change your mind (use the "Revise
-                Solution" button).
-            </div>
+            <div class="note">TIP: Please revise your solution every time your change your mind (use the "Revise Solution" button).</div>
 
         </form>
     </div>
@@ -200,31 +115,17 @@
 <div id="dialog-form" title="Questions" style="display:none;">
   <form>
     <fieldset>
-      <h3> How helpful was the DElibot for the discussion? (in terms of aiding collaboration and argumentation)</h3>
+      <h3> Did your group have a good discussion? How would you rate the quality of the discussion?</h3>
       <input type="radio" id="q1-a1" name="question1" value="negative">
-      <label for="q1-a1">Not helpful at all</label><br>
+      <label for="q1-a1">Not productive at all</label><br>
       <input type="radio" id="q1-a2" name="question1" value="neutral">
       <label for="q1-a2">It was ok</label><br>
       <input type="radio" id="q1-a3" name="question1" value="positive">
       <label for="q1-a3">Very helpful</label><br>
 
-      <h3>How natural were the responses by the DEliBot? (did they fit the context, was it something that a person could say)</h3>
-      <input type="radio" id="q2-a1" name="question2" value="negative">
-      <label for="q2-a1">Not natural</label><br>
-      <input type="radio" id="q2-a2" name="question2" value="neutral">
-      <label for="q2-a2">It was ok</label><br>
-      <input type="radio" id="q2-a3" name="question2" value="positive">
-      <label for="q2-a3">Very natural</label><br>
+      <h3>Who was the most useful member of your group?</h3>
+      <textarea id="most_usefull_free-text" rows="1" cols="50"></textarea>
 
-
-      <h3>Would the Delibot have been more helpful if it had spoken a bit more, a bit less, was the frequency about right?</h3>
-      <input type="radio" id="q3-a1" name="question3" value="too_much">
-      <label for="q3-a1">Bit less would be better</label><br>
-      <input type="radio" id="q3-a2" name="question3" value="just_right">
-      <label for="q3-a2">Just right</label><br>
-      <input type="radio" id="q3-a3" name="question3" value="not_enough">
-      <label for="q3-a3">Bit More would be better</label><br>
-      <!-- Add more questions similarly -->
       <h3>Is there anything else that you wish to add:</h3>
       <textarea id="free-text" rows="4" cols="50"></textarea>
 
@@ -238,19 +139,14 @@
 <audio id="audio" src="/static/announcement.mp3" autostart="false" ></audio>
 
 </body>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-<link href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" rel="Stylesheet">
-<script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.0/socket.io.js"
-        integrity="sha512-/xb5+PNOA079FJkngKI2jvID5lyiqdHXaUUcfmzE0X0BdpkgzIWHC59LOG90a2jDcOyRsd1luOr24UCCAG8NNw=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
 <script type="text/javascript" src="/static/utils.js"></script>
 <script type="text/javascript" src="/static/notify.min.js"></script>
 
 <script type="text/javascript">
 $(function() {
-    var socket = null;
-    var socket = io.connect('https://' + document.domain, {autoConnect: true,  transports: ["websocket", "polling"], upgrade: true, forceNew:true});
+    var socket = io.connect('https://' + document.domain, {autoConnect: true,  transports: ["websocket", "polling"], upgrade: true});
+
     var room_id = $('input#chat_id').val();
     var timer = null;
     var room_status = $('#room_status').val();
@@ -265,29 +161,10 @@ $(function() {
         $('#msg_submit').prop('disabled', true);
     }
 
-
-
-    socket.on( 'connect', function() {
-        console.log('connecting');
-        var user_status = $('input#user_status').val();
-        socket.emit('join', { 'room': room_id, 'user_name': user_name, 'user_status': user_status, user_type: current_user_type});
-          socket.on('disconnect', function () {
-        console.log("LOG: just disconnected: " + socket.id)
-      })
-
-      // use the ack function argument to send a response back
-      socket.on('isConnected', function(id, ackFn) {
-          let otherSocket = io.sockets.connected[id];
-          ackFn(!!otherSocket && otherSocket.connected);
-      });
-
-      socket.on("connect_error", function(err){
-          console.log('connect_error due to ' +  err);
-        });
-         if (room_status == ROUTING_TIMER_STARTED || room_status == READY_TO_START){
+    if (room_status == ROUTING_TIMER_STARTED || room_status == READY_TO_START){
         $.notify("The group phase of the game will start soon! Please submit your card selection. Once everyone does so, the game will start! (click to close)",  {autoHide: false, className: 'info'});
         activityWatcher(wakeup, kick);
-<!--        sound.play();-->
+        sound.play();
 
         if (room_status == ROUTING_TIMER_STARTED){
                 var user_status = $('input#user_status').val();
@@ -363,7 +240,153 @@ $(function() {
         }
       };
 
-      socket.on('response', function(message_str) {
+
+    socket.on( 'connect', function() {
+        var user_status = $('input#user_status').val();
+        socket.emit('join', { 'room': room_id, 'user_name': user_name, 'user_status': user_status, user_type: current_user_type});
+    });
+
+    $('#leave_room').on('click', function(e){
+        if (confirm('Are you sure you want to leave? Leaving the room will exclude you from participation.')) {
+            var user_status = $('input#user_status').val();
+            socket.emit('leave', { user_name: user_name, room: room_id, user_id:global_user_id, user_status: user_status, user_type: current_user_type});
+            window.location.href = "/";
+        }
+    });
+
+<!--   $('#final_submit').on('click', function(e){-->
+<!--        if (confirm("Are you sure you want to Submit HIT? Press the button ONLY after you've submitted the solo solution, participated in the chat and submitted your final solution.")) {-->
+
+<!--            var mturk_url = $('#mturk_url').val();-->
+<!--            var selection = get_card_selection();-->
+<!--            var room_status = $('input#room_status').val();-->
+<!--            var user_status = $('input#user_status').val();-->
+
+<!--            socket.emit('response', {-->
+<!--                user_id: global_user_id,-->
+<!--                user_name: user_name,-->
+<!--                type: WASON_AGREE,-->
+<!--                message: selection,-->
+<!--                room: room_id,-->
+<!--                user_type: current_user_type,-->
+<!--                user_status: user_status-->
+<!--            });-->
+
+<!--            if (mturk_url != ''){-->
+<!--                $('#mturk').submit();-->
+<!--            }-->
+<!--        }-->
+<!--    });-->
+
+    $('#group_start').on('click', function(e){
+      $('#group_start').prop('disabled', true);
+      socket.emit('response', { user_name: 'SYSTEM_MODERATOR', room: room_id, user_id: -1, user_status: USR_MODERATING, type: "MODERATION", message: "GROUP_PHASE_STARTED", user_type: current_user_type});
+    });
+
+    $('#group_ended').on('click', function(e){
+      $('#group_ended').prop('disabled', true);
+      socket.emit('response', { user_name: 'SYSTEM_MODERATOR', room: room_id, user_id: -1, user_status: USR_MODERATING, type: "MODERATION", message: "GROUP_PHASE_ENDED", user_type: current_user_type});
+    });
+
+    $('.kick').on('click', function(e){
+        e.preventDefault();
+        if (confirm('Are you sure you want kick this user?.')) {
+
+            kick_user_id = $(this).val();
+            kick_user_name = $(this).attr('name');
+            kick_generic(kick_user_id, kick_user_name, room_id, true);
+        }
+    });
+
+    var user_status = $('input#user_status').val();
+
+    if (user_status == USR_MODERATING){
+        $('#chat_container').removeClass('hidden');
+    }
+
+    $('#delibot_annotation').change(function(){
+        $('#message').prop('disabled', false);
+        $('#msg_submit').prop('disabled', false)
+    });
+
+    $('form#chat_form').on('submit', function(e) {
+        var user_status = $('input#user_status').val();
+        e.preventDefault();
+        var message = $('input#message').val();
+        var annotation = $('#delibot_annotation').val();
+
+        if (message!=""){
+            socket.emit( 'response', {
+                user_id: global_user_id,
+                user_name: user_name,
+                type: CHAT_MESSAGE,
+                message: {'message': message, 'annotation': annotation},
+                room: room_id,
+                user_type: current_user_type,
+                user_status: user_status
+          });
+        }
+
+        if (current_user_type == 'human_delibot'){
+
+            $('#message').prop('disabled', true);
+            $('#msg_submit').prop('disabled', true)
+            $('#delibot_annotation').val('def');
+        }
+
+        $('input#message').val('').focus();
+
+     });
+
+
+    var card_click = $('input:checkbox').on('change', function(e){
+        var selection = get_card_selection();
+        var user_status = $('input#user_status').val();
+        socket.emit( 'response', {
+            user_id: global_user_id,
+            user_name: user_name,
+            type: WASON_GAME,
+            message: selection,
+            user_status: user_status,
+            room: room_id,
+            user_type: current_user_type
+        });
+
+        $('#btn-agree').prop('disabled', false);
+    });
+
+
+    var agree_clicked = $('#btn-agree').on('click', function(e){
+
+        $('#btn-agree').text('Revise Solution')
+
+        var selection = get_card_selection();
+        room_status = $('input#room_status').val();
+        var user_status = $('input#user_status').val();
+
+        socket.emit('response', {
+            user_id: global_user_id,
+            user_name: user_name,
+            type: WASON_AGREE,
+            message: selection,
+            room: room_id,
+            user_type: current_user_type,
+            user_status: user_status
+        });
+
+        if (user_status == USR_ONBOARDING){
+            $.notify("Thank you for submitting your solution. The game will start soon! Please wait for the other participants to submit their solo selections. (click to close)", {autoHide: false, className: 'info'});
+        }
+        $('#btn-agree').prop('disabled', true);
+
+    });
+
+    $('.DELIBOT').on('click', function(e){
+        id_type = e.target.id
+        socket.emit('delibot', { room_id: room_id, delitype: id_type});
+    });
+
+    socket.on('response', function(message_str) {
         msg =  JSON.parse(message_str);
         console.log(msg);
         switch(msg.type) {
@@ -485,7 +508,7 @@ $(function() {
                 }
                 clearInterval(timer);
                 $('#chat_container').removeClass('hidden');
-<!--                $('#game_play_timer').removeClass('hidden');-->
+                $('#game_play_timer').removeClass('hidden');
                 $('.task_description').removeClass('hidden');
                 $('#game_start_timer').addClass('hidden');
 
@@ -520,26 +543,9 @@ $(function() {
         }
     });
 
-
-    $('#leave_room').on('click', function(e){
-        if (confirm('Are you sure you want to leave? Leaving the room will exclude you from participation.')) {
-            var user_status = $('input#user_status').val();
-            socket.emit('leave', { user_name: user_name, room: room_id, user_id:global_user_id, user_status: user_status, user_type: current_user_type});
-            window.location.href = "/";
-        }
-    });
-
     function validateForm() {
       // Validate Question 1
       if (!$('input[name="question1"]:checked').val()) {
-        return false;
-      }
-
-      if (!$('input[name="question2"]:checked').val()) {
-        return false;
-      }
-
-      if (!$('input[name="question3"]:checked').val()) {
         return false;
       }
 
@@ -561,9 +567,7 @@ $(function() {
           // Handle form submission
           let answers = {
             helpfulness: $('input[name="question1"]:checked').val(),
-            fluency: $('input[name="question2"]:checked').val(),
-            timing: $('input[name="question3"]:checked').val(),
-
+            most_helpful: $('#most_usefull_free-text').val(),
             // Collect answers for other questions similarly
             other_feedbacl: $('#free-text').val()
           };
@@ -606,123 +610,13 @@ $(function() {
         $('input[name="question1"]').prop('checked', false);
         // Reset other questions similarly
         $('#free-text').val('');
+        $('#most_usefull_free-text').val('');
       }
     });
 
     $("#final_submit").on("click", function() {
       $("#dialog-form").dialog("open");
     });
-
-
-    $('#group_start').on('click', function(e){
-      $('#group_start').prop('disabled', true);
-      socket.emit('response', { user_name: 'SYSTEM_MODERATOR', room: room_id, user_id: -1, user_status: USR_MODERATING, type: "MODERATION", message: "GROUP_PHASE_STARTED", user_type: current_user_type});
-    });
-
-    $('#group_ended').on('click', function(e){
-      $('#group_ended').prop('disabled', true);
-      socket.emit('response', { user_name: 'SYSTEM_MODERATOR', room: room_id, user_id: -1, user_status: USR_MODERATING, type: "MODERATION", message: "GROUP_PHASE_ENDED", user_type: current_user_type});
-    });
-
-    $('.kick').on('click', function(e){
-        e.preventDefault();
-        if (confirm('Are you sure you want kick this user?.')) {
-
-            kick_user_id = $(this).val();
-            kick_user_name = $(this).attr('name');
-            kick_generic(kick_user_id, kick_user_name, room_id, true);
-        }
-    });
-
-    var user_status = $('input#user_status').val();
-
-    if (user_status == USR_MODERATING){
-        $('#chat_container').removeClass('hidden');
-    }
-
-    $('#delibot_annotation').change(function(){
-        $('#message').prop('disabled', false);
-        $('#msg_submit').prop('disabled', false)
-    });
-
-    $('form#chat_form').on('submit', function(e) {
-        var user_status = $('input#user_status').val();
-        e.preventDefault();
-        var message = $('input#message').val();
-        var annotation = $('#delibot_annotation').val();
-
-        if (message!=""){
-            socket.emit( 'deliresponse2', {
-                user_id: global_user_id,
-                user_name: user_name,
-                type: CHAT_MESSAGE,
-                message: {'message': message, 'annotation': annotation},
-                room: room_id,
-                user_type: current_user_type,
-                user_status: user_status
-          });
-        }
-
-        if (current_user_type == 'human_delibot'){
-
-            $('#message').prop('disabled', true);
-            $('#msg_submit').prop('disabled', true)
-            $('#delibot_annotation').val('def');
-        }
-
-        $('input#message').val('').focus();
-
-     });
-
-
-    var card_click = $('input:checkbox').on('change', function(e){
-        var selection = get_card_selection();
-        var user_status = $('input#user_status').val();
-        socket.emit( 'response', {
-            user_id: global_user_id,
-            user_name: user_name,
-            type: WASON_GAME,
-            message: selection,
-            user_status: user_status,
-            room: room_id,
-            user_type: current_user_type
-        });
-
-        $('#btn-agree').prop('disabled', false);
-    });
-
-
-    var agree_clicked = $('#btn-agree').on('click', function(e){
-
-        $('#btn-agree').text('Revise Solution')
-
-        var selection = get_card_selection();
-        room_status = $('input#room_status').val();
-        var user_status = $('input#user_status').val();
-
-        socket.emit('response', {
-            user_id: global_user_id,
-            user_name: user_name,
-            type: WASON_AGREE,
-            message: selection,
-            room: room_id,
-            user_type: current_user_type,
-            user_status: user_status
-        });
-
-        if (user_status == USR_ONBOARDING){
-            $.notify("Thank you for submitting your solution. The game will start soon! Please wait for the other participants to submit their solo selections. (click to close)", {autoHide: false, className: 'info'});
-        }
-        $('#btn-agree').prop('disabled', true);
-
-    });
-
-    $('.DELIBOT').on('click', function(e){
-        id_type = e.target.id
-        socket.emit('delibot', { room_id: room_id, delitype: id_type});
-    });
-
-
 
     $("#message").bind("keydown", function( event ) {
         if (event.keyCode === $.ui.keyCode.TAB &&
@@ -755,7 +649,7 @@ $(function() {
     function wakeup(){
         status = $('input#room_status').val();
         if(status != 'GAME_FINISHED'){
-<!--            sound.play();-->
+            sound.play();
             $.notify("You have been inactive for a while. Please be mindful, that after a prolonged period of inactivity you will be excluded from the room. (click to close)", {autoHide: false, className: 'error'});
         }
     }
@@ -791,8 +685,6 @@ $(function() {
         }
         prevKey = e.key.toUpperCase();
     });
-    });
 });
-
 </script>
 </html>
