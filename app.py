@@ -494,17 +494,75 @@ def delibot2():
                                       "start_time": campaign['start_time']})
 
 
-@app.route('/partial_test')
-def test_partial():
-    return render_template("generic_room.html", room_data={'id': 0, 'name': 0, 'game': 0,
-                                      'messages': [], 'existing_users': [],
-                                      'current_user': 0,
-                                      'current_user_id': 0,
-                                      'current_user_type': 0,
-                                      'current_user_status': 0, 'room_status': 0,
-                                      'mturk_return_url': 0,
+@app.route('/chess_room')
+def chess_room():
+
+    with open('data/games/chess/pilot.json', 'r') as rf:
+        games = json.load(rf)
+
+    sl = random.randint(0, 2) + random.random()
+    sleep(sl)
+    room_id = request.args.get('room_id')
+    mturk_info_id = request.args.get('mturk_info', None)
+
+    has_user = PG.check_for_user(mturk_info_id=mturk_info_id)
+    print("Has user chat room", str(has_user))
+    if has_user:
+        return render_template('unsuccessful_onboarding.html')
+
+    is_moderator = request.args.get('moderator', False)
+
+    room = PG.get_single_room(room_id)
+    running_dialogue = PG.get_messages(room.room_id)
+    messages = [d for d in running_dialogue if d.message_type == CHAT_MESSAGE]
+
+    logged_users = set()
+    for item in running_dialogue:
+        if item.message_type == JOIN_ROOM:
+            logged_users.add((item.origin, item.origin_id))
+        elif item.message_type == LEAVE_ROOM and (item.origin, item.origin_id) in logged_users:
+            logged_users.remove((item.origin, item.origin_id))
+
+    user_type = 'participant'
+    if is_moderator == "True":
+        user_type = 'moderator'
+
+    campaign = PG.get_campaign(room.campaign)
+
+    current_user = generate_user([d[0] for d in logged_users], user_type)
+
+    if is_moderator:
+        status = USR_MODERATING
+    else:
+        status = USR_ONBOARDING
+    m = Message(origin_name=current_user['user_name'], message_type=JOIN_ROOM, room_id=room_id,
+                origin_id=current_user['user_id'], user_status=status, user_type=user_type)
+    create_broadcast_message(m)
+
+    formated_return_url = None
+    if mturk_info_id:
+        PG.update_mturk_user_id(mturk_info_id, current_user['user_id'])
+        mturk_info = PG.get_mturk_info(mturk_info_id)
+        if mturk_info:
+            formated_return_url = '{}/mturk/externalSubmit?assignmentId={}&user_id={}'.format(mturk_info[1],
+                                                                                              mturk_info[0],
+                                                                                              current_user['user_id'])
+    handle_routing(running_dialogue, logged_users, campaign['start_threshold'], campaign['start_time'],
+                   campaign['close_threshold'], room.room_id)
+
+    # Have to get the room again, in case the status changed
+    room = PG.get_single_room(room_id)
+
+    return render_template("generic_room.html", room_data={'id': room_id, 'name': room.name, 'game': games,
+                                      'messages': messages, 'existing_users': logged_users,
+                                      'current_user': current_user['user_name'],
+                                      'current_user_id': current_user['user_id'],
+                                      'current_user_type': user_type,
+                                      'current_user_status': status, 'room_status': room.status,
+                                      'mturk_return_url': formated_return_url,
                                       # 'mturk_return_url': 'test_post',
-                                      "start_time": 0})
+                                      "start_time": campaign['start_time']})
+
 
 @socketio.on('delibot')
 def delibot(json):

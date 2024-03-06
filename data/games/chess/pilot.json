@@ -1,0 +1,105 @@
+[
+  {"id": 1,
+  	"notes": "opga_9_bl306wd4-e4",
+    "fin": "4r1k1/p4p1p/1p3qpB/3b4/1P1R4/P1Q5/5PPP/6K1 w - - 0 1",
+    "turn": "w",
+    "eval": 8.9,
+    "type": "tactical",
+    "moves": [
+      {"id": 1,
+        "fin": "4r1k1/p4p1p/1p3qpB/3b4/1P2R3/P1Q5/5PPP/6K1 b - - 1 1",
+        "eval": 20,
+        "text": "Rook d4 -> e4"
+      },
+      {"id": 2,
+        "fin": "4r1k1/p4p1p/1p3qpB/3b4/1P1R4/P1Q4P/5PP1/6K1 b - - 0 1",
+        "eval": 0.4,
+        "text": "Pawn h2 -> h3"
+      },
+      {"id": 3,
+        "fin": "4r1k1/p4p1p/1p3qp1/3b4/1P1R4/P1Q1B3/5PPP/6K1 b - - 1 1",
+        "eval": 0,
+        "text": "Bishop h6 -> e3"
+      },
+      {"id": 4,
+        "fin": "4r1k1/p4p1p/1p3qpB/3R4/1P6/P1Q5/5PPP/6K1 b - - 0 1",
+        "eval": -6.1,
+        "text": "Rook d4 -> d5 (takes)"
+      },
+      {"id": 5,
+        "fin": "4r1k1/p4p1p/1p3qpB/3b4/1P6/P1QR4/5PPP/6K1 b - - 1 1",
+        "eval": -20,
+        "text": "Rook d4 -> d3"
+      }
+      ]
+  },
+    {"id": 2,
+  	"notes": "opga_22_ej6wc1-a3",
+    "fin": "r1bqk2r/pp1n1ppp/2p2n2/3p4/P2Pp3/2P1P3/2PN1PPP/R1BQKB1R w KQkq - 0 1",
+    "turn": "w",
+    "eval": 1.44,
+    "type": "positional",
+    "moves": [
+      {"id": 1,
+        "fin": "r1bqk2r/pp1n1ppp/2p2n2/3p4/P2Pp3/B1P1P3/2PN1PPP/R2QKB1R b KQkq - 1 1",
+        "eval": 1.44,
+        "text": "Bishop c1 -> a3"
+      },
+      {"id": 2,
+        "fin": "r1bqk2r/pp1n1ppp/2p2n2/3p4/P1PPp3/4P3/2PN1PPP/R1BQKB1R b KQkq - 0 1",
+        "eval": 0.53,
+        "text": "Pawn c3 -> c4"
+      },
+      {"id": 3,
+        "fin": "r1bqk2r/pp1n1ppp/2p2n2/3p4/P2Pp3/2P1P3/2PNBPPP/R1BQK2R b KQkq - 1 1",
+        "eval": 0.44,
+        "text": "Bishop f2 -> e2"
+      },
+      {"id": 4,
+        "fin": "r1bqk2r/pp1n1ppp/2p2n2/3p4/P2Pp3/1NP1P3/2P2PPP/R1BQKB1R b KQkq - 1 1",
+        "eval": -0.38,
+        "text": "Knight d2 -> b3"
+      },
+      {"id": 5,
+        "fin": "r1bqk2r/pp1n1ppp/2p2n2/3p4/P2PN3/2P1P3/2P2PPP/R1BQKB1R b KQkq - 0 1",
+        "eval": -3.91,
+        "text": "Knight d2 -> e4 (takes)"
+      }
+      ]
+  }
+  ,
+    {"id": 3,
+  	"notes": "opga_37_po551wf8-g6",
+    "fin": "5N2/4P3/7k/6r1/8/8/8/4K3 w - - 0 1",
+    "turn": "w",
+    "eval": 7.15,
+    "type": "endgame",
+    "moves": [
+      {"id": 1,
+        "fin": "8/4P3/6Nk/6r1/8/8/8/4K3 b - - 1 1",
+        "eval": 7.15,
+        "text": "Knight f8 -> g1"
+      },
+      {"id": 2,
+        "fin": "8/3NP3/7k/6r1/8/8/8/4K3 b - - 1 1",
+        "eval": 2.8,
+        "text": "Knight f8 -> d7"
+      },
+      {"id": 3,
+        "fin": "4QN2/8/7k/6r1/8/8/8/4K3 b - - 0 1",
+        "eval": 0,
+        "text": "Pawn e7 -> e8 (promotes to Queen)"
+      },
+      {"id": 4,
+        "fin": "5N2/4P3/7k/6r1/8/8/3K4/8 b - - 1 1",
+        "eval": -0.12,
+        "text": "King e1 -> d2"
+      },
+      {"id": 5,
+        "fin": "8/4P3/4N2k/6r1/8/8/8/4K3 b - - 1 1",
+        "eval": -4.95,
+        "text": "Knight f8 -> e6"
+      }
+      ]
+  }
+]

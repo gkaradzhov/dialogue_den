@@ -48,7 +48,10 @@
 <div class="row">
     <div class="col-6">
         <div class="task">
-            {% include "partials/test.html" %}
+            {% with room_data=room_data %}
+                {% include "partials/test.html"  %}
+        {% endwith %}
+
         </div>
         <hr/>
         <h3>Logged users:</h3>
@@ -94,17 +97,6 @@
             {%endfor%}
         </div>
         <form id="chat_form" class="sumbission" action="" method="POST">
-            {% if room_data.current_user_type == 'human_delibot'%}
-            <select name="delibot_annotation" id="delibot_annotation">
-                <option disabled selected value="def"> -- select an option -- </option>
-              <option value="reasoning">Reasoning</option>
-              <option value="solution">Solution (w/o reasons)</option>
-              <option value="moderation">Moderation</option>
-              <option value="none">None</option>
-            </select>
-            {%else%}
-            <input type="hidden" id="delibot_annotation" value="no_annotation"/>
-            {%endif%}
             <input type="text" id="message" placeholder="Type a message"/>
             <input id="msg_submit" class="btn btn-primary" type="submit"/>
             <div class="note">TIP: Please revise your solution every time your change your mind (use the "Revise Solution" button).</div>
@@ -112,6 +104,7 @@
         </form>
     </div>
 </div>
+
 <div id="dialog-form" title="Questions" style="display:none;">
   <form>
     <fieldset>

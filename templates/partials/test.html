@@ -4,84 +4,53 @@
         <div class="row">
             Carefully examine the board below. With black to move, which of these 5 moves would be the best.
             You can press the "Show" button next to each move to visualise it.
-        </div>
-        <div class="row"><div id="board1" style="width: 400px"></div></div>
-        <div class="row mt-0 mb-0">
-            <div class="col">
-                <h3><span class="badge badge-secondary">1. Rook -> h2 (takes)</span></h3>
-            </div>
-            <div class="col">
-              <button type="button" class="btn btn-warning" id="move1Btn"> Show</button>
-            </div>
-        </div>
-        <div class="row mt-0 mb-0">
-            <div class="col">
-                <h3><span class="badge badge-secondary">2. Bishop -> e3 (takes)</span></h3>
-            </div>
-            <div class="col">
-              <button type="button" class="btn btn-warning" id="move2Btn"> Show</button>
-            </div>
-        </div>
-        <div class="row mt-0 mb-0">
-            <div class="col">
-                <h3><span class="badge badge-secondary">3. Pawn -> g5</span></h3>
-            </div>
-            <div class="col">
-              <button type="button" class="btn btn-warning" id="move3Btn"> Show</button>
-            </div>
-        </div>
-        <div class="row mt-0 mb-0">
-            <div class="col">
-                <h3><span class="badge badge-secondary">4. Rook (d8) -> e8</span></h3>
-            </div>
-            <div class="col">
-              <button type="button" class="btn btn-warning" id="move4Btn"> Show</button>
-            </div>
-        </div>
-        <div class="row mt-0 mb-0">
-            <div class="col">
-                <h3><span class="badge badge-secondary">5. Knight (f6) -> g4</span></h3>
-            </div>
-            <div class="col">
-              <button type="button" class="btn btn-warning" id="move5Btn"> Show</button>
-            </div>
-        </div>
-    </div>
-<link rel="stylesheet" type="text/css" href="/static/css/chessboard-1.0.0.css"/>
-<script type="text/javascript" src="/static/chessboard-1.0.0.min.js"></script>
-<script>
 
+
+            <div class="row">
+                <div id="board1" style="width: 400px"></div>
+            </div>
+            <table class="table table-sm">
+                <tbody>
+                {% for move in room_data.game[0]['moves']%}
+                <tr>
+                    <th scope="row">{{loop.index}}</th>
+                    <td><h5><span class="badge badge-secondary">{{move['text']}}</span></h5></td>
+                    <td>
+                        <button type="button" data-fin="{{move['fin']}}" class="move_game btn btn-warning"
+                                id="move{{move['id']}}">Show
+                        </button>
+                    </td>
+                    <td>
+                        <button type="button" data-fin="{{move['fin']}}" class="btn btn-success"
+                                id="selected_{{room_data.game[0]['id']}}_{{move['id']}}">Select
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <link rel="stylesheet" type="text/css" href="/static/css/chessboard-1.0.0.css"/>
+        <script type="text/javascript" src="/static/chessboard-1.0.0.min.js"></script>
+
+        <script>
 var sleepSetTimeout_ctrl;
-
 function sleep(ms) {
     clearInterval(sleepSetTimeout_ctrl);
     return new Promise(resolve => sleepSetTimeout_ctrl = setTimeout(resolve, ms));
 }
 
 async function show_board(start, move){
+      board.position(start, false)
       board.position(move, true)
-       await sleep(1500);
+      await sleep(1500);
       board.position(start, true)
 }
-    var board = Chessboard('board1',  {position: '2kr3r/ppqn1pp1/5np1/2b5/4p3/1BP1B1N1/PP2QPPP/R4RK1 b - - 0 17', showNotation: true})
-    board.orientation('black')
-    $('#move1Btn').on('click', function () {
-       show_board('2kr3r/ppqn1pp1/5np1/2b5/4p3/1BP1B1N1/PP2QPPP/R4RK1 b - - 0 17', '2kr4/ppqn1pp1/5np1/2b5/4p3/1BP1B1N1/PP2QPPr/R4RK1 w - - 0 18');
-    })
-    $('#move2Btn').on('click', function () {
-       show_board('2kr3r/ppqn1pp1/5np1/2b5/4p3/1BP1B1N1/PP2QPPP/R4RK1 b - - 0 17', '2kr3r/ppqn1pp1/5np1/8/4p3/1BP1b1N1/PP2QPPP/R4RK1 w - - 0 18');
+    var board = Chessboard('board1',  {position: "{{room_data.game[0]['fin']}}", showNotation: true})
+
+    $('.move_game').on('click', function () {
+        var clicked = $(this);
+       show_board("{{room_data.game[0]['fin']}}", clicked.data('fin'));
     })
 
-    $('#move3Btn').on('click', function () {
-       show_board('2kr3r/ppqn1pp1/5np1/2b5/4p3/1BP1B1N1/PP2QPPP/R4RK1 b - - 0 17', '2kr3r/ppqn1pp1/5n2/2b3p1/4p3/1BP1B1N1/PP2QPPP/R4RK1 w - - 0 18');
-    })
-
-    $('#move4Btn').on('click', function () {
-       show_board('2kr3r/ppqn1pp1/5np1/2b5/4p3/1BP1B1N1/PP2QPPP/R4RK1 b - - 0 17', '2k1r2r/ppqn1pp1/5np1/2b5/4p3/1BP1B1N1/PP2QPPP/R4RK1 w - - 1 18');
-    })
-
-
-    $('#move5Btn').on('click', function () {
-       show_board('2kr3r/ppqn1pp1/5np1/2b5/4p3/1BP1B1N1/PP2QPPP/R4RK1 b - - 0 17', '2kr3r/ppqn1pp1/6p1/2b5/4p1n1/1BP1B1N1/PP2QPPP/R4RK1 w - - 1 18');
-    })
 </script>
