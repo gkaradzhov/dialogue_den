@@ -1,5 +1,12 @@
 <!DOCTYPE html>
-
+    <style type="text/css">
+    .highlight-white {
+      box-shadow: inset 0 0 3px 3px yellow;
+    }
+    .highlight-black {
+      box-shadow: inset 0 0 3px 3px blue;
+    }
+    </style>
     <div class="container">
         <div class="row">
             Carefully examine the board below. With black to move, which of these 5 moves would be the best.
@@ -21,14 +28,16 @@
                         </button>
                     </td>
                     <td>
-                        <button type="button" data-fin="{{move['fin']}}" class="btn btn-success"
-                                id="selected_{{room_data.game[0]['id']}}_{{move['id']}}">Select
-                        </button>
+                        <input type="radio" data-fin="{{move['fin']}}" class="btn btn-success"
+                                id="selected_{{room_data.game[0]['id']}}_{{move['id']}}"/>
                     </td>
                 </tr>
                 {% endfor %}
                 </tbody>
             </table>
+        </div>
+        <div class="game_buttons">
+            <button type="button" id="main_game_button" class="btn btn-success btn-lg">Submit and move to Next</button>
         </div>
         <link rel="stylesheet" type="text/css" href="/static/css/chessboard-1.0.0.css"/>
         <script type="text/javascript" src="/static/chessboard-1.0.0.min.js"></script>
@@ -53,4 +62,13 @@ async function show_board(start, move){
        show_board("{{room_data.game[0]['fin']}}", clicked.data('fin'));
     })
 
+    socket.emit('response', {
+                                user_id: global_user_id,
+                                user_name: user_name,
+                                type: FINISHED_ONBOARDING,
+                                room: room_id,
+                                user_status: user_status,
+                                user_type: current_user_type,
+                                message: ''
+                            });
 </script>
