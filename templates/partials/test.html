@@ -1,4 +1,12 @@
 <!DOCTYPE html>
+<input id="chat_id" type="hidden" value="{{room_data.id}}"/>
+<input id="user_id" type="hidden" value="{{room_data.current_user_id}}"/>
+<input id="user_name" type="hidden" value="{{room_data.current_user}}"/>
+<input id="user_status" type="hidden" value="{{room_data.current_user_status}}"/>
+<input id="room_status" type="hidden" value="{{room_data.room_status}}"/>
+<input id="start_time" type="hidden" value="{{room_data.start_time}}"/>
+<input id="user_type" type="hidden" value="{{room_data.current_user_type}}">
+<input id="mturk_url" type="hidden" value="{{room_data.mturk_return_url}}">
     <style type="text/css">
     .highlight-white {
       box-shadow: inset 0 0 3px 3px yellow;
@@ -44,6 +52,15 @@
 
         <script>
         $(function() {
+
+   var room_id = $('input#chat_id').val();
+    var room_status = $('#room_status').val();
+    var user_name = $('input#user_name').val();
+    var global_user_id = $('input#user_id').val();
+    var current_user_type = $('#user_type').val();
+
+
+
 var sleepSetTimeout_ctrl;
 function sleep(ms) {
     clearInterval(sleepSetTimeout_ctrl);
