@@ -15,20 +15,20 @@
       box-shadow: inset 0 0 3px 3px blue;
     }
     </style>
-    <div class="container">
-        <div class="row">
+    <div class="">
+        <div class="">
             Carefully examine the board below. With black to move, which of these 5 moves would be the best.
             You can press the "Show" button next to each move to visualise it.
 
 
-            <div class="row">
+            <div class="">
                 <div id="board1" style="width: 400px"></div>
             </div>
             <table class="table table-sm">
                 <tbody>
                 {% for move in room_data.game[0]['moves']%}
                 <tr>
-                    <th scope="row">{{loop.index}}</th>
+                    <th scope="">{{loop.index}}</th>
                     <td><h5><span class="badge badge-secondary">{{move['text']}}</span></h5></td>
                     <td>
                         <button type="button" data-fin="{{move['fin']}}" class="move_game btn btn-warning"
