@@ -43,6 +43,7 @@
         <script type="text/javascript" src="/static/chessboard-1.0.0.min.js"></script>
 
         <script>
+        $(function() {
 var sleepSetTimeout_ctrl;
 function sleep(ms) {
     clearInterval(sleepSetTimeout_ctrl);
@@ -71,4 +72,6 @@ async function show_board(start, move){
                                 user_type: current_user_type,
                                 message: ''
                             });
+
+});
 </script>
