@@ -12,7 +12,7 @@
     You can press the "Show" button next to each move to visualise it.
 
     {% for game in room_data.game%}
-    <div id="{{loop.index}}" class="chess_game_container hidden">
+    <div id="chess_game_container{{loop.index}}" class="hidden">
     <div class="">
         <div id="board1" data-fin="{{game['fin']}}" style="width: 400px"></div>
     </div>
@@ -71,15 +71,16 @@ async function show_board(start, move){
     var board = Chessboard('board1',  {position: "{{room_data.game[0]['fin']}}", showNotation: true})
     var socket = io.connect('https://' + document.domain, {autoConnect: true,  transports: ["websocket", "polling"], upgrade: true});
     var current_counter = 0;
-    $('.chess_game_container#'+current_counter).removeClass('hidden');
+    $('#chess_game_container'+current_counter).removeClass('hidden');
     $('.move_game').on('click', function () {
         var clicked = $(this);
        show_board("{{room_data.game[0]['fin']}}", clicked.data('fin'));
     })
 
     $('#main_game_button').on('click', function () {
-        $('.chess_game_container#'+current_counter).addClass('hidden');
-        
+        $('#chess_game_container'+current_counter).addClass('hidden');
+        board = Chessboard('board1',  {position: $('.chess_game_container#board1').data('fin'), showNotation: true})
+
         current_counter++;
         $('.chess_game_container#'+current_counter).removeClass('hidden');
 
