@@ -12,7 +12,7 @@
     You can press the "Show" button next to each move to visualise it.
 
     {% for game in room_data.game%}
-
+    <div id="{{loop.index}}" class="chess_game_container hidden">
     <div class="">
         <div id="board1" data-fin="{{game['fin']}}" style="width: 400px"></div>
     </div>
@@ -35,6 +35,7 @@
         {% endfor %}
         </tbody>
     </table>
+    </div>
     {%endfor%}
 </div>
 
@@ -69,22 +70,28 @@ async function show_board(start, move){
 }
     var board = Chessboard('board1',  {position: "{{room_data.game[0]['fin']}}", showNotation: true})
     var socket = io.connect('https://' + document.domain, {autoConnect: true,  transports: ["websocket", "polling"], upgrade: true});
-
+    var current_counter = 0;
+    $('.chess_game_container#'+current_counter).removeClass('hidden');
     $('.move_game').on('click', function () {
         var clicked = $(this);
        show_board("{{room_data.game[0]['fin']}}", clicked.data('fin'));
     })
 
     $('#main_game_button').on('click', function () {
-           socket.emit('response', {
-                                user_id: global_user_id,
-                                user_name: user_name,
-                                type: FINISHED_ONBOARDING,
-                                room: room_id,
-                                user_status: user_status,
-                                user_type: current_user_type,
-                                message: ''
-                            });
+        $('.chess_game_container#'+current_counter).addClass('hidden');
+        
+        current_counter++;
+        $('.chess_game_container#'+current_counter).removeClass('hidden');
+
+<!--           socket.emit('response', {-->
+<!--                                user_id: global_user_id,-->
+<!--                                user_name: user_name,-->
+<!--                                type: FINISHED_ONBOARDING,-->
+<!--                                room: room_id,-->
+<!--                                user_status: user_status,-->
+<!--                                user_type: current_user_type,-->
+<!--                                message: ''-->
+<!--                            });-->
     })
 
 
