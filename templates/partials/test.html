@@ -14,7 +14,7 @@
     {% for game in room_data.game%}
     <div id="chess_game_container{{loop.index}}" class="hidden">
     <div class="">
-        <div id="board1" data-fin="{{game['fin']}}" style="width: 400px"></div>
+        <div id="board{{loop.index}}" data-fin="{{game['fin']}}" style="width: 400px"></div>
     </div>
     <table class="table table-sm">
         <tbody>
@@ -70,7 +70,7 @@ async function show_board(start, move){
 }
     var board = Chessboard('board1',  {position: "{{room_data.game[0]['fin']}}", showNotation: true})
     var socket = io.connect('https://' + document.domain, {autoConnect: true,  transports: ["websocket", "polling"], upgrade: true});
-    var current_counter = 0;
+    var current_counter = 1;
     $('#chess_game_container'+current_counter).removeClass('hidden');
     $('.move_game').on('click', function () {
         var clicked = $(this);
@@ -78,21 +78,27 @@ async function show_board(start, move){
     })
 
     $('#main_game_button').on('click', function () {
-        $('#chess_game_container'+current_counter).addClass('hidden');
-        board = Chessboard('board1',  {position: $('.chess_game_container#board1').data('fin'), showNotation: true})
+        $('#chess_game_container'+current_counter.toString()).addClass('hidden');
 
         current_counter++;
-        $('.chess_game_container#'+current_counter).removeClass('hidden');
 
-<!--           socket.emit('response', {-->
-<!--                                user_id: global_user_id,-->
-<!--                                user_name: user_name,-->
-<!--                                type: FINISHED_ONBOARDING,-->
-<!--                                room: room_id,-->
-<!--                                user_status: user_status,-->
-<!--                                user_type: current_user_type,-->
-<!--                                message: ''-->
-<!--                            });-->
+        if(current_counter == 4){
+           current_counter = 1
+           socket.emit('response', {
+                    user_id: global_user_id,
+                    user_name: user_name,
+                    type: FINISHED_ONBOARDING,
+                    room: room_id,
+                    user_status: user_status,
+                    user_type: current_user_type,
+                    message: ''
+                });
+        }
+
+        board = Chessboard('board1',  {position: $('#board'+current_counter.toString()).data('fin'), showNotation: true})
+        $('.chess_game_container#'+current_counter.toString()).removeClass('hidden');
+
+
     })
 
 
