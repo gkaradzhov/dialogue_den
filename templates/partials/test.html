@@ -81,7 +81,7 @@ async function show_board(start, move){
         $('#chess_game_container'+current_counter.toString()).addClass('hidden');
 
         current_counter++;
-
+        console.log(current_counter);
         if(current_counter == 4){
            current_counter = 1;
            socket.emit('response', {
@@ -94,12 +94,11 @@ async function show_board(start, move){
                     message: ''
                 });
         }
+        console.log("starting switch" + current_counter);
 
         $('#chess_game_container'+current_counter.toString()).removeClass('hidden');
         board = Chessboard('board1',  {position: $('#board'+current_counter.toString()).data('fin'), showNotation: true});
-
-
-    })
+    });
 
 
 });
