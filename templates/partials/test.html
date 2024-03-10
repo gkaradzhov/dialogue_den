@@ -83,7 +83,7 @@ async function show_board(start, move){
         current_counter++;
 
         if(current_counter == 4){
-           current_counter = 1
+           current_counter = 1;
            socket.emit('response', {
                     user_id: global_user_id,
                     user_name: user_name,
@@ -96,7 +96,7 @@ async function show_board(start, move){
         }
 
         board = Chessboard('board1',  {position: $('#board'+current_counter.toString()).data('fin'), showNotation: true})
-        $('.chess_game_container#'+current_counter.toString()).removeClass('hidden');
+        $('#chess_game_container'+current_counter.toString()).removeClass('hidden');
 
 
     })
