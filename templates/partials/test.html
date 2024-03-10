@@ -95,8 +95,8 @@ async function show_board(start, move){
                 });
         }
 
-        board = Chessboard('board1',  {position: $('#board'+current_counter.toString()).data('fin'), showNotation: true})
         $('#chess_game_container'+current_counter.toString()).removeClass('hidden');
+        board = Chessboard('board1',  {position: $('#board'+current_counter.toString()).data('fin'), showNotation: true});
 
 
     })
