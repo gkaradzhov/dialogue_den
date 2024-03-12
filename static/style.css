@@ -211,3 +211,9 @@
   display: flex;
   align-items: center;
 }
+
+
+
+input[type=radio]{
+  transform:scale(2);
+}

@@ -101,16 +101,31 @@ async function show_board(start, move){
 
         if(current_counter == 4){
            current_counter = 1;
-           socket.emit('response', {
-                    user_id: global_user_id,
-                    user_name: user_name,
-                    type: FINISHED_ONBOARDING,
-                    room: room_id,
-                    user_status: user_status,
-                    user_type: current_user_type,
-                    message: ''
-                });
+           room_status = $('input#room_status').val();
+
+           if(room_status == READY_TO_START){
+               socket.emit('response', {
+                        user_id: global_user_id,
+                        user_name: user_name,
+                        type: FINISHED_ONBOARDING,
+                        room: room_id,
+                        user_status: user_status,
+                        user_type: current_user_type,
+                        message: ''
+                    });
+           }
+           else{
+                $('.task button').prop('disabled', true);
+                $('.task input').prop('disabled', true);
+                $('.timer_holder').addClass('hidden');
+                $.notify("Game Finished! Thank you for playing! (click to close)", {autoHide: false, className: 'success'});
+                $('input#room_status').val('GAME_FINISHED');
+                $(window).scrollTop(0);
+                break;
+            $("#dialog-form").dialog("open");
+           }
         }
+
 
         $('#chess_game_container'+current_counter.toString()).removeClass('hidden');
         board = Chessboard('#board'+current_counter.toString(),  {position: $('#board'+current_counter.toString()).data('fin'), showNotation: true});
