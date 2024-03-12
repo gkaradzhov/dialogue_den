@@ -29,7 +29,7 @@
             </td>
             <td>
                 <input type="radio" name="solution_selection" data-fin="{{move['fin']}}" class="btn btn-success"
-                       id="selected_{{room_data.game[0]['id']}}_{{move['id']}}"/>
+                       id="{{move['id']}}" value="{{move['id']}}"/>
             </td>
         </tr>
         {% endfor %}
@@ -71,14 +71,29 @@ async function show_board(start, move){
     var board = Chessboard('board1',  {position: "{{room_data.game[0]['fin']}}", showNotation: true})
     var socket = io.connect('https://' + document.domain, {autoConnect: true,  transports: ["websocket", "polling"], upgrade: true});
     var current_counter = 1;
+
     $('#chess_game_container'+current_counter).removeClass('hidden');
     $('.move_game').on('click', function () {
-        var clicked = $(this);
-       show_board("{{room_data.game[0]['fin']}}", clicked.data('fin'));
+       var clicked = $(this);
+       show_board($('#board'+current_counter.toString()).data('fin'), clicked.data('fin'));
     })
 
     $('#main_game_button').on('click', function () {
         $('#chess_game_container'+current_counter.toString()).addClass('hidden');
+
+        var selection = $("#chess_game_container'+current_counter.toString() > input[type='radio'][name='solution_selection']:checked").val();
+        room_status = $('input#room_status').val();
+        var user_status = $('input#user_status').val();
+
+        socket.emit('response', {
+            user_id: global_user_id,
+            user_name: user_name,
+            type: GAME_SUBMIT,
+            message: selection,
+            room: room_id,
+            user_type: current_user_type,
+            user_status: user_status
+        });
 
         current_counter ++;
 
