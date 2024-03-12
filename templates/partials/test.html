@@ -81,7 +81,7 @@ async function show_board(start, move){
     $('#main_game_button').on('click', function () {
         $('#chess_game_container'+current_counter.toString()).addClass('hidden');
 
-        var selection = $("#chess_game_container'+current_counter.toString() > input[type='radio'][name='solution_selection']:checked").val();
+        var selection = $("#chess_game_container" + current_counter.toString() + " > input[type='radio'][name='solution_selection']:checked").val();
         room_status = $('input#room_status').val();
         var user_status = $('input#user_status').val();
 
