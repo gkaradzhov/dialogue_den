@@ -88,7 +88,7 @@ async function show_board(start, move){
         socket.emit('response', {
             user_id: global_user_id,
             user_name: user_name,
-            type: GAME_SUBMIT,
+            type: "GAME_SUBMIT",
             message: selection,
             room: room_id,
             user_type: current_user_type,
