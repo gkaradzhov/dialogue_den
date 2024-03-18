@@ -136,8 +136,9 @@ async function show_board(start, move){
 
     socket.on('response', function(message_str) {
         msg =  JSON.parse(message_str);
-        console.log(msg);
+        console.log("In partial" + msg);
         if (msg.type==FINISHED_ONBOARDING){
+            console.log("Finished onboarding in partial");
             current_counter = 1;
             $('input#room_status').val(ROOM_PLAYING);
             $('#chess_game_container'+current_counter.toString()).removeClass('hidden');
