@@ -240,6 +240,7 @@ $(function() {
 
     socket.on( 'connect', function() {
         var user_status = $('input#user_status').val();
+        console.log("socket exists and connected");
         socket.emit('join', { 'room': room_id, 'user_name': user_name, 'user_status': user_status, user_type: current_user_type});
     });
 
