@@ -103,7 +103,7 @@ async function show_board(start, move){
            current_counter = 1;
            room_status = $('input#room_status').val();
 
-           if(room_status == READY_TO_START){
+           if(room_status != ROOM_PLAYING){
                socket.emit('response', {
                         user_id: global_user_id,
                         user_name: user_name,
@@ -113,8 +113,7 @@ async function show_board(start, move){
                         user_type: current_user_type,
                         message: ''
                     });
-           }
-           if (room_status == ROOM_PLAYING){
+           }else{
                 $('.task button').prop('disabled', true);
                 $('.task input').prop('disabled', true);
                 $('.timer_holder').addClass('hidden');
