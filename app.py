@@ -663,6 +663,7 @@ def on_leave(data):
 
 
 def check_finished(room_history, usr_status, room_status):
+    # ROOM_READY_TO_START indicates that the routing timer has elapsed
     if usr_status == USR_ONBOARDING and room_status != ROOM_READY_TO_START:
         return False
     logged_users = {}
@@ -675,7 +676,7 @@ def check_finished(room_history, usr_status, room_status):
         if item.message_type == LEAVE_ROOM and item.origin_id in logged_users:
             if item.origin_id in logged_users:
                 del logged_users[item.origin_id]
-        elif item.message_type == WASON_AGREE and item.user_status == usr_status:
+        elif (item.message_type == WASON_AGREE or item.message_type == "SUBMITTED_ALL") and item.user_status == usr_status:
             logged_users[item.origin_id] = True
         elif item.message_type == WASON_GAME or item.message_type == JOIN_ROOM:
             logged_users[item.origin_id] = False
