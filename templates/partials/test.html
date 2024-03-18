@@ -99,21 +99,27 @@ async function show_board(start, move){
 
         current_counter ++;
 
-        if(current_counter == 4){
-           current_counter = 1;
-           room_status = $('input#room_status').val();
 
-           if(room_status != ROOM_PLAYING){
+        if(current_counter == 4){
+            socket.emit('response', {
+                            user_id: global_user_id,
+                            user_name: user_name,
+                            type: "SUBMITTED_ALL",
+                            room: room_id,
+                            user_status: user_status,
+                            user_type: current_user_type,
+                            message: ''
+                        });
+           if(room_status == ROOM_PLAYING){
                socket.emit('response', {
-                        user_id: global_user_id,
-                        user_name: user_name,
-                        type: "SUBMITTED_ALL",
-                        room: room_id,
-                        user_status: user_status,
-                        user_type: current_user_type,
-                        message: ''
-                    });
-           }else{
+                            user_id: global_user_id,
+                            user_name: user_name,
+                            type: "SUBMITTED_ALL",
+                            room: room_id,
+                            user_status: user_status,
+                            user_type: current_user_type,
+                            message: ''
+                        });
                 $('.task button').prop('disabled', true);
                 $('.task input').prop('disabled', true);
                 $('.timer_holder').addClass('hidden');
@@ -122,14 +128,22 @@ async function show_board(start, move){
                 $(window).scrollTop(0);
             $("#dialog-form").dialog("open");
            }
+        } else {
+            $('#chess_game_container'+current_counter.toString()).removeClass('hidden');
+            board = Chessboard('#board'+current_counter.toString(),  {position: $('#board'+current_counter.toString()).data('fin'), showNotation: true});
         }
-
-
-        $('#chess_game_container'+current_counter.toString()).removeClass('hidden');
-        board = Chessboard('#board'+current_counter.toString(),  {position: $('#board'+current_counter.toString()).data('fin'), showNotation: true});
     });
 
-
+    socket.on('response', function(message_str) {
+        msg =  JSON.parse(message_str);
+        console.log(msg);
+        if (msg.type==FINISHED_ONBOARDING){
+            current_counter = 1;
+            $('input#room_status').val(ROOM_PLAYING);
+            $('#chess_game_container'+current_counter.toString()).removeClass('hidden');
+            board = Chessboard('#board'+current_counter.toString(),  {position: $('#board'+current_counter.toString()).data('fin'), showNotation: true});
+        }
+    });
 });
 
 
