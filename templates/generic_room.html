@@ -24,6 +24,15 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.0/socket.io.js" integrity="sha512-/xb5+PNOA079FJkngKI2jvID5lyiqdHXaUUcfmzE0X0BdpkgzIWHC59LOG90a2jDcOyRsd1luOr24UCCAG8NNw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
 
+<script type="text/javascript" src="/static/utils.js"></script>
+<script type="text/javascript" src="/static/notify.min.js"></script>
+
+<script>
+    $(function() {
+    var socket = io.connect('https://' + document.domain, {autoConnect: true,  transports: ["websocket", "polling"], upgrade: true, forceNew: true});
+    });
+</script>
+
 <input id="chat_id" type="hidden" value="{{room_data.id}}"/>
 <input id="user_id" type="hidden" value="{{room_data.current_user_id}}"/>
 <input id="user_name" type="hidden" value="{{room_data.current_user}}"/>
@@ -133,13 +142,8 @@
 
 </body>
 
-<script type="text/javascript" src="/static/utils.js"></script>
-<script type="text/javascript" src="/static/notify.min.js"></script>
-
 <script type="text/javascript">
 $(function() {
-    var socket = io.connect('https://' + document.domain, {autoConnect: true,  transports: ["websocket", "polling"], upgrade: true, forceNew: true});
-
     var room_id = $('input#chat_id').val();
     var timer = null;
     var room_status = $('#room_status').val();
