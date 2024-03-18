@@ -98,6 +98,9 @@ async function show_board(start, move){
 
         current_counter ++;
 
+        if (current_counter == 3 && room_status == ROOM_PLAYING){
+           $("#main_game_button").html('Final Submission');
+        }
 
         if(current_counter == 4){
             socket.emit('response', {
@@ -117,6 +120,11 @@ async function show_board(start, move){
                 $('input#room_status').val('GAME_FINISHED');
                 $(window).scrollTop(0);
             $("#dialog-form").dialog("open");
+           }else{
+                $("#main_game_button").prop('disabled', true);
+                $("#main_game_button").html('The group chat will begin shortly, please wait');
+
+
            }
         } else {
             $('#chess_game_container'+current_counter.toString()).removeClass('hidden');
@@ -128,6 +136,9 @@ async function show_board(start, move){
         msg =  JSON.parse(message_str);
         console.log("In partial" + msg);
         if (msg.type==FINISHED_ONBOARDING){
+            ("#main_game_button").prop('disabled', false);
+            $("#main_game_button").html('Submit and Move to Next');
+
             console.log("Finished onboarding in partial");
             current_counter = 1;
             $('input#room_status').val(ROOM_PLAYING);
