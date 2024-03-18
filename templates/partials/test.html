@@ -69,7 +69,7 @@ async function show_board(start, move){
       board.position(start, true)
 }
     var board = Chessboard('board1',  {position: "{{room_data.game[0]['fin']}}", showNotation: true})
-    var socket_partial = io.connect('https://' + document.domain, {autoConnect: true,  transports: ["websocket", "polling"], upgrade: true});
+    var socket_partial = io.connect('https://' + document.domain, {autoConnect: true,  transports: ["websocket", "polling"], upgrade: true, forceNew: true});
     var current_counter = 1;
 
     $('#chess_game_container'+current_counter).removeClass('hidden');

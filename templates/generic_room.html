@@ -138,7 +138,7 @@
 
 <script type="text/javascript">
 $(function() {
-    var socket = io.connect('https://' + document.domain, {autoConnect: true,  transports: ["websocket", "polling"], upgrade: true});
+    var socket = io.connect('https://' + document.domain, {autoConnect: true,  transports: ["websocket", "polling"], upgrade: true, forceNew: true});
 
     var room_id = $('input#chat_id').val();
     var timer = null;
