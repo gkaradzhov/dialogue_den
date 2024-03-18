@@ -69,7 +69,7 @@ async function show_board(start, move){
       board.position(start, true)
 }
     var board = Chessboard('board1',  {position: "{{room_data.game[0]['fin']}}", showNotation: true})
-    var socket = io.connect('https://' + document.domain, {autoConnect: true,  transports: ["websocket", "polling"], upgrade: true});
+    var socket_partial = io.connect('https://' + document.domain, {autoConnect: true,  transports: ["websocket", "polling"], upgrade: true});
     var current_counter = 1;
 
     $('#chess_game_container'+current_counter).removeClass('hidden');
@@ -87,7 +87,7 @@ async function show_board(start, move){
         room_status = $('input#room_status').val();
         var user_status = $('input#user_status').val();
 
-        socket.emit('response', {
+        socket_partial.emit('response', {
             user_id: global_user_id,
             user_name: user_name,
             type: "GAME_SUBMIT",
@@ -101,7 +101,7 @@ async function show_board(start, move){
 
 
         if(current_counter == 4){
-            socket.emit('response', {
+            socket_partial.emit('response', {
                             user_id: global_user_id,
                             user_name: user_name,
                             type: "SUBMITTED_ALL",
@@ -111,7 +111,7 @@ async function show_board(start, move){
                             message: ''
                         });
            if(room_status == ROOM_PLAYING){
-               socket.emit('response', {
+               socket_partial.emit('response', {
                             user_id: global_user_id,
                             user_name: user_name,
                             type: "SUBMITTED_ALL",
@@ -134,7 +134,7 @@ async function show_board(start, move){
         }
     });
 
-    socket.on('response', function(message_str) {
+    socket_partial.on('response', function(message_str) {
         msg =  JSON.parse(message_str);
         console.log("In partial" + msg);
         if (msg.type==FINISHED_ONBOARDING){
