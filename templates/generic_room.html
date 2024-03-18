@@ -28,9 +28,7 @@
 <script type="text/javascript" src="/static/notify.min.js"></script>
 
 <script>
-    $(function() {
     var socket = io.connect('https://' + document.domain, {autoConnect: true,  transports: ["websocket", "polling"], upgrade: true, forceNew: true});
-    });
 </script>
 
 <input id="chat_id" type="hidden" value="{{room_data.id}}"/>
