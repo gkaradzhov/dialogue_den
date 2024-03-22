@@ -499,7 +499,9 @@ def chess_room():
 
     with open('data/games/chess/pilot.json', 'r') as rf:
         games = json.load(rf)
-
+    random.shuffle(games)
+    for g in games:
+        random.shuffle(g['moves'])
     sl = random.randint(0, 2) + random.random()
     sleep(sl)
     room_id = request.args.get('room_id')
@@ -614,8 +616,12 @@ def create_room():
         camp = request.form.get('campaign', None)
         print(camp)
         room = Room(room_name, campaign=camp)
-
-        PG.create_room(room)
+        with open('data/games/chess/pilot.json', 'r') as rf:
+            games = json.load(rf)
+        if 'chess' in camp:
+            PG.create_room(room, games)
+        else:
+            PG.create_room(room)
         return redirect('/rooms')
 
 

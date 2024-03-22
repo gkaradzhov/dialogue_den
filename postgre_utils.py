@@ -75,7 +75,7 @@ class PostgreConnection:
             cursor.close()
             self.pool.putconn(conn)
 
-    def create_room(self, room, optional_type='chat'):
+    def create_room(self, room, optional_type='chat', game_object=None):
         if not room.campaign:
             campaign_id = self.__execute("SELECT id FROM campaign WHERE name LIKE 'local_beta'")
             if len(campaign_id) > 0:
@@ -83,9 +83,12 @@ class PostgreConnection:
         self.__execute(
             "INSERT INTO room (id, name, is_done, campaign_id, status) VALUES (%s, %s, %s, %s, 'RECRUITING') RETURNING ID",
             (room.room_id, room.name, room.is_done, room.campaign))
-        wason_game = generate_wason_cards()
+        if game_object:
+            game = game_object
+        else:
+            game = generate_wason_cards()
         m = Message(origin_name='SYSTEM', message_type=WASON_INITIAL, room_id=room.room_id,
-                    origin_id='-1', content=json.dumps(wason_game))
+                    origin_id='-1', content=json.dumps(game))
         self.insert_message(m)
 
         m = Message(origin_name='SYSTEM', message_type='ROOM_TYPE', room_id=room.room_id,
