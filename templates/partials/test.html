@@ -136,7 +136,7 @@ async function show_board(start, move){
         msg =  JSON.parse(message_str);
         console.log("In partial" + msg);
         if (msg.type==FINISHED_ONBOARDING){
-            ("#main_game_button").prop('disabled', false);
+            $("#main_game_button").prop('disabled', false);
             $("#main_game_button").html('Submit and Move to Next');
 
             console.log("Finished onboarding in partial");
