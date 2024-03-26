@@ -126,10 +126,17 @@
       <h3>Who was the most useful member of your group?</h3>
       <textarea id="most_usefull_free-text" rows="1" cols="50"></textarea>
 
-      <h3>Is there anything else that you wish to add:</h3>
+      <h3>How confident were you in the selected response</h3>
+      <textarea id="confidence_free-text" rows="4" cols="50"></textarea>
+
+        <h3>Did you find the task interesting or engaging? </h3>
+      <textarea id="interesting_free-text" rows="4" cols="50"></textarea>
+
+        <h3>Is there anything else that you wish to add:</h3>
       <textarea id="free-text" rows="4" cols="50"></textarea>
 
-      <h2>Are you sure you want to Submit HIT? Press the button ONLY after you've submitted the solo solution, participated in the chat, submitted your final solution and filled the questionnaire above.</h2>
+
+<!--      <h2>Are you sure you want to Submit HIT? Press the button ONLY after you've submitted the solo solution, participated in the chat, submitted your final solution and filled the questionnaire above.</h2>-->
       <input type="submit" id="submit-form" tabindex="-1" style="position:absolute; top:-1000px">
     </fieldset>
   </form>
@@ -565,6 +572,8 @@ $(function() {
             helpfulness: $('input[name="question1"]:checked').val(),
             most_helpful: $('#most_usefull_free-text').val(),
             // Collect answers for other questions similarly
+            confidence: $('#confidence_free-text').val(),
+            interesting: $('#interesting_free-text').val(),
             other_feedbacl: $('#free-text').val()
           };
 
@@ -596,6 +605,8 @@ $(function() {
             if (mturk_url != ''){
                 $('#mturk').submit();
             }
+
+            $(this).dialog("close");
         },
         Cancel: function() {
           $(this).dialog("close");
