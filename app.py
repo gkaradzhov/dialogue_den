@@ -611,13 +611,14 @@ def create_room():
     else:
         camp = request.form.get('campaign', None)
         print(camp)
+        campaign_name = PG.get_campaign(camp)['name']
         room = Room(room_name, campaign=camp)
         with open('data/games/chess/pilot.json', 'r') as rf:
             games = json.load(rf)
             random.shuffle(games)
             for g in games:
                 random.shuffle(g['moves'])
-        if 'chess' in camp:
+        if 'chess' in campaign_name:
             PG.create_room(room, games)
         else:
             PG.create_room(room)

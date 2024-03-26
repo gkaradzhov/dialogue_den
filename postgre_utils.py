@@ -94,7 +94,7 @@ class PostgreConnection:
         m = Message(origin_name='SYSTEM', message_type='ROOM_TYPE', room_id=room.room_id,
                     origin_id='-1', content=optional_type)
         self.insert_message(m)
-        
+
     def get_active_rooms(self):
         db_rooms = self.__execute("SELECT id, name, is_done FROM room WHERE is_done=false")
         rooms = []
@@ -135,7 +135,7 @@ class PostgreConnection:
 
     def get_campaign(self, campaign_id):
         campaign = self.__execute(
-            "SELECT id, start_threshold, start_time, close_threshold, user_moderator_chance FROM campaign WHERE id=%s AND is_active=true",
+            "SELECT id, start_threshold, start_time, close_threshold, user_moderator_chance, name FROM campaign WHERE id=%s AND is_active=true",
             (campaign_id,))
         if len(campaign) > 0:
             campaign = campaign[0]
@@ -143,7 +143,7 @@ class PostgreConnection:
             return None
 
         return {'id': campaign[0], 'start_threshold': campaign[1], 'start_time': campaign[2],
-                'close_threshold': campaign[3], 'user_moderator_chance': campaign[4]}
+                'close_threshold': campaign[3], 'user_moderator_chance': campaign[4], 'name': campaign[5]}
 
     def get_campaigns(self):
         campaigns = self.__execute("SELECT id, name FROM campaign")
