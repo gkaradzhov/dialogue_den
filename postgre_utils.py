@@ -94,7 +94,7 @@ class PostgreConnection:
         m = Message(origin_name='SYSTEM', message_type='ROOM_TYPE', room_id=room.room_id,
                     origin_id='-1', content=optional_type)
         self.insert_message(m)
-
+        
     def get_active_rooms(self):
         db_rooms = self.__execute("SELECT id, name, is_done FROM room WHERE is_done=false")
         rooms = []

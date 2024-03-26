@@ -497,11 +497,6 @@ def delibot2():
 @app.route('/chess_room')
 def chess_room():
 
-    with open('data/games/chess/pilot.json', 'r') as rf:
-        games = json.load(rf)
-    random.shuffle(games)
-    for g in games:
-        random.shuffle(g['moves'])
     sl = random.randint(0, 2) + random.random()
     sleep(sl)
     room_id = request.args.get('room_id')
@@ -554,6 +549,7 @@ def chess_room():
 
     # Have to get the room again, in case the status changed
     room = PG.get_single_room(room_id)
+    games = [d.content for d in running_dialogue if d.message_type == WASON_INITIAL][0]
 
     return render_template("generic_room.html", room_data={'id': room_id, 'name': room.name, 'game': games,
                                       'messages': messages, 'existing_users': logged_users,
@@ -618,6 +614,9 @@ def create_room():
         room = Room(room_name, campaign=camp)
         with open('data/games/chess/pilot.json', 'r') as rf:
             games = json.load(rf)
+            random.shuffle(games)
+            for g in games:
+                random.shuffle(g['moves'])
         if 'chess' in camp:
             PG.create_room(room, games)
         else:
