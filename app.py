@@ -550,6 +550,7 @@ def chess_room():
     # Have to get the room again, in case the status changed
     room = PG.get_single_room(room_id)
     games = [d.content for d in running_dialogue if d.message_type == WASON_INITIAL][0]
+    games = json.loads(games)
 
     return render_template("generic_room.html", room_data={'id': room_id, 'name': room.name, 'game': games,
                                       'messages': messages, 'existing_users': logged_users,
