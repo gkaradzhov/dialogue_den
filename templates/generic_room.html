@@ -458,7 +458,7 @@ $(function() {
                 $('.task button').prop('disabled', true);
                 $('.task input').prop('disabled', true);
                 $('.timer_holder').addClass('hidden');
-                $.notify("Game Finished! Thank you for playing! (click to close)", {autoHide: false, className: 'success'});
+                $.notify("Game Finished! Thank you for playing! You can close the window now.", {autoHide: false, className: 'success'});
                 $('input#room_status').val('GAME_FINISHED');
                 $(window).scrollTop(0);
                 break;
