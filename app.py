@@ -972,7 +972,7 @@ def validate_finish_game(all_messages, room_id):
     finished_onboarding = check_finished(all_messages, USR_ONBOARDING, room.status)
     if finished_onboarding:
         m = Message(origin_id=SYSTEM_ID, origin_name=SYSTEM_USER, message_type=FINISHED_ONBOARDING, room_id=room_id,
-                    content=10)
+                    content=30)
         create_broadcast_message(m)
         PG.set_room_status(room_id, 'FINISHED_ONBOARDING')
 
