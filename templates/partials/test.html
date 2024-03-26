@@ -8,10 +8,23 @@
 <input id="user_type" type="hidden" value="{{room_data.current_user_type}}">
 <input id="mturk_url" type="hidden" value="{{room_data.mturk_return_url}}">
 <div>
-    Carefully examine the board below. With black to move, which of these 5 moves would be the best.
-    You can press the "Show" button next to each move to visualise it.
+    <div id="detailed_instructions">
+                        <ol>
+                            <li>Read the instructions carefully. You will be presented a set of 3 chess problems, each with 5 possible moves. Finish the task by yourself. Wait for the rest of the participants to complete the task (this may take a few minutes, but typically less than 3).</li>
+                            <li>Participate in a group discussion (via the chat), collaborate with the other participants and try to find the best solution for each of the problems. Give your best effort in solving the task, discussing your arguments and solutions with the group.
+                                In the past, groups that collaborate well typically are better in solving the task.</li>
+                            <li>You can submit the same answer, if you believe it's the correct one.</li>
+<!--                            <li>You are expected to participate actively in the conversation for at least 5 minutes.</li>-->
+<!--                            <li>Press the Complete HIT button.</li>-->
+                            <li>Do not refresh the page at any time. The flow of the experiment is in one direction only - once you submit a solution to a problem, you cannot return back to it.</li>
+                        </ol>
+    </div>
+
+    <b>Carefully examine the board below. With White to move, which of these 5 moves would be the best.
+    You can press the "Show" button next to each move to visualise it.</b>
 
     {% for game in room_data.game%}
+    <div>Problem set № {{loop.index}}</div>
     <div id="chess_game_container{{loop.index}}" class="hidden">
     <div class="">
         <div id="board{{loop.index}}" data-fin="{{game['fin']}}" style="width: 400px"></div>
@@ -113,6 +126,7 @@ async function show_board(start, move){
                             message: ''
                         });
            if(user_status == USR_PLAYING){
+           if (confirm("Are you sure you want to Submit? Press the button ONLY after you are happy with your submission and want to conclude the experiment.")) {
                 $('.task button').prop('disabled', true);
                 $('.task input').prop('disabled', true);
                 $('.timer_holder').addClass('hidden');
@@ -120,6 +134,7 @@ async function show_board(start, move){
                 $('input#room_status').val('GAME_FINISHED');
                 $(window).scrollTop(0);
             $("#dialog-form").dialog("open");
+           }
            }else{
                 $("#main_game_button").prop('disabled', true);
                 $("#main_game_button").html('The group chat will begin shortly, please wait');
