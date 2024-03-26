@@ -619,7 +619,7 @@ def create_room():
             for g in games:
                 random.shuffle(g['moves'])
         if 'chess' in campaign_name:
-            PG.create_room(room, games)
+            PG.create_room(room, game_object=games)
         else:
             PG.create_room(room)
         return redirect('/rooms')
