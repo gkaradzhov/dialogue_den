@@ -133,15 +133,18 @@ async function show_board(start, move){
                             message: ''
                         });
            if(user_status == USR_PLAYING){
-           if (confirm("Are you sure you want to Submit? Press the button ONLY after you are happy with your submission and want to conclude the experiment.")) {
-                $('.task button').prop('disabled', true);
-                $('.task input').prop('disabled', true);
-                $('.timer_holder').addClass('hidden');
-                $.notify("Game Finished! Thank you for playing! (click to close)", {autoHide: false, className: 'success'});
-                $('input#room_status').val('GAME_FINISHED');
-                $(window).scrollTop(0);
-            $("#dialog-form").dialog("open");
-           }
+               if (confirm("Are you sure you want to Submit? Press the button ONLY after you are happy with your submission and want to conclude the experiment.")) {
+                    $('.task button').prop('disabled', true);
+                    $('.task input').prop('disabled', true);
+                    $('.timer_holder').addClass('hidden');
+                    $.notify("Game Finished! Thank you for playing! You can close the tab (click to close)", {autoHide: false, className: 'success'});
+                    $('input#room_status').val('GAME_FINISHED');
+                    $(window).scrollTop(0);
+                    $("#dialog-form").dialog("open");
+               }
+               else{
+                    console.log("button canceled")
+               }
            }else{
                 $("#main_game_button").prop('disabled', true);
                 $("#main_game_button").html('The group chat will begin shortly, please wait');
