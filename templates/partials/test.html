@@ -8,9 +8,10 @@
 <input id="user_type" type="hidden" value="{{room_data.current_user_type}}">
 <input id="mturk_url" type="hidden" value="{{room_data.mturk_return_url}}">
 <div>
-    <a class="btn btn-primary" data-toggle="collapse" href="#detailed_instructions" role="button" aria-expanded="true" aria-controls="detailed_instructions">
+    <a class="btn btn-primary" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="true" aria-controls="collapseExample">
     Show/Hide instructions
   </a>
+    <div class="collapse" id="collapseExample">
     <div id="detailed_instructions" data-toggle="collapse">
                         <ol>
                             <li>Read the instructions carefully. You will be presented a set of 3 chess problems, each with 5 possible moves. Finish the task by yourself. Wait for the rest of the participants to complete the task (this may take a few minutes, but typically less than 3).</li>
@@ -22,7 +23,7 @@
                             <li>Do not refresh the page at any time. The flow of the experiment is in one direction only - once you submit a solution to a problem, you cannot return back to it.</li>
                         </ol>
     </div>
-
+</div>
     <b>Carefully examine the board below. With White to move, which of these 5 moves would be the best.
     You can press the "Show" button next to each move to visualise it.</b>
 
