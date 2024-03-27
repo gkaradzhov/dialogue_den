@@ -143,6 +143,8 @@ async function show_board(start, move){
                     $("#dialog-form").dialog("open");
                }
                else{
+                    current_counter--;
+                     $('#chess_game_container'+current_counter.toString()).removeClass('hidden');
                     console.log("button canceled")
                }
            }else{
