@@ -716,7 +716,7 @@ def handle_room_events(room_messages, room_id, last_message):
         elif item.message_type == ROUTING_TIMER_ELAPSED:
             timer_ended = True
             timer_ended_timestamp = item.timestamp
-        elif item.message_type == WASON_AGREE:
+        elif item.message_type == WASON_AGREE or item.message_type == "GAME_SUBMIT":
             submitted_users[item.origin_id] = True
             if item.origin_id in logged_users:
                 logged_users[item.origin_id] = item.timestamp
