@@ -284,7 +284,7 @@ $(function() {
 
     $('#group_start').on('click', function(e){
       $('#group_start').prop('disabled', true);
-      socket.emit('response', { user_name: 'SYSTEM_MODERATOR', room: room_id, user_id: -1, user_status: USR_MODERATING, type: "MODERATION", message: "GROUP_PHASE_STARTED", user_type: current_user_type});
+      socket.emit('response', { user_name: 'SYSTEM_MODERATOR', room: room_id, user_id: -1, user_status: USR_MODERATING, type: "MODERATION", message: FINISHED_ONBOARDING, user_type: current_user_type});
     });
 
     $('#group_ended').on('click', function(e){

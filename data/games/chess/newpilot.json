@@ -1,0 +1,122 @@
+[
+  {
+    "eval": 0.47,
+    "fin": "r2qrnk1/pp2bppp/2p1bn2/3p2B1/3P4/2NBPN2/PPQ2PPP/1R3RK1 w - - 0 1",
+    "id": "newpilot_2",
+    "moves": [
+      {
+        "eval": 0.47,
+        "fin": "r2qrnk1/pp2bppp/2p1bn2/3p2B1/1P1P4/2NBPN2/P1Q2PPP/1R3RK1 b - b3 0 1",
+        "id": "newpilot_2.1",
+        "text": "Pawn b2 -> c2"
+      },
+      {
+        "eval": 0.3,
+        "fin": "r2qrnk1/pp2bppp/2p1bn2/3pN1B1/3P4/2NBP3/PPQ2PPP/1R3RK1 b - - 1 1",
+        "id": "newpilot_2.2",
+        "text": "Knight f3 -> e5"
+      },
+      {
+        "eval": 0.0,
+        "fin": "r2qrnk1/pp2bppp/2p1bB2/3p4/3P4/2NBPN2/PPQ2PPP/1R3RK1 b - - 0 1",
+        "id": "newpilot_2.3",
+        "text": "Bishop g5 -> f6"
+      },
+      {
+        "eval": -1.51,
+        "fin": "r2qrnk1/pp2bppp/2p1bn2/3p2B1/3PP3/2NB1N2/PPQ2PPP/1R3RK1 b - - 0 1",
+        "id": "newpilot_2.4",
+        "text": "Pawn e3 -> e4"
+      },
+      {
+        "eval": -4.7,
+        "fin": "r2qrnk1/pp2bppB/2p1bn2/3p2B1/3P4/2N1PN2/PPQ2PPP/1R3RK1 b - - 0 1",
+        "id": "newpilot_2.5",
+        "text": "Knight d3 -> h7 (takes)"
+      }
+    ],
+    "notes": "opga_24_E27wb2-b4",
+    "turn": "w",
+    "type": "positional"
+  },
+  {
+    "eval": -0.24,
+    "fin": "8/8/8/8/3p1B2/4p3/5p2/5K1k w - - 0 1",
+    "id": "newpilot_3",
+    "moves": [
+      {
+        "eval": -0.24,
+        "fin": "8/8/8/8/3p1B2/4p3/5p2/5K1k w - - 0 1",
+        "id": "newpilot_3.1",
+        "text": "Bishop f4 -> g3"
+      },
+      {
+        "eval": -0.24,
+        "fin": "8/8/8/6B1/3p4/4p3/5p2/5K1k b - - 1 1",
+        "id": "newpilot_3.2",
+        "text": "Bishop f4 -> g5"
+      },
+      {
+        "eval": -60,
+        "fin": "8/8/8/4B3/3p4/4p3/5p2/5K1k b - - 1 1",
+        "id": "newpilot_3.3",
+        "text": "Bishop f4 -> e5"
+      },
+      {
+        "eval": -100,
+        "fin": "8/8/8/8/3p1B2/4p3/4Kp2/7k b - - 1 1",
+        "id": "newpilot_3.4",
+        "text": "King f1 -> f2"
+      },
+      {
+        "eval": -102,
+        "fin": "8/8/8/8/3p4/4B3/5p2/5K1k b - - 0 1",
+        "id": "newpilot_3.5",
+        "text": "Bishop f4 -> e3 (takes)"
+      }
+    ],
+    "notes": "opga-40po167wf4-g3",
+    "turn": "w",
+    "type": "endgame"
+  },
+  {
+    "eval": 130,
+    "fin": "3rkn2/1Q2b2p/2p1p3/p2q4/n3NP2/2P1K1R1/P2B3P/2N5 w - - 0 1",
+    "id": "newpilot_1",
+    "moves": [
+      {
+        "eval": 130,
+        "fin": "3rkn2/4Q2p/2p1p3/p2q4/n3NP2/2P1K1R1/P2B3P/2N5 b - - 0 1",
+        "id": "newpilot_1.1",
+        "text": "Queen b7 -> e8 (takes, check)"
+      },
+      {
+        "eval": 0,
+        "fin": "3rkn2/4b2p/2p1p3/p2q4/n3NP2/1QP1K1R1/P2B3P/2N5 b - - 1 1",
+        "id": "newpilot_1.2",
+        "text": "Queen b7 -> b3"
+      },
+      {
+        "eval": -2,
+        "fin": "3rkn2/4b2p/2p1p3/p2q4/n3NP2/2P1K1R1/P2B3P/1QN5 b - - 1 1",
+        "id": "newpilot_1.3",
+        "text": "Queen b7 -> b1"
+      },
+      {
+        "eval": -4.74,
+        "fin": "3rkn2/1Q2b1Rp/2p1p3/p2q4/n3NP2/2P1K3/P2B3P/2N5 b - - 1 1",
+        "id": "newpilot_1.4",
+        "text": "Rook g3 -> g7"
+      },
+      {
+        "eval": -6.69,
+        "fin": "3rkn2/1Q2b2p/2p1pN2/p2q4/n4P2/2P1K1R1/P2B3P/2N5 b - - 1 1",
+        "id": "newpilot_1.5",
+        "text": "Knight e4 -> f6"
+      }
+    ],
+    "notes": "opga_14_bl29wb7-e7",
+    "turn": "w",
+    "type": "tactical"
+  }
+]

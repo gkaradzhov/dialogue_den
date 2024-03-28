@@ -614,7 +614,7 @@ def create_room():
         print(camp)
         campaign_name = PG.get_campaign(camp)['name']
         room = Room(room_name, campaign=camp)
-        with open('data/games/chess/pilot.json', 'r') as rf:
+        with open('data/games/chess/newpilot.json', 'r') as rf:
             games = json.load(rf)
             random.shuffle(games)
             for g in games:
@@ -739,17 +739,18 @@ def handle_room_events(room_messages, room_id, last_message):
             user_activity[user] = difference.total_seconds() <= 545
         else:
             difference = now - last_active
-            user_activity[user] = difference.total_seconds() <= 120
+            user_activity[user] = difference.total_seconds() <= 240
 
     if routing_threshold is not None and routing_threshold is True:
         for user, activity in user_activity.items():
             if not activity:
-                m = Message(origin_name='AUTO_KICKED', message_type=LEAVE_ROOM, room_id=room_id, origin_id=user,
-                            user_status='AUTO_KICKED')
-                create_broadcast_message(m)
-
-                all_messages = PG.get_messages(room_id)
-                validate_finish_game(all_messages, room_id)
+                # m = Message(origin_name='AUTO_KICKED', message_type=LEAVE_ROOM, room_id=room_id, origin_id=user,
+                #             user_status='AUTO_KICKED')
+                # create_broadcast_message(m)
+                # TODO: Re-enable user kicking
+                pass
+                # all_messages = PG.get_messages(room_id)
+                # validate_finish_game(all_messages, room_id)
 
     if routing_timer_timestamp and not timer_ended:
         time_since_start = now - routing_timer_timestamp
