@@ -30,9 +30,11 @@
 <input id="start_time" type="hidden" value="{{room_data.start_time}}"/>
 <input id="user_type" type="hidden" value="{{room_data.current_user_type}}">
 <input id="mturk_url" type="hidden" value="{{room_data.mturk_return_url}}">
+<script>
+    var socket = io.connect('https://' + document.domain, {autoConnect: true,  transports: ["websocket", "polling"], upgrade: true, forceNew: true});
+</script>
 
-
-<div>
+<div class="task">
     <br/>
     <div class="collapse show" id="collapseExample">
         <div id="detailed_instructions">
@@ -42,7 +44,7 @@
                 <li>Do not refresh the page at any time. The flow of the experiment is in one direction only - once you submit a solution to a problem, you cannot return back to it.</li>
             </ol>
         </div>
-</div>
+    </div>
     <b>Carefully examine the board below. With White to move, which of these 5 moves would be the best.
     You can press the "Show" button next to each move to visualise it.</b>
 
