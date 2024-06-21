@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<input id="chat_id" type="hidden" value="{{room_data.id}}"/>
+<input id="user_id" type="hidden" value="{{room_data.current_user_id}}"/>
+<input id="user_name" type="hidden" value="{{room_data.current_user}}"/>
+<input id="user_status" type="hidden" value="{{room_data.current_user_status}}"/>
+<input id="room_status" type="hidden" value="{{room_data.room_status}}"/>
+<input id="start_time" type="hidden" value="{{room_data.start_time}}"/>
+<input id="user_type" type="hidden" value="{{room_data.current_user_type}}">
+<input id="mturk_url" type="hidden" value="{{room_data.mturk_return_url}}">
+<div>
+    <br/>
+    <div class="collapse show" id="collapseExample">
+        <div id="detailed_instructions">
+            <ol>
+                <li>You will be presented a set of 3 chess problems, each with 5 possible moves. </li>
+                <li>Give your best effort in solving all of the problems.</li>
+                <li>Do not refresh the page at any time. The flow of the experiment is in one direction only - once you submit a solution to a problem, you cannot return back to it.</li>
+            </ol>
+        </div>
+</div>
+    <b>Carefully examine the board below. With White to move, which of these 5 moves would be the best.
+    You can press the "Show" button next to each move to visualise it.</b>
+
+    {% for game in room_data.game%}
+    <div id="chess_game_container{{loop.index}}" class="hidden">
+        <div>Problem set № {{loop.index}}</div>
+    <div class="">
+        <div id="board{{loop.index}}" data-fin="{{game['fin']}}" style="width: 400px"></div>
+    </div>
+    <table class="table table-sm">
+        <tbody>
+        {% for move in game['moves']%}
+        <tr>
+            <th scope="row">{{loop.index}}</th>
+            <td><h5><span class="badge badge-secondary">{{move['text']}}</span></h5></td>
+            <td>
+                <button type="button" data-fin="{{move['fin']}}" class="move_game btn btn-warning"
+                        id="move{{move['id']}}">Show
+                </button>
+            </td>
+            <td>
+                <input type="radio" name="solution_selection" data-fin="{{move['fin']}}" class="btn btn-success"
+                       id="{{move['id']}}" value="{{move['id']}}"/>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
+    {%endfor%}
+</div>
+
+
+
+<div class="game_buttons">
+    <button type="button" id="main_game_button" class="btn btn-success btn-lg">Submit and move to Next</button>
+</div>
+
+<div id="dialog-form" title="Questions" style="display:none;">
+  <form>
+    <fieldset>
+      <h3> Do you play chess online or in person?</h3>
+      <input type="radio" id="q1-a1" name="question1" value="negative">
+      <label for="q1-a1">I do not</label><br>
+      <input type="radio" id="q1-a2" name="question1" value="online">
+      <label for="q1-a2">Online</label><br>
+      <input type="radio" id="q1-a3" name="question1" value="inperson">
+      <label for="q1-a3">Very helpful</label><br>
+        <input type="radio" id="q1-a4" name="question1" value="both">
+      <label for="q1-a4">Both</label><br>
+
+      <h3>If you play online, what is your chess.com/lichess rating</h3>
+      <textarea id="most_usefull_free-text" rows="1" cols="50"></textarea>
+
+      <h3>How confident were you in the selected response</h3>
+      <textarea id="confidence_free-text" rows="4" cols="50"></textarea>
+
+        <h3>Did you find the task interesting or engaging? </h3>
+      <textarea id="interesting_free-text" rows="4" cols="50"></textarea>
+
+        <h3>Is there anything else that you wish to add:</h3>
+      <textarea id="free-text" rows="4" cols="50"></textarea>
+
+
+<!--      <h2>Are you sure you want to Submit HIT? Press the button ONLY after you've submitted the solo solution, participated in the chat, submitted your final solution and filled the questionnaire above.</h2>-->
+      <input type="submit" id="submit-form" tabindex="-1" style="position:absolute; top:-1000px">
+    </fieldset>
+  </form>
+</div>
+
+
+<link rel="stylesheet" type="text/css" href="/static/css/chessboard-1.0.0.css"/>
+<script type="text/javascript" src="/static/chessboard-1.0.0.min.js"></script>
+
+<script>
+        $(function() {
+
+   var room_id = $('input#chat_id').val();
+    var room_status = $('#room_status').val();
+    var user_name = $('input#user_name').val();
+    var global_user_id = $('input#user_id').val();
+    var current_user_type = $('#user_type').val();
+
+
+
+var sleepSetTimeout_ctrl;
+function sleep(ms) {
+    clearInterval(sleepSetTimeout_ctrl);
+    return new Promise(resolve => sleepSetTimeout_ctrl = setTimeout(resolve, ms));
+}
+
+async function show_board(start, move){
+      board.position(start, false)
+      board.position(move, true)
+      await sleep(1500);
+      board.position(start, true)
+}
+    var board = Chessboard('board1',  {position: "{{room_data.game[0]['fin']}}", showNotation: true})
+    var current_counter = 1;
+
+    $('#chess_game_container'+current_counter).removeClass('hidden');
+    $('.move_game').on('click', function () {
+       var clicked = $(this);
+       show_board($('#board'+current_counter.toString()).data('fin'), clicked.data('fin'));
+    })
+
+    $('#main_game_button').on('click', function () {
+        $('#chess_game_container'+current_counter.toString()).addClass('hidden');
+
+        var selection = $("#chess_game_container"+ current_counter.toString()).find("input[type='radio'][name='solution_selection']:checked").val()
+
+        console.log(selection);
+        room_status = $('input#room_status').val();
+        user_status = $('input#user_status').val();
+
+        socket.emit('response', {
+            user_id: global_user_id,
+            user_name: user_name,
+            type: "GAME_SUBMIT",
+            message: selection,
+            room: room_id,
+            user_type: current_user_type,
+            user_status: user_status
+        });
+
+        current_counter ++;
+
+        if (current_counter == 3){
+           $("#main_game_button").html('Final Submission');
+        }
+
+        if(current_counter == 4){
+            socket.emit('response', {
+                            user_id: global_user_id,
+                            user_name: user_name,
+                            type: "SUBMITTED_ALL",
+                            room: room_id,
+                            user_status: user_status,
+                            user_type: current_user_type,
+                            message: ''
+                        });
+
+               if (confirm("Are you sure you want to Submit? Press the button ONLY after you are happy with your submission and want to conclude the experiment.")) {
+                    $('.task button').prop('disabled', true);
+                    $('.task input').prop('disabled', true);
+                    $('.timer_holder').addClass('hidden');
+                    $.notify("Game Finished! Thank you for playing! You can close the tab (click to close)", {autoHide: false, className: 'success'});
+                    $('input#room_status').val('GAME_FINISHED');
+                    $(window).scrollTop(0);
+                    $("#dialog-form").dialog("open");
+               }
+               else{
+                    current_counter--;
+                     $('#chess_game_container'+current_counter.toString()).removeClass('hidden');
+                    console.log("button canceled")
+               }
+        } else {
+            $('#chess_game_container'+current_counter.toString()).removeClass('hidden');
+            board = Chessboard('#board'+current_counter.toString(),  {position: $('#board'+current_counter.toString()).data('fin'), showNotation: true});
+        }
+    });
+
+    socket.on('response', function(message_str) {
+        msg =  JSON.parse(message_str);
+        console.log("In partial" + msg);
+        if (msg.type==FINISHED_ONBOARDING){
+            $("#main_game_button").prop('disabled', false);
+            $("#main_game_button").html('Submit and Move to Next');
+            $("#collapseExample").collapse('hide');
+            console.log("Finished onboarding in partial");
+            current_counter = 1;
+            $('input#room_status').val(ROOM_PLAYING);
+            $('#chess_game_container'+current_counter.toString()).removeClass('hidden');
+            board = Chessboard('#board'+current_counter.toString(),  {position: $('#board'+current_counter.toString()).data('fin'), showNotation: true});
+        }
+    });
+});
+
+
+</script>

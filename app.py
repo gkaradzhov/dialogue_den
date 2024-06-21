@@ -9,7 +9,7 @@ from datetime import timezone
 from os import path
 from time import sleep
 from sklearn.base import BaseEstimator, TransformerMixin
-
+import uuid
 import flask_login
 import flask_socketio
 import requests
@@ -562,6 +562,71 @@ def chess_room():
                                       # 'mturk_return_url': 'test_post',
                                       "start_time": campaign['start_time']})
 
+@app.route('/chess_recruiting')
+def chess_recruiting():
+
+    sl = random.randint(0, 2) + random.random()
+    sleep(sl)
+    room_id = request.args.get('room_id')
+    mturk_info_id = request.args.get('mturk_info', None)
+
+    has_user = PG.check_for_user(mturk_info_id=mturk_info_id)
+    print("Has user chat room", str(has_user))
+    if has_user:
+        return render_template('unsuccessful_onboarding.html')
+
+
+    campaign_name = PG.get_campaign('884c71e1-d32b-4403-b46a-be450ec8e693')['name']
+    r = Room('recruit'+ uuid.uuid4().hex, campaign='884c71e1-d32b-4403-b46a-be450ec8e693')
+
+    ch = random.choice(['data/games/chess/newpilot.json', 'data/games/chess/pilot.json'])
+    with open(ch, 'r') as rf:
+        games = json.load(rf)
+        random.shuffle(games)
+        for g in games:
+            random.shuffle(g['moves'])
+
+    PG.create_room(r, game_object=games)
+
+    room = PG.get_single_room(r.room_id)
+    running_dialogue = PG.get_messages(room.room_id)
+    messages = [d for d in running_dialogue if d.message_type == CHAT_MESSAGE]
+
+
+    campaign = PG.get_campaign(room.campaign)
+
+    current_user = generate_user([d[0] for d in logged_users], user_type)
+
+    status = USR_ONBOARDING
+    m = Message(origin_name=current_user['user_name'], message_type=JOIN_ROOM, room_id=room_id,
+                origin_id=current_user['user_id'], user_status=status, user_type=user_type)
+    create_broadcast_message(m)
+
+    formated_return_url = None
+    if mturk_info_id:
+        PG.update_mturk_user_id(mturk_info_id, current_user['user_id'])
+        mturk_info = PG.get_mturk_info(mturk_info_id)
+        if mturk_info:
+            formated_return_url = '{}/mturk/externalSubmit?assignmentId={}&user_id={}'.format(mturk_info[1],
+                                                                                              mturk_info[0],
+                                                                                              current_user['user_id'])
+    # handle_routing(running_dialogue, logged_users, campaign['start_threshold'], campaign['start_time'],
+    #                campaign['close_threshold'], room.room_id)
+
+    # Have to get the room again, in case the status changed
+    room = PG.get_single_room(room_id)
+    games = [d.content for d in running_dialogue if d.message_type == WASON_INITIAL][0]
+    games = json.loads(games)
+
+    return render_template("chess_recruiting.html", room_data={'id': room_id, 'name': room.name, 'game': games,
+                                      'messages': messages,
+                                      'current_user': current_user['user_name'],
+                                      'current_user_id': current_user['user_id'],
+                                      'current_user_type': 'recruit',
+                                      'current_user_status': status, 'room_status': room.status,
+                                      'mturk_return_url': formated_return_url,
+                                      # 'mturk_return_url': 'test_post',
+                                      "start_time": campaign['start_time']})
 
 @socketio.on('delibot')
 def delibot(json):
