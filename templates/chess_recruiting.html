@@ -51,12 +51,12 @@
     You can press the "Show" button next to each move to visualise it.</b>
 
     {% for game in room_data.game%}
-    <div id="chess_game_container{{loop.index}}" class="hidden">
+    <div id="chess_game_container{{loop.index}}" class="hidden task">
         <div>Problem set № {{loop.index}}</div>
     <div class="">
         <div id="board{{loop.index}}" data-fin="{{game['fin']}}" style="width: 400px"></div>
     </div>
-    <table class="table table-sm">
+    <table class="table table-sm task">
         <tbody>
         {% for move in game['moves']%}
         <tr>
@@ -81,7 +81,7 @@
 
 
 
-<div class="game_buttons">
+<div class="game_buttons task">
     <button type="button" id="main_game_button" class="btn btn-success btn-lg">Submit and move to Next</button>
 </div>
 
@@ -137,6 +137,15 @@ function sleep(ms) {
     clearInterval(sleepSetTimeout_ctrl);
     return new Promise(resolve => sleepSetTimeout_ctrl = setTimeout(resolve, ms));
 }
+
+    function validateForm() {
+      // Validate Question 1
+      if (!$('input[name="question1"]:checked').val()) {
+        return false;
+      }
+
+      return true;
+    }
 
 async function show_board(start, move){
       board.position(start, false)
