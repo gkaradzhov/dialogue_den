@@ -36,7 +36,7 @@
     var socket = io.connect('https://' + document.domain, {autoConnect: true,  transports: ["websocket", "polling"], upgrade: true, forceNew: true});
 </script>
 
-<div class="task">
+<div class="row">
     <br/>
     <div class="collapse show" id="collapseExample">
         <div id="detailed_instructions">
@@ -51,12 +51,12 @@
     You can press the "Show" button next to each move to visualise it.</b>
 
     {% for game in room_data.game%}
-    <div id="chess_game_container{{loop.index}}" class="hidden task">
+    <div id="chess_game_container{{loop.index}}" class="hidden">
         <div>Problem set № {{loop.index}}</div>
     <div class="">
         <div id="board{{loop.index}}" data-fin="{{game['fin']}}" style="width: 400px"></div>
     </div>
-    <table class="table table-sm task">
+    <table class="table table-sm">
         <tbody>
         {% for move in game['moves']%}
         <tr>
@@ -81,7 +81,7 @@
 
 
 
-<div class="game_buttons task">
+<div class="game_buttons">
     <button type="button" id="main_game_button" class="btn btn-success btn-lg">Submit and move to Next</button>
 </div>
 
