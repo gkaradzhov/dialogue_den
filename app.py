@@ -595,11 +595,11 @@ def chess_recruiting():
 
     campaign = PG.get_campaign(room.campaign)
 
-    current_user = generate_user([d[0] for d in logged_users], user_type)
+    current_user = generate_user([], 'recruiting')
 
     status = USR_ONBOARDING
     m = Message(origin_name=current_user['user_name'], message_type=JOIN_ROOM, room_id=room_id,
-                origin_id=current_user['user_id'], user_status=status, user_type=user_type)
+                origin_id=current_user['user_id'], user_status=status, user_type='recruiting')
     create_broadcast_message(m)
 
     formated_return_url = None
