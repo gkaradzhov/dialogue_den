@@ -567,7 +567,6 @@ def chess_recruiting():
 
     sl = random.randint(0, 2) + random.random()
     sleep(sl)
-    room_id = request.args.get('room_id')
     mturk_info_id = request.args.get('mturk_info', None)
 
     has_user = PG.check_for_user(mturk_info_id=mturk_info_id)
@@ -576,7 +575,6 @@ def chess_recruiting():
         return render_template('unsuccessful_onboarding.html')
 
 
-    campaign_name = PG.get_campaign('884c71e1-d32b-4403-b46a-be450ec8e693')['name']
     r = Room('recruit'+ uuid.uuid4().hex, campaign='884c71e1-d32b-4403-b46a-be450ec8e693')
 
     ch = random.choice(['data/games/chess/newpilot.json', 'data/games/chess/pilot.json'])
@@ -589,6 +587,7 @@ def chess_recruiting():
     PG.create_room(r, game_object=games)
 
     room = PG.get_single_room(r.room_id)
+    room_id = room.room_id
     running_dialogue = PG.get_messages(room.room_id)
     messages = [d for d in running_dialogue if d.message_type == CHAT_MESSAGE]
 
