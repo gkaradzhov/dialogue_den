@@ -151,6 +151,73 @@ async function show_board(start, move){
        show_board($('#board'+current_counter.toString()).data('fin'), clicked.data('fin'));
     })
 
+    $("#dialog-form").dialog({
+      autoOpen: false,
+      height: 600,
+      width: 1000,
+      modal: true,
+      buttons: {
+      "Submit": function() {
+      if (!validateForm()) {
+        alert("Please answer all the questions.");
+        return;
+      }
+
+          // Handle form submission
+          let answers = {
+            helpfulness: $('input[name="question1"]:checked').val(),
+            most_helpful: $('#most_usefull_free-text').val(),
+            // Collect answers for other questions similarly
+            confidence: $('#confidence_free-text').val(),
+            interesting: $('#interesting_free-text').val(),
+            other_feedbacl: $('#free-text').val()
+          };
+
+          console.log(answers); // Use the answers object as needed
+           var mturk_url = $('#mturk_url').val();
+           var selection = get_card_selection();
+           var room_status = $('input#room_status').val();
+           var user_status = $('input#user_status').val();
+
+           socket.emit('response', {
+                user_id: global_user_id,
+                user_name: user_name,
+                type: WASON_AGREE,
+                message: selection,
+                room: room_id,
+                user_type: current_user_type,
+                user_status: user_status
+            });
+
+
+           let answersJson = JSON.stringify(answers);
+
+           socket.emit('post_feedback', {
+                user_id: global_user_id,
+                content: answersJson,
+                room: room_id
+            });
+
+            if (mturk_url != ''){
+                $('#mturk').submit();
+            }
+
+            $(this).dialog("close");
+        },
+        Cancel: function() {
+          $(this).dialog("close");
+        }
+      },
+      close: function() {
+        // Reset the form when the dialog is closed
+        $('input[name="question1"]').prop('checked', false);
+        // Reset other questions similarly
+        $('#free-text').val('');
+        $('#most_usefull_free-text').val('');
+      }
+    });
+
+
     $('#main_game_button').on('click', function () {
         $('#chess_game_container'+current_counter.toString()).addClass('hidden');
 
