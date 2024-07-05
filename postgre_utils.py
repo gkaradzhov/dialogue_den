@@ -233,8 +233,8 @@ class PostgreConnection:
             worker_id = self.__execute("SELECT worker_id FROM mturk_info WHERE id=%s", (mturk_info_id,))
             print("WId", str(worker_id))
             if worker_id:
-                has_user = self.__execute("SELECT worker_id FROM mturk_info WHERE worker_id=%s AND user_id IS NOT NULL",
-                                          (worker_id[0],))
+                has_user = self.__execute("SELECT worker_id FROM mturk_info WHERE worker_id=%s AND user_id IS NOT NULL and campaign_id=%s",
+                                          (worker_id[0], "0d957f51-702c-4882-8475-921d4e4f041d")) #Special UUID token for the chess recruiting
                 print("Has Us Internal", str(has_user))
                 if has_user:
                     return True

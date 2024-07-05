@@ -185,7 +185,7 @@ def route_to_room():
     return_url = request.args.get('turkSubmitTo', None)
 
     if assignment != '0' and assignment != 0:
-        mturk_info_id = PG.add_initial_mturk_info(assignment, hit, worker, campaign_id, return_url)
+        mturk_info_id = PG.add_initial_mturk_info(assignment, hit, worker, "0d957f51-702c-4882-8475-921d4e4f041d", return_url)
     else:
         mturk_info_id = 0
     ###
@@ -205,21 +205,24 @@ def route_to_room():
                                                         'turk_submit': return_url,
                                                         'campaign_id': campaign_id})
 
-    active_room_id, type = PG.get_create_campaign_room(campaign_id)
+    # active_room_id, type = PG.get_create_campaign_room(campaign_id)
+    #
+    # print(type)
+    # if type == 'chat':
+    #     resp = make_response(redirect(
+    #         url_for('chatroom', room_id=active_room_id, mturk_info=mturk_info_id, _scheme='https',
+    #                 _external=True)))
+    # elif type == 'delibot':
+    #     resp = make_response(redirect(
+    #         url_for('delibot', room_id=active_room_id, mturk_info=mturk_info_id, _scheme='https',
+    #                 _external=True)))
+    # else:
+    #     resp = make_response(redirect(
+    #         url_for('delibot2', room_id=active_room_id, mturk_info=mturk_info_id, _scheme='https',
+    #                 _external=True)))
 
-    print(type)
-    if type == 'chat':
-        resp = make_response(redirect(
-            url_for('chatroom', room_id=active_room_id, mturk_info=mturk_info_id, _scheme='https',
-                    _external=True)))
-    elif type == 'delibot':
-        resp = make_response(redirect(
-            url_for('delibot', room_id=active_room_id, mturk_info=mturk_info_id, _scheme='https',
-                    _external=True)))
-    else:
-        resp = make_response(redirect(
-            url_for('delibot2', room_id=active_room_id, mturk_info=mturk_info_id, _scheme='https',
-                    _external=True)))
+    resp = make_response(redirect(url_for('chess_recruiting', mturk_info=mturk_info_id, _scheme='https',
+                     _external=True)))
     return resp
 
 
