@@ -566,6 +566,11 @@ def chess_room():
                                       "start_time": campaign['start_time']})
 
 @app.route('/chess_recruiting')
+@talisman(
+
+    frame_options='ALLOW-FROM',
+    frame_options_allow_from='https://mturk.com',
+)
 def chess_recruiting():
 
     sl = random.randint(0, 2) + random.random()
