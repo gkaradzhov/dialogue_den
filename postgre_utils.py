@@ -185,10 +185,18 @@ class PostgreConnection:
 
         if len(rooms) == 0:
             room_name = "{}_{}".format(time.time(), campaign_id)
+            ch = random.choice(['data/games/chess/newpilot.json'])
+            with open(ch, 'r') as rf:
+                games = json.load(rf)
+                random.shuffle(games)
+                for g in games:
+                    random.shuffle(g['moves'])
+
             r = Room(room_name, campaign=campaign_id)
-            type = random.choice(
-                ['delibot', 'delibot2'])
-            self.create_room(r, type)
+            # type = random.choice(
+            #     ['delibot', 'delibot2'])
+            type = "NA"
+            self.create_room(r, game_object=games)
             return r.room_id, type
         else:
             type = self.__execute(

@@ -193,19 +193,20 @@ def route_to_room():
         return render_template("preview.html")
 
     if wait_room == 'True':
-        # return render_template('waiting_room.html', data={'ssttmm': start_time,
-        #                                                   'assignment_id': assignment,
-        #                                                   'hit_id': hit,
-        #                                                   'worker_id': worker,
-        #                                                   'turk_submit': return_url,
-        #                                                   'campaign_id': campaign_id})
-        return render_template('onboarding.html', data={'assignment_id': assignment,
-                                                        'hit_id': hit,
-                                                        'worker_id': worker,
-                                                        'turk_submit': return_url,
-                                                        'campaign_id': campaign_id})
+        return render_template('waiting_room.html', data={'ssttmm': start_time,
+                                                          'assignment_id': assignment,
+                                                          'hit_id': hit,
+                                                          'worker_id': worker,
+                                                          'turk_submit': return_url,
+                                                          'campaign_id': campaign_id})
+        # return render_template('onboarding.html', data={
+        #                                                 'assignment_id': assignment,
+        #                                                 'hit_id': hit,
+        #                                                 'worker_id': worker,
+        #                                                 'turk_submit': return_url,
+        #                                                 'campaign_id': campaign_id})
 
-    # active_room_id, type = PG.get_create_campaign_room(campaign_id)
+    active_room_id, type = PG.get_create_campaign_room(campaign_id)
     #
     # print(type)
     # if type == 'chat':
@@ -221,7 +222,7 @@ def route_to_room():
     #         url_for('delibot2', room_id=active_room_id, mturk_info=mturk_info_id, _scheme='https',
     #                 _external=True)))
 
-    resp = make_response(redirect(url_for('chess_recruiting', mturk_info=mturk_info_id, _scheme='https',
+    resp = make_response(redirect(url_for('chess_room', room_id=active_room_id, mturk_info=mturk_info_id, _scheme='https',
                      _external=True)))
     return resp
 
@@ -505,10 +506,10 @@ def chess_room():
     room_id = request.args.get('room_id')
     mturk_info_id = request.args.get('mturk_info', None)
 
-    has_user = PG.check_for_user(mturk_info_id=mturk_info_id)
-    print("Has user chat room", str(has_user))
-    if has_user:
-        return render_template('unsuccessful_onboarding.html')
+    # has_user = PG.check_for_user(mturk_info_id=mturk_info_id)
+    # print("Has user chat room", str(has_user))
+    # if has_user:
+    #     return render_template('unsuccessful_onboarding.html')
 
     is_moderator = request.args.get('moderator', False)
 
