@@ -499,6 +499,10 @@ def delibot2():
 
 
 @app.route('/chess_room')
+@talisman(
+    frame_options='ALLOW-FROM',
+    frame_options_allow_from='https://mturk.com',
+)
 def chess_room():
 
     sl = random.randint(0, 2) + random.random()
