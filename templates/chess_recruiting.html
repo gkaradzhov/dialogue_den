@@ -51,9 +51,9 @@
     You can press the "Show" button next to each move to visualise it.</b>
 
     {% for game in room_data.game%}
-    <div id="chess_game_container{{loop.index}}" class="hidden">
+    <div id="chess_game_container{{loop.index}}" class="hidden row">
         <div>Problem set № {{loop.index}}</div>
-    <div class="">
+    <div class="row">
         <div id="board{{loop.index}}" data-fin="{{game['fin']}}" style="width: 400px"></div>
     </div>
     <table class="table table-sm">
