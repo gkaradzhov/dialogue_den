@@ -212,7 +212,9 @@ async function show_board(start, move){
             });
 
             if (mturk_url != ''){
-                $('#mturk').submit();
+<!--                $('#mturk').submit();-->
+                window.location.replace(mturk_url);
+
             }
 
             $(this).dialog("close");
