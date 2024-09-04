@@ -228,7 +228,7 @@ def route_to_room():
     #                  _external=True)))
     #
 
-    resp = make_response(redirect(url_for('chess_room', mturk_info=mturk_info_id, _scheme='https',
+    resp = make_response(redirect(url_for('chess_room', room_id=active_room_id, mturk_info=mturk_info_id, _scheme='https',
                      _external=True)))
     return resp
 
