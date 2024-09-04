@@ -184,8 +184,10 @@ def route_to_room():
     worker = request.args.get('workerId', None)
     return_url = request.args.get('turkSubmitTo', None)
 
+    #Recruitment: 0d957f51-702c-4882-8475-921d4e4f041d
+    # Chess run: "2762a169-1378-4df7-9fce-004c8fa3a09f"
     if assignment != '0' and assignment != 0:
-        mturk_info_id = PG.add_initial_mturk_info(assignment, hit, worker, "0d957f51-702c-4882-8475-921d4e4f041d", return_url)
+        mturk_info_id = PG.add_initial_mturk_info(assignment, hit, worker, "2762a169-1378-4df7-9fce-004c8fa3a09f", return_url)
     else:
         mturk_info_id = 0
     ###
@@ -206,7 +208,7 @@ def route_to_room():
         #                                                 'turk_submit': return_url,
         #                                                 'campaign_id': campaign_id})
 
-    # active_room_id, type = PG.get_create_campaign_room(campaign_id)
+    active_room_id, type = PG.get_create_campaign_room(campaign_id)
     #
     # print(type)
     # if type == 'chat':
@@ -222,7 +224,11 @@ def route_to_room():
     #         url_for('delibot2', room_id=active_room_id, mturk_info=mturk_info_id, _scheme='https',
     #                 _external=True)))
 
-    resp = make_response(redirect(url_for('chess_recruiting', mturk_info=mturk_info_id, _scheme='https',
+    # resp = make_response(redirect(url_for('chess_recruiting', mturk_info=mturk_info_id, _scheme='https',
+    #                  _external=True)))
+    #
+
+    resp = make_response(redirect(url_for('chess_room', mturk_info=mturk_info_id, _scheme='https',
                      _external=True)))
     return resp
 
@@ -544,14 +550,21 @@ def chess_room():
                 origin_id=current_user['user_id'], user_status=status, user_type=user_type)
     create_broadcast_message(m)
 
+
     formated_return_url = None
     if mturk_info_id:
         PG.update_mturk_user_id(mturk_info_id, current_user['user_id'])
         mturk_info = PG.get_mturk_info(mturk_info_id)
         if mturk_info:
-            formated_return_url = '{}/mturk/externalSubmit?assignmentId={}&user_id={}'.format(mturk_info[1],
-                                                                                              mturk_info[0],
-                                                                                              current_user['user_id'])
+            formated_return_url = "https://app.prolific.com/submissions/complete?cc=CLJPD5I9"
+
+    # if mturk_info_id:
+    #     PG.update_mturk_user_id(mturk_info_id, current_user['user_id'])
+    #     mturk_info = PG.get_mturk_info(mturk_info_id)
+    #     if mturk_info:
+    #         formated_return_url = '{}/mturk/externalSubmit?assignmentId={}&user_id={}'.format(mturk_info[1],
+    #                                                                                           mturk_info[0],
+    #                                                                                           current_user['user_id'])
     handle_routing(running_dialogue, logged_users, campaign['start_threshold'], campaign['start_time'],
                    campaign['close_threshold'], room.room_id)
 
