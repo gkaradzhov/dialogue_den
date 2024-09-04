@@ -556,7 +556,7 @@ def chess_room():
         PG.update_mturk_user_id(mturk_info_id, current_user['user_id'])
         mturk_info = PG.get_mturk_info(mturk_info_id)
         if mturk_info:
-            formated_return_url = "https://app.prolific.com/submissions/complete?cc=CLJPD5I9"
+            formated_return_url = "https://app.prolific.com/submissions/complete?cc=CIRNCU11"
 
     # if mturk_info_id:
     #     PG.update_mturk_user_id(mturk_info_id, current_user['user_id'])
