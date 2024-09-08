@@ -595,10 +595,10 @@ def chess_recruiting():
     sleep(sl)
     mturk_info_id = request.args.get('mturk_info', None)
 
-    has_user = PG.check_for_user(mturk_info_id=mturk_info_id)
-    print("Has user chat room", str(has_user))
-    if has_user:
-        return render_template('unsuccessful_onboarding.html')
+    # has_user = PG.check_for_user(mturk_info_id=mturk_info_id)
+    # print("Has user chat room", str(has_user))
+    # if has_user:
+    #     return render_template('unsuccessful_onboarding.html')
 
 
     r = Room('recruit'+ uuid.uuid4().hex, campaign='884c71e1-d32b-4403-b46a-be450ec8e693')
