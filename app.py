@@ -632,7 +632,8 @@ def chess_recruiting():
         PG.update_mturk_user_id(mturk_info_id, current_user['user_id'])
         mturk_info = PG.get_mturk_info(mturk_info_id)
         if mturk_info:
-            formated_return_url = "https://app.prolific.com/submissions/complete?cc=C1LNJRXT"
+            formated_return_url = mturk_info[1]
+            # formated_return_url = "https://app.prolific.com/submissions/complete?cc=C1LNJRXT"
             # formated_return_url = '{}/mturk/externalSubmit?assignmentId={}&user_id={}'.format(mturk_info[1],
             #                                                                                   mturk_info[0],
             #                                                                                   current_user['user_id'])
