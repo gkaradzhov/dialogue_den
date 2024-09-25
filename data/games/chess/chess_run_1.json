@@ -32,7 +32,7 @@
         "eval": -4.7,
         "fin": "6r1/pkpq3p/6p1/2P1N3/3PnP2/1P5R/7K/3Q4 b - - 1 1",
         "id": "chess_runa_1_5",
-        "text": "Knight c4 -> e5s"
+        "text": "Knight c4 -> e5"
       }
     ],
     "notes": "opga_8_bl201wc5-c6",
@@ -60,7 +60,7 @@
         "eval": 0.2,
         "fin": "r3kb1r/pp4p1/2p1p1p1/4p3/8/2PqPQ1P/PP1N2P1/1R2KR2 b - - 1 1",
         "id": "chess_runa_2.3",
-        "text": "Bishop f4 -> e5"
+        "text": "Rook h1 -> f1"
       },
       {
         "eval": 0.0,
@@ -100,7 +100,7 @@
         "eval": 0.0,
         "fin": "8/p7/Pp1kB3/1Ppn1K2/2P5/8/8/8 b - - 1 1",
         "id": "chess_runa_3.3",
-        "text": "King g5 -> e5"
+        "text": "King g5 -> f5"
       },
       {
         "eval": -5.1,
