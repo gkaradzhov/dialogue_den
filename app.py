@@ -208,7 +208,7 @@ def route_to_room():
         #                                                 'turk_submit': return_url,
         #                                                 'campaign_id': campaign_id})
 
-    active_room_id, type = PG.get_create_campaign_room(campaign_id)
+    # active_room_id, type = PG.get_create_campaign_room(campaign_id)
     #
     # print(type)
     # if type == 'chat':
@@ -224,12 +224,12 @@ def route_to_room():
     #         url_for('delibot2', room_id=active_room_id, mturk_info=mturk_info_id, _scheme='https',
     #                 _external=True)))
 
-    # resp = make_response(redirect(url_for('chess_recruiting', mturk_info=mturk_info_id, _scheme='https',
-    #                  _external=True)))
-
-
-    resp = make_response(redirect(url_for('chess_room', room_id=active_room_id, mturk_info=mturk_info_id, _scheme='https',
+    resp = make_response(redirect(url_for('chess_recruiting', mturk_info=mturk_info_id, _scheme='https',
                      _external=True)))
+
+    #
+    # resp = make_response(redirect(url_for('chess_room', room_id=active_room_id, mturk_info=mturk_info_id, _scheme='https',
+    #                  _external=True)))
     return resp
 
 
