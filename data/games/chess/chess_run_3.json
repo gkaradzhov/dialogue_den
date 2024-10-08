@@ -1,0 +1,123 @@
+[
+  {
+    "eval": 7.13,
+    "fin": "6r1/pkpq3p/6p1/2P5/2NPnP2/1P6/6RK/3Q4 w - - 0 1",
+    "id": "chess_runc_1",
+    "moves": [
+      {
+        "eval": 7.13,
+        "fin": "6r1/pkpq3p/2P3p1/8/2NPnP2/1P6/6RK/3Q4 b - - 0 1",
+        "id": "chess_runc_1_1",
+        "text": "Pawn c5 -> c6 (Check)"
+      },
+      {
+        "eval": 0.13,
+        "fin": "6r1/pkpq3p/6p1/2P5/2NPnP2/1P3Q2/6RK/8 b - - 1 1",
+        "id": "chess_runc_1_2",
+        "text": "Queen d1 -> f3"
+      },
+      {
+        "eval": 0,
+        "fin": "6r1/pkpq3p/6p1/N1P5/3PnP2/1P6/6RK/3Q4 b - - 1 1",
+        "id": "chess_runc_1_3",
+        "text": "Knight c4 -> a5 (Check)"
+      },
+
+      {
+        "eval": -0.35,
+        "fin": "6r1/pkpq3p/6p1/2P5/2NPnP2/1P6/6RK/7Q b - - 1 1",
+        "id": "chess_runc_1_4",
+        "text": "Queen d1 -> h1"
+      },
+      {
+        "eval": -0.96,
+        "fin": "6r1/pkpq3p/6p1/2P5/2NPnP2/1P6/6RK/1Q6 b - - 1 1",
+        "id": "chess_runc_1_5",
+        "text": "Queen d1 -> b1"
+      }
+    ],
+    "notes": "opga_8_bl201wc5-c6",
+    "turn": "w",
+    "type": "tactical"
+  },
+  {
+    "eval": 0.48,
+    "fin": "r2qrnk1/pp2bppp/2p1bn2/3p2B1/3P4/2NBPN2/PPQ2PPP/1R3RK1 w - - 0 1",
+    "id": "chess_runc_2",
+    "moves": [
+      {
+        "eval": 0.48,
+        "fin": "r2qrnk1/pp2bppp/2p1bn2/3p2B1/1P1P4/2NBPN2/P1Q2PPP/1R3RK1 b - b3 0 1",
+        "id": "chess_runc_2.1",
+        "text": "Pawn b2 -> b4"
+      },
+      {
+        "eval": 0.3,
+        "fin": "r2qrnk1/pp2bppp/2p1bn2/3pN1B1/3P4/2NBP3/PPQ2PPP/1R3RK1 b - - 1 1",
+        "id": "chess_runc_2.2",
+        "text": "Knight f3 -> e5"
+      },
+      {
+        "eval": 0.0,
+        "fin": "r2qrnk1/pp2bppp/2p1bB2/3p4/3P4/2NBPN2/PPQ2PPP/1R3RK1 b - - 0 1",
+        "id": "chess_runc_2.3",
+        "text": "Bishop g5 -> f6 (takes)"
+      },
+      {
+        "eval": -1.57,
+        "fin": "r2qrnk1/pp2bppp/2p1bn2/3p2B1/3PP3/2NB1N2/PPQ2PPP/1R3RK1 b - - 0 1",
+        "id": "chess_runc_2.4",
+        "text": "Pawn e3 -> e4"
+      },
+      {
+        "eval": -4.24,
+        "fin": "r2qrnk1/pp2bppB/2p1bn2/3p2B1/3P4/2N1PN2/PPQ2PPP/1R3RK1 b - - 0 1",
+        "id": "chess_runc_2.5",
+        "text": "Bishop d3 -> h7 (takes, check)"
+      }
+    ],
+    "notes": "opga-24_E27wb2-b4",
+    "turn": "w",
+    "type": "positional"
+  },
+  {
+    "eval": 4.27,
+    "fin": "8/8/3k4/8/8/5pp1/8/3KR3 w - - 0 1",
+    "id": "chess_runc_3",
+    "moves": [
+      {
+        "eval": 4.27,
+        "fin": "8/8/3k4/8/8/5pp1/3K4/4R3 b - - 1 1",
+        "id": "chess_runc_3.1",
+        "text": "King d1 -> d22"
+      },
+      {
+        "eval": 0.0,
+        "fin": "8/8/3k4/8/8/5pp1/8/3K1R2 b - - 1 1",
+        "id": "chess_runc_3.2",
+        "text": "Rook e1 -> f1"
+      },
+      {
+        "eval": -2.45,
+        "fin": "8/8/3k4/8/8/4Rpp1/8/3K4 b - - 1 1",
+        "id": "chess_runc_3.3",
+        "text": "Rook e1 -> e3"
+      },
+      {
+        "eval": -2.69,
+        "fin": "8/8/3k4/8/8/5pp1/8/3K2R1 b - - 1 1",
+        "id": "chess_runc_3.4",
+        "text": "Rook e1 -> g1"
+      },
+      {
+        "eval": -9.3,
+        "fin": "8/8/3k4/8/8/5pp1/2K5/4R3 b - - 1 1",
+        "id": "chess_runc_3.5",
+        "text": "King d1 -> c2"
+      }
+    ],
+    "notes": "opgb_40_po287wd1-d2",
+    "turn": "w",
+    "type": "endgame"
+  }
+]
