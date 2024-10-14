@@ -1,0 +1,123 @@
+[
+  {
+    "eval": 4.24,
+    "fin": "rr4k1/1q3ppp/1bQRp3/6P1/4P3/P4N2/1P6/K3R3 w - - 0 1",
+    "id": "chess_rund_1",
+    "moves": [
+      {
+        "eval": 4.24,
+        "fin": "rr1R2k1/1q3ppp/1bQ1p3/6P1/4P3/P4N2/1P6/K3R3 b - - 1 1",
+        "id": "chess_rund_1_1",
+        "text": "Rook d6 -> d8 (Takes, Check)"
+      },
+      {
+        "eval": 0.33,
+        "fin": "rr4k1/1Q3ppp/1b1Rp3/6P1/4P3/P4N2/1P6/K3R3 b - - 0 1",
+        "id": "chess_rund_1_2",
+        "text": "Queen c6 -> b7 (takes)"
+      },
+      {
+        "eval": 0,
+        "fin": "rr4k1/1q3ppp/1bQRp3/6P1/4P3/P4N2/1P6/1K2R3 b - - 1 1",
+        "id": "chess_rund_1_3",
+        "text": "King a1 -> b1 (Check)"
+      },
+
+      {
+        "eval": -2.21,
+        "fin": "rr4k1/1q3ppp/1bQRp3/4N1P1/4P3/P7/1P6/K3R3 b - - 1 1",
+        "id": "chess_rund_1_4",
+        "text": "Knight f3 -> e5"
+      },
+      {
+        "eval": -3.61,
+        "fin": "rr4k1/1q3ppp/1bQRp3/6P1/4P3/P4N2/1P6/K1R5 b - - 1 1",
+        "id": "chess_runc_1_5",
+        "text": "Rook e1 -> c1"
+      }
+    ],
+    "notes": "opga_12_bl524wd6-d8",
+    "turn": "w",
+    "type": "tactical"
+  },
+  {
+    "eval": -0.55,
+    "fin": "r4r2/pppqbpk1/2n1b2p/4p1p1/3pP3/3P2PP/PPPN1PBK/R2Q1RN1 w - - 0 1",
+    "id": "chess_rund_2",
+    "moves": [
+      {
+        "eval": -0.55,
+        "fin": "r4r2/pppqbpk1/2n1b2p/4p1p1/3pP3/3P1BPP/PPPN1P1K/R2Q1RN1 b - - 1 1",
+        "id": "chess_rund_2.1",
+        "text": "Bishop g2 -> f3"
+      },
+      {
+        "eval": -0.84,
+        "fin": "r4r2/pppqbpk1/2n1b2p/4p1p1/3pPP2/3P2PP/PPPN2BK/R2Q1RN1 b - f3 0 1",
+        "id": "chess_rund_2.2",
+        "text": "Pawn f2 -> f4"
+      },
+      {
+        "eval": -0.93,
+        "fin": "r4r2/pppqbpk1/2n1b2p/4p1p1/3pP3/3P2PP/PPPNNPBK/R2Q1R2 b - - 1 1",
+        "id": "chess_rund_2.3",
+        "text": "Knight g1 -> e2"
+      },
+      {
+        "eval": -1.36,
+        "fin": "r4r2/pppqbpk1/2n1b2p/4p1pQ/3pP3/3P2PP/PPPN1PBK/R4RN1 b - - 1 1",
+        "id": "chess_rund_2.4",
+        "text": "Queen d1 -> h5"
+      },
+      {
+        "eval": -2.68,
+        "fin": "r4r2/pppqbpk1/2n1b2p/4p1p1/3pP3/2PP2PP/PP1N1PBK/R2Q1RN1 b - - 0 1",
+        "id": "chess_rund_2.5",
+        "text": "Pawn c2 -> c3"
+      }
+    ],
+    "notes": "opga-29_S25wg2-f3",
+    "turn": "w",
+    "type": "positional"
+  },
+  {
+    "eval": 6.31,
+    "fin": "3kN2b/2p4P/2p2p2/2P2P1K/8/8/8/8 w - - 0 1",
+    "id": "chess_rund_3",
+    "moves": [
+      {
+        "eval": 6.31,
+        "fin": "3k3b/2p3NP/2p2p2/2P2P1K/8/8/8/8 b - - 1 1",
+        "id": "chess_rund_3.1",
+        "text": "Knight e8 -> g7"
+      },
+      {
+        "eval": 0.0,
+        "fin": "3k3b/2N4P/2p2p2/2P2P1K/8/8/8/8 b - - 0 1",
+        "id": "chess_rund_3.2",
+        "text": "Knight e8 -> c7 (takes)"
+      },
+      {
+        "eval": -4.65,
+        "fin": "3k3b/2p4P/2p2N2/2P2P1K/8/8/8/8 b - - 0 1",
+        "id": "chess_rund_3.3",
+        "text": "Knight e8 -> f6 (takes)"
+      },
+      {
+        "eval": -6.18,
+        "fin": "3kN2b/2p4P/2p2pK1/2P2P2/8/8/8/8 b - - 1 1",
+        "id": "chess_rund_3.4",
+        "text": "King h5 -> g6"
+      },
+      {
+        "eval": -6.26,
+        "fin": "3kN2b/2p4P/2p2p2/2P2P2/6K1/8/8/8 b - - 1 1",
+        "id": "chess_rund_3.5",
+        "text": "King h5 -> g4"
+      }
+    ],
+    "notes": "opgb_39_po252we8-g7",
+    "turn": "w",
+    "type": "endgame"
+  }
+]
