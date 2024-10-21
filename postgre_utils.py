@@ -185,7 +185,7 @@ class PostgreConnection:
 
         if len(rooms) == 0:
             room_name = "{}_{}".format(time.time(), campaign_id)
-            ch = random.choice(['data/games/chess/chess_run_4.json'])
+            ch = random.choice(['data/games/chess/chess_run_1.json'])
             with open(ch, 'r') as rf:
                 games = json.load(rf)
                 random.shuffle(games)
