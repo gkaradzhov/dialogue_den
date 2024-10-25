@@ -1,0 +1,122 @@
+[
+  {
+    "eval": 4.57,
+    "fin": "1r6/pp2kp2/3q1p1Q/3Pp3/6b1/1B6/P1P3PP/1K3R2 w - - 0 1",
+    "id": "chess_rune_1",
+    "moves": [
+      {
+        "eval": 4.57,
+        "fin": "1r6/pp2kp2/3q1p2/3Pp3/6bQ/1B6/P1P3PP/1K3R2 b - - 1 1",
+        "id": "chess_rune_1_1",
+        "text": "Queen h6 -> h4"
+      },
+      {
+        "eval": 0.6,
+        "fin": "1r6/pp2kp2/3q1p1Q/3Pp3/6b1/1B5P/P1P3P1/1K3R2 b - - 0 1",
+        "id": "chess_rune_1_2",
+        "text": "Pawn h2 -> h3"
+      },
+      {
+        "eval": 0,
+        "fin": "1r6/pp2kpQ1/3q1p2/3Pp3/6b1/1B6/P1P3PP/1K3R2 b - - 1 1",
+        "id": "chess_rune_1_3",
+        "text": "Queen h6 -> g7"
+      },
+      {
+        "eval": -3.14,
+        "fin": "1r6/pp2kp2/3q1R1Q/3Pp3/6b1/1B6/P1P3PP/1K6 b - - 0 1",
+        "id": "chess_rune_1_4",
+        "text": "Rook f1 -> f6 (takes)"
+      },
+      {
+        "eval": -5.17,
+        "fin": "1r6/pp2kp2/3q1Q2/3Pp3/6b1/1B6/P1P3PP/1K3R2 b - - 0 1",
+        "id": "chess_rune_1_5",
+        "text": "Queen h6 -> f6 (takes, check)"
+      }
+    ],
+    "notes": "opga_15_bl237wh6-h4",
+    "turn": "w",
+    "type": "tactical"
+  },
+  {
+    "eval": 4.6,
+    "fin": "r2qk2r/p4ppp/5n2/3p4/8/1P2B2Q/P4PPP/R4RK1 w - - 0 1",
+    "id": "chess_rune_2",
+    "moves": [
+      {
+        "eval": 4.6,
+        "fin": "r2qk2r/p4ppp/5n2/2Bp4/8/1P5Q/P4PPP/R4RK1 b - - 1 1",
+        "id": "chess_rune_2.1",
+        "text": "Bishop e3 -> c5"
+      },
+      {
+        "eval": 3.36,
+        "fin": "r2qk2r/p4ppp/5n2/3p4/8/1P2B2Q/P4PPP/2R2RK1 b - - 1 1",
+        "id": "chess_rune_2.2",
+        "text": "Rook a1 -> c1"
+      },
+      {
+        "eval": 2.63,
+        "fin": "r2qk2r/p4ppp/5n2/3p4/3B4/1P5Q/P4PPP/R4RK1 b - - 1 1",
+        "id": "chess_rune_2.3",
+        "text": "Bishop e3 -> d4"
+      },
+      {
+        "eval": 2.04,
+        "fin": "r2qk2r/p4ppp/5n2/3p4/8/1P2B1PQ/P4P1P/R4RK1 b - - 0 1",
+        "id": "chess_rune_2.4",
+        "text": "Pawn g2 -> g3"
+      },
+      {
+        "eval": 1.76,
+        "fin": "r2qk2r/p4ppp/5n2/3p4/6P1/1P2B2Q/P4P1P/R4RK1 b - g3 0 1",
+        "id": "chess_rune_2.5",
+        "text": "Pawn g2 -> g4"
+      }
+    ],
+    "notes": "https://www.chess.com/forum/view/more-puzzles/positional-puzzles",
+    "turn": "w",
+    "type": "positional"
+  },
+  {
+    "eval": 0.12,
+    "fin": "8/k7/P2b2P1/KP1Pn2P/4R3/8/6np/8 w - - 0 1",
+    "id": "chess_rune_3",
+    "moves": [
+      {
+        "eval": 0.12,
+        "fin": "8/k7/PP1b2P1/K2Pn2P/4R3/8/6np/8 b - - 0 1",
+        "id": "chess_rune_3.1",
+        "text": "Pawn b5 -> b6 (check)"
+      },
+      {
+        "eval": -6,
+        "fin": "8/k5P1/P2b4/KP1Pn2P/4R3/8/6np/8 b - - 0 1",
+        "id": "chess_rune_3.2",
+        "text": "Pawn g6 -> g7"
+      },
+      {
+        "eval": -6.55,
+        "fin": "8/k7/P2b2P1/KP1PR2P/8/8/6np/8 b - - 0 1",
+        "id": "chess_rune_3.3",
+        "text": "Rook e4 -> e5 (takes)"
+      },
+      {
+        "eval": -20,
+        "fin": "8/k7/P2b2PP/KP1Pn3/4R3/8/6np/8 b - - 0 1",
+        "id": "chess_rune_3.4",
+        "text": "Pawn h5 -> h6"
+      },
+      {
+        "eval": -25,
+        "fin": "8/k7/P2b2P1/KP1Pn2P/3R4/8/6np/8 b - - 1 1",
+        "id": "chess_rune_3.5",
+        "text": "Rook e4 -> d4"
+      }
+    ],
+    "notes": "https://www.chess.com/clubs/forum/view/endgame-puzzles5",
+    "turn": "w",
+    "type": "endgame"
+  }
+]
