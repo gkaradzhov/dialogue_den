@@ -814,7 +814,7 @@ def handle_room_events(room_messages, room_id, last_message):
         elif item.message_type == ROUTING_TIMER_ELAPSED:
             timer_ended = True
             timer_ended_timestamp = item.timestamp
-        elif item.message_type == WASON_AGREE or item.message_type == "GAME_SUBMIT":
+        elif item.message_type == WASON_AGREE or item.message_type == "SUBMITTED_ALL":
             submitted_users[item.origin_id] = True
             if item.origin_id in logged_users:
                 logged_users[item.origin_id] = item.timestamp
@@ -827,28 +827,27 @@ def handle_room_events(room_messages, room_id, last_message):
     now = datetime.datetime.now(timezone.utc)
     if routing_timer_timestamp:
         routing_threshold = now - routing_timer_timestamp
-        routing_threshold = routing_threshold.total_seconds() >= 120
+        routing_threshold = routing_threshold.total_seconds() >= 180
     else:
         routing_threshold = None
 
     for user, last_active in logged_users.items():
         if user in submitted_users:
             difference = now - last_active
-            user_activity[user] = difference.total_seconds() <= 545
+            user_activity[user] = difference.total_seconds() <= 2660 # Big threshold, we are not kicking users who has submitted
         else:
             difference = now - last_active
-            user_activity[user] = difference.total_seconds() <= 240
+            user_activity[user] = difference.total_seconds() <= 180
 
     if routing_threshold is not None and routing_threshold is True:
         for user, activity in user_activity.items():
             if not activity:
-                # m = Message(origin_name='AUTO_KICKED', message_type=LEAVE_ROOM, room_id=room_id, origin_id=user,
-                #             user_status='AUTO_KICKED')
-                # create_broadcast_message(m)
+                m = Message(origin_name='AUTO_KICKED', message_type=LEAVE_ROOM, room_id=room_id, origin_id=user,
+                            user_status='AUTO_KICKED')
+                create_broadcast_message(m)
                 # TODO: Re-enable user kicking
-                pass
-                # all_messages = PG.get_messages(room_id)
-                # validate_finish_game(all_messages, room_id)
+                all_messages = PG.get_messages(room_id)
+                validate_finish_game(all_messages, room_id)
 
     if routing_timer_timestamp and not timer_ended:
         time_since_start = now - routing_timer_timestamp
