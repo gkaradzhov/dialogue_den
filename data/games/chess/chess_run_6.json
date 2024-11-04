@@ -1,0 +1,122 @@
+[
+  {
+    "eval": 3.41,
+    "fin": "r1bq1rk1/ppp2pp1/2np1n1p/3Np1NQ/7P/1B1P4/PPP2PP1/2KR3R w - - 0 1",
+    "id": "chess_runf_1",
+    "moves": [
+      {
+        "eval": 3.41,
+        "fin": "r1bq1rk1/ppp2pp1/2np1nQp/3Np1N1/7P/1B1P4/PPP2PP1/2KR3R b - - 1 1",
+        "id": "chess_runf_1_1",
+        "text": "Queen h5 -> g6"
+      },
+      {
+        "eval": -2.07,
+        "fin": "r1bq1rk1/ppp2pp1/2np1N1p/4p1NQ/7P/1B1P4/PPP2PP1/2KR3R b - - 0 1",
+        "id": "chess_runf_1_2",
+        "text": "Knight d5 -> f6 (takes, check)"
+      },
+      {
+        "eval": -3.11,
+        "fin": "r1bq1rk1/ppp2Np1/2np1n1p/3Np2Q/7P/1B1P4/PPP2PP1/2KR3R b - - 0 1",
+        "id": "chess_runf_1_3",
+        "text": "Knight g5 -> f7 (takes)"
+      },
+      {
+        "eval": -4.36,
+        "fin": "r1bq1rk1/ppp2Qp1/2np1n1p/3Np1N1/7P/1B1P4/PPP2PP1/2KR3R b - - 0 1",
+        "id": "chess_runf_1_4",
+        "text": "Queen h5 -> f7 (takes, check)"
+      },
+      {
+        "eval": -6.13,
+        "fin": "r1bq1rk1/ppp2pp1/2np1n1p/3Np2Q/4N2P/1B1P4/PPP2PP1/2KR3R b - - 1 1",
+        "id": "chess_runf_1_5",
+        "text": "Knight g5 -> e4"
+      }
+    ],
+    "notes": "opga_16_bl407wh5-g6",
+    "turn": "w",
+    "type": "tactical"
+  },
+  {
+    "eval": 5.14,
+    "fin": "r1bqk2r/1p1p2p1/p3p2p/4P3/3Q1P2/5N2/PP4PP/3R1R1K w - - 0 1",
+    "id": "chess_runf_2",
+    "moves": [
+      {
+        "eval": 5.14,
+        "fin": "r1bqk2r/1p1p2p1/p3p2p/4P3/3Q1P2/8/PP1N2PP/3R1R1K b - - 1 1",
+        "id": "chess_runf_2.1",
+        "text": "Knight f3 -> d2"
+      },
+      {
+        "eval": 4.68,
+        "fin": "r1bqk2r/1p1p2p1/p3p2p/4P3/3Q1P2/5N1P/PP4P1/3R1R1K b - - 0 1",
+        "id": "chess_runf_2.2",
+        "text": "Pawn h2 -> h3"
+      },
+      {
+        "eval": 4.2,
+        "fin": "r1bqk2r/1p1p2p1/p3p2p/4P3/3Q1P2/5N2/PP4PP/3R1RK1 b - - 1 1",
+        "id": "chess_runf_2.3",
+        "text": "King h1 -> g1"
+      },
+      {
+        "eval": 3.22,
+        "fin": "r1bqk2r/1p1p2p1/p3p2p/4P3/3Q1P2/5NP1/PP5P/3R1R1K b - - 0 1",
+        "id": "chess_runf_2.4",
+        "text": "Pawn g2 -> g3"
+      },
+      {
+        "eval": -1.86,
+        "fin": "r1bqk2r/1p1p2p1/p3p2p/4P3/3Q1P1N/8/PP4PP/3R1R1K b - - 1 1",
+        "id": "chess_runf_2.5",
+        "text": "Knight f3 -> h4"
+      }
+    ],
+    "notes": "https://www.chess.com/forum/view/more-puzzles/positional-puzzles",
+    "turn": "w",
+    "type": "positional"
+  },
+  {
+    "eval": 8.37,
+    "fin": "r2qk3/8/8/8/8/8/8/3QK2R w Kq - 0 1",
+    "id": "chess_runf_3",
+    "moves": [
+      {
+        "eval": 8.37,
+        "fin": "r2qk3/8/8/7Q/8/8/8/4K2R b Kq - 1 1",
+        "id": "chess_runf_3.1",
+        "text": "Queen d1 -> h5 (check)"
+      },
+      {
+        "eval": 4.53,
+        "fin": "r2qk2R/8/8/8/8/8/8/3QK3 b q - 1 1",
+        "id": "chess_runf_3.2",
+        "text": "Rook h1 -> h8 (check)"
+      },
+      {
+        "eval": 4.35,
+        "fin": "r2qk3/8/8/8/8/8/4Q3/4K2R b Kq - 1 1",
+        "id": "chess_runf_3.3",
+        "text": "Queen d1 -> e2 (check)"
+      },
+      {
+        "eval": -0.03,
+        "fin": "r2Qk3/8/8/8/8/8/8/4K2R b Kq - 0 1",
+        "id": "chess_runf_3.4",
+        "text": "Queen d1 -> d8 (takes, check)"
+      },
+      {
+        "eval": -5.45,
+        "fin": "r2qk3/8/8/8/8/8/4K3/3Q3R b q - 1 1",
+        "id": "chess_runf_3.5",
+        "text": "King e1 -> e2"
+      }
+    ],
+    "notes": "https://www.chess.com/forum/view/more-puzzles/endgame-puzzles4",
+    "turn": "w",
+    "type": "endgame"
+  }
+]
