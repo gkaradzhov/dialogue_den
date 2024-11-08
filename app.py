@@ -36,7 +36,7 @@ from wason_message_processing import get_context_solutions_users
 login_manager = flask_login.LoginManager()
 
 app = Flask(__name__, static_url_path='/static')
-app.config['SECRET_KEY'] = 'this_secret_key_potato_21_kaxvhsdferfx3d34'
+app.config['SECRET_KEY'] = os.environ.get('SECRETKEY')
 from delitrigger import ChangeOfMindPredictor, Selector
 s = Selector('aa')
 app.config.update(dict(

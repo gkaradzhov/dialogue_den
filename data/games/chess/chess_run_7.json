@@ -41,39 +41,40 @@
     "type": "tactical"
   },
   {
-    "eval": 5.14,
-    "fin": "r1bqk2r/1p1p2p1/p3p2p/4P3/3Q1P2/5N2/PP4PP/3R1R1K w - - 0 1",
+    "eval": 2.22,
+    "fin": "r2q1rk1/2pbp1pp/p2p1n2/1p1P4/4PN1Q/PP4P1/2P3BP/4RRK1 w - - 0 1",
     "id": "chess_rung_2",
     "moves": [
       {
-        "eval": 5.14,
-        "fin": "r1bqk2r/1p1p2p1/p3p2p/4P3/3Q1P2/8/PP1N2PP/3R1R1K b - - 1 1",
+        "eval": 2.22,
+        "fin": "r2q1rk1/2pbp1pp/p2p1n2/1p1P4/4PN1Q/PP4PB/2P4P/4RRK1 b - - 1 1",
         "id": "chess_rung_2.1",
-        "text": "Knight f3 -> d2"
+        "text": "Bishop g2 -> h3"
       },
-      {
-        "eval": 4.68,
-        "fin": "r1bqk2r/1p1p2p1/p3p2p/4P3/3Q1P2/5N1P/PP4P1/3R1R1K b - - 0 1",
+            {
+        "eval": 1.35,
+        "fin": "r2q1rk1/2pbp1pp/p2p1n2/1p1P4/4PN1Q/PP4P1/2P1R1BP/5RK1 b - - 1 1",
         "id": "chess_rung_2.2",
-        "text": "Pawn h2 -> h3"
+        "text": "Rook e1 -> e2"
       },
       {
-        "eval": 4.2,
-        "fin": "r1bqk2r/1p1p2p1/p3p2p/4P3/3Q1P2/5N2/PP4PP/3R1RK1 b - - 1 1",
+        "eval": 1.14,
+        "fin": "r2q1rk1/2pbp1pp/p2p1n2/1p1P4/4PN1Q/PP3BP1/2P4P/4RRK1 b - - 1 1",
         "id": "chess_rung_2.3",
-        "text": "King h1 -> g1"
+        "text": "Bishop g2 -> f3"
       },
+
       {
-        "eval": 3.22,
-        "fin": "r1bqk2r/1p1p2p1/p3p2p/4P3/3Q1P2/5NP1/PP5P/3R1R1K b - - 0 1",
+        "eval": 0.0,
+        "fin": "r2q1rk1/2pbp1pp/p2p1n2/1p1P3N/4P2Q/PP4P1/2P3BP/4RRK1 b - - 1 1",
         "id": "chess_rung_2.4",
-        "text": "Pawn g2 -> g3"
+        "text": "Knight f4 -> h5"
       },
       {
-        "eval": -1.86,
-        "fin": "r1bqk2r/1p1p2p1/p3p2p/4P3/3Q1P1N/8/PP4PP/3R1R1K b - - 1 1",
+        "eval": -0.3,
+        "fin": "r2q1rk1/2pbp1pp/p2pNn2/1p1P4/4P2Q/PP4P1/2P3BP/4RRK1 b - - 1 1",
         "id": "chess_rung_2.5",
-        "text": "Knight f3 -> h4"
+        "text": "Knight f4 -> e6"
       }
     ],
     "notes": "https://www.chess.com/forum/view/more-puzzles/positional-puzzles",
